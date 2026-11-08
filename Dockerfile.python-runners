@@ -1,0 +1,5 @@
+FROM python@sha256:db20d8506e2f15b6db39b40b6015ca46bae855dec6dd326d462cfe79ae972893
+
+RUN pip install --no-cache-dir dagster==1.10.5 prefect==3.2.14 fastapi==0.115.2
+
+WORKDIR /benchmark

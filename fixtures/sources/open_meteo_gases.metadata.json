@@ -1,0 +1,11 @@
+{
+  "source_id": "open_meteo_gases",
+  "description": "Open-Meteo hourly nitrogen dioxide and ozone observations",
+  "request_url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=37.7749&longitude=-122.4194&start_date=2024-01-01&end_date=2024-01-02&timezone=GMT&hourly=nitrogen_dioxide%2Cozone",
+  "retrieved_at_utc": "2026-10-28T12:06:29.860269+00:00",
+  "http_status": 200,
+  "response_sha256": "c04fb22b3f6943f4dc4c9c28cd8aa19fc1387209953cb713fa1c6390b3776242",
+  "saved_json_sha256": "4589481e70a973f88a151481f820b898f8c18a02164fe30aa7737a6173e577ea",
+  "payload_file": "fixtures/sources/open_meteo_gases.json",
+  "payload_bytes": 2774
+}

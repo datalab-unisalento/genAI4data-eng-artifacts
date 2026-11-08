@@ -1,0 +1,106 @@
+{
+  "id": "bench_6d1f4ea0_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/usgs/earthquakes?run_id=6d1f4ea0_1&attempt=1",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $json;\nconst features = data.features || [];\n\nconst bands = { minor: [], moderate: [], major: [] };\n\nfeatures.forEach(f => {\n  const mag = f.properties.mag;\n  const depth = f.geometry.coordinates[2];\n  let band; \n  if (mag < 4.0) band = 'minor';\n  else if (mag < 5.0) band = 'moderate';\n  else band = 'major';\n  bands[band].push({ mag, depth });\n});\n\nconst result = [];\nfor (const [name, events] of Object.entries(bands)) {\n  if (events.length === 0) continue;\n  const magnitudes = events.map(e => e.mag);\n  result.push({\n    magnitude_band: name,\n    event_count: events.length,\n    max_magnitude: Math.max(...magnitudes),\n    max_depth_km: Math.max(...events.map(e => e.depth))\n  });\n}\n\nreturn [{ json: { records: result } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/6d1f4ea0_1?attempt=1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "SHA-256 of every archived fixture and reference output used by the benchmark",
+  "files": {
+    "fixtures/expected/t1_open_meteo_ingestion.json": "fb56d42265f0a9578619375aac68e64fac4554de41abdf40bbee58cd3fdfd2f1",
+    "fixtures/expected/t2_usgs_etl.json": "7f914507b9895172e6e5f1fb15f584295f66a7fc5bcaefdb678b2e58b346c787",
+    "fixtures/expected/t3_open_meteo_join.json": "b0083dcf86fcd134df60d88d1ef490120531c7d26f97f693b1b15fcebeac5344",
+    "fixtures/expected/t4_daily_particulate_summary.json": "c7769339dc423e8d6be0f046339050054f39c32f77ca4073aa8f8498fafeca27",
+    "fixtures/expected/t5_trailing_three_hour_peak.json": "4359f40ce3151215c415c4bdf5328bfb91706d8b34024e15a591dc924cb2a4d7",
+    "fixtures/expected/t6_earthquake_band_summary.json": "c8c3d973703a92334808b44e72ec68e57fde6339ef574eb916a56b2ccab00f3b",
+    "fixtures/sources/open_meteo_gases.json": "4589481e70a973f88a151481f820b898f8c18a02164fe30aa7737a6173e577ea",
+    "fixtures/sources/open_meteo_gases.metadata.json": "22964a66ece2ca19ec23c766791690bfd0f9765c5181c0155d83c6a770a36e35",
+    "fixtures/sources/open_meteo_particulate.json": "27a3136399786ec154a563f00df6dafae0438c383e1be3431102c2b489a17dfb",
+    "fixtures/sources/open_meteo_particulate.metadata.json": "816abf8a339e2729061719230a9283bc9cd3baaf78debf3f50707de608b005a8",
+    "fixtures/sources/usgs_earthquakes.json": "1c8783e09b94775ca7c1eda51bdb6572acbc290167f74c12f0a5214f8222ce81",
+    "fixtures/sources/usgs_earthquakes.metadata.json": "7d776cd6fc79afb460ee704e27a9e1f23382b85db14d04bb2b6179caea529878"
+  }
+}

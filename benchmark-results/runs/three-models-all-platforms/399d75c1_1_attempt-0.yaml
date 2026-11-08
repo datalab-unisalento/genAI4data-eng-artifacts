@@ -1,0 +1,51 @@
+id: bench_399d75c1_1
+namespace: bench
+tasks:
+- id: t2_usgs_etl
+  type: io.kestra.plugin.scripts.python.Script
+  runner: PROCESS
+  script: |
+    import urllib.request
+    import json
+
+    source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=399d75c1_1&attempt=0"
+    sink_url = "http://recorder:8090/sink/399d75c1_1?attempt=0"
+
+    # Fetch the source data
+    with urllib.request.urlopen(source_url) as response:
+        geojson_data = json.loads(response.read().decode('utf-8'))
+
+    records = []
+
+    for feature in geojson_data['features']:
+        properties = feature['properties']
+        geometry = feature['geometry']
+        coordinates = geometry['coordinates']
+
+        record = {
+            "id": feature['id'],
+            "magnitude": properties['mag'],
+            "place": properties['place'],
+            "time_ms": properties['time'],
+            "longitude": coordinates[0],
+            "latitude": coordinates[1],
+            "depth_km": coordinates[2],
+            "magnitude_band": (
+                "minor" if properties['mag'] < 4.0 else
+                "moderate" if 4.0 <= properties['mag'] < 5.0 else
+                "major"
+            )
+        }
+
+        records.append(record)
+
+    # Post to sink
+    request = urllib.request.Request(
+        sink_url,
+        data=json.dumps(records).encode('utf-8'),
+        headers={'Content-Type': 'application/json'},
+        method='POST'
+    )
+
+    with urllib.request.urlopen(request) as response:
+        pass  # Response is not used, but we ensure the POST succeeds

@@ -1,0 +1,64 @@
+id: bench_d848c446_1
+namespace: bench
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=d848c446_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/d848c446_1?attempt=0"
+
+      # Fetch the source data
+      with urllib.request.urlopen(source_url) as response:
+          data = json.loads(response.read().decode('utf-8'))
+
+      # Initialize summary dictionary
+      summary = {
+          "minor": {"event_count": 0, "max_magnitude": float('-inf'), "max_depth_km": float('-inf')},
+          "moderate": {"event_count": 0, "max_magnitude": float('-inf'), "max_depth_km": float('-inf')},
+          "major": {"event_count": 0, "max_magnitude": float('-inf'), "max_depth_km": float('-inf')}
+      }
+
+      # Process each feature
+      for feature in data.get("features", []):
+          mag = feature["properties"]["mag"]
+          depth = feature["geometry"]["coordinates"][2]
+
+          band = None
+          if mag < 4.0:
+              band = "minor"
+          elif 4.0 <= mag < 5.0:
+              band = "moderate"
+          else:  # mag >= 5.0
+              band = "major"
+
+          summary[band]["event_count"] += 1
+          if mag > summary[band]["max_magnitude"]:
+              summary[band]["max_magnitude"] = mag
+          if depth > summary[band]["max_depth_km"]:
+              summary[band]["max_depth_km"] = depth
+
+      # Prepare output records
+      records = []
+      for band, stats in summary.items():
+          if stats["event_count"] > 0:
+              record = {
+                  "magnitude_band": band,
+                  "event_count": stats["event_count"],
+                  "max_magnitude": stats["max_magnitude"],
+                  "max_depth_km": stats["max_depth_km"]
+              }
+              records.append(record)
+
+      # Post to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response ignored per contract

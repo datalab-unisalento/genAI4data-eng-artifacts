@@ -1,0 +1,261 @@
+{
+  "run_id": "14fdd9d0_1",
+  "task": "t1_open_meteo_ingestion",
+  "platform": "nifi",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/14fdd9d0_1_attempt-2.groovy",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:3e98e50d02073a2b4113b49e26b582b2ca8850b6cedad9e67c827e2710f04b40"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "runtime_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 7.869356567000068,
+    "execution_duration_seconds": 144.90019194699562,
+    "total_duration_seconds": 227.18441051099944,
+    "prompt_tokens": 3327,
+    "output_tokens": 1089,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 56.96983870967741,
+    "peak_cpu_percent": 402.15999999999997,
+    "peak_memory_bytes": 1475669393,
+    "resource_sample_count": 62,
+    "mean_gpu_utilization_percent": 5.546666666666668,
+    "peak_gpu_memory_bytes": 42086694912,
+    "estimated_gpu_energy_wh": 3.22903476382098,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 3,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=14fdd9d0_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/14fdd9d0_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.76542481299839,
+        "ollama_total_duration_seconds": 2.758866352,
+        "model_load_duration_seconds": 0.001111065,
+        "prompt_tokens": 764,
+        "output_tokens": 363,
+        "output_tokens_per_second": 150.19643459317663,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/14fdd9d0_1_attempt-0.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=abfa9167-01a1-1000-bb7f-e7176e557fca] java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure: java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 17.488743574998807,
+      "request_metrics": {
+        "run_id": "14fdd9d0_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 21,
+        "mean_cpu_percent": 9.28,
+        "peak_cpu_percent": 160.75,
+        "peak_memory_bytes": 1393452645,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 9.285714285714286,
+        "gpu_sample_count": 21,
+        "peak_gpu_memory_bytes": 42086694912,
+        "gpu_power_sample_count": 21,
+        "estimated_gpu_energy_wh": 1.481764091271174,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=14fdd9d0_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/14fdd9d0_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=abfa9167-01a1-1000-bb7f-e7176e557fca] java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure: java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure\nPrevious artifact:\ndef sourceUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=14fdd9d0_1&attempt=0'\ndef sinkUrl = 'http://recorder:8090/sink/14fdd9d0_1?attempt=0'\n\ndef response = new URL(sourceUrl).openConnection().with {\n    it.connect()\n    it.getInputStream().use { text(it.text) }\n}\ndef data = new groovy.json.JsonSlurper().parse(text)\n\ndef records = []\nif (data.hourly && data.hourly.time && data.hourly.pm10 && data.hourly.pm2_5) {\n    def times = data.hourly.time\n    def pm10s = data.hourly.pm10\n    def pm25s = data.hourly.pm2_5\n    for (int i = 0; i < times.size(); i++) {\n        records << [\n            time: times[i],\n            pm10: pm10s[i],\n            pm2_5: pm25s[i]\n        ]\n    }\n}\n\ndef body = groovy.json.JsonOutput.toJson(records)\ndef conn = new URL(sinkUrl).openConnection()\nconn.setRequestMethod('POST')\nconn.setDoOutput(true)\nconn.setRequestProperty('Content-Type', 'application/json')\nconn.outputStream.with { out -> out.write(body.bytes) }\nconn.responseCode\nif (conn.responseCode >= 300) {\n    throw new RuntimeException(\"HTTP ${conn.responseCode}\")\n}\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.576050429001043,
+        "ollama_total_duration_seconds": 2.571902467,
+        "model_load_duration_seconds": 0.004986039,
+        "prompt_tokens": 1282,
+        "output_tokens": 363,
+        "output_tokens_per_second": 179.7353582526752,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/14fdd9d0_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=abfb7beb-01a1-1000-eb33-f7717e5d5ffc] java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure: java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 66.05839790399841,
+      "request_metrics": {
+        "run_id": "14fdd9d0_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 21,
+        "mean_cpu_percent": 87.67904761904762,
+        "peak_cpu_percent": 402.15999999999997,
+        "peak_memory_bytes": 1475669393,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 3.357142857142857,
+        "gpu_sample_count": 28,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 28,
+        "estimated_gpu_energy_wh": 0.8673270246551018,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=14fdd9d0_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/14fdd9d0_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=abfb7beb-01a1-1000-eb33-f7717e5d5ffc] java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure: java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure\nPrevious artifact:\ndef sourceUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=14fdd9d0_1&attempt=1'\ndef sinkUrl = 'http://recorder:8090/sink/14fdd9d0_1?attempt=1'\n\ndef response = new URL(sourceUrl).openConnection().with {\n    it.connect()\n    it.getInputStream().use { text(it.text) }\n}\ndef data = new groovy.json.JsonSlurper().parse(text)\n\ndef records = []\nif (data.hourly && data.hourly.time && data.hourly.pm10 && data.hourly.pm2_5) {\n    def times = data.hourly.time\n    def pm10s = data.hourly.pm10\n    def pm25s = data.hourly.pm2_5\n    for (int i = 0; i < times.size(); i++) {\n        records << [\n            time: times[i],\n            pm10: pm10s[i],\n            pm2_5: pm25s[i]\n        ]\n    }\n}\n\ndef body = groovy.json.JsonOutput.toJson(records)\ndef conn = new URL(sinkUrl).openConnection()\nconn.setRequestMethod('POST')\nconn.setDoOutput(true)\nconn.setRequestProperty('Content-Type', 'application/json')\nconn.outputStream.with { out -> out.write(body.bytes) }\nconn.responseCode\nif (conn.responseCode >= 300) {\n    throw new RuntimeException(\"HTTP ${conn.responseCode}\")\n}\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.527881325000635,
+        "ollama_total_duration_seconds": 2.524054902,
+        "model_load_duration_seconds": 0.001218451,
+        "prompt_tokens": 1281,
+        "output_tokens": 363,
+        "output_tokens_per_second": 178.0957880591435,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/14fdd9d0_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=abfcfa59-01a1-1000-fddb-95d0886416e7] java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure: java.lang.IllegalArgumentException: Expecting at least 2 arguments, a category class and a Closure",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 61.3530504679984,
+      "request_metrics": {
+        "run_id": "14fdd9d0_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 20,
+        "mean_cpu_percent": 74.7995,
+        "peak_cpu_percent": 380.59999999999997,
+        "peak_memory_bytes": 1399444209,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 4.884615384615385,
+        "gpu_sample_count": 26,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 26,
+        "estimated_gpu_energy_wh": 0.8799436478947043,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T13:54:10Z"
+}

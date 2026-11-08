@@ -1,0 +1,55 @@
+id: bench_9e28c2e6_1
+namespace: bench
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=9e28c2e6_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/9e28c2e6_1?attempt=0"
+
+      # Fetch the GeoJSON data
+      with urllib.request.urlopen(source_url) as response:
+          geojson_data = json.loads(response.read().decode('utf-8'))
+
+      records = []
+      for feature in geojson_data.get("features", []):
+          props = feature.get("properties", {})
+          geom = feature.get("geometry", {})
+          coordinates = geom.get("coordinates", [None, None, None])
+
+          record = {
+              "id": feature.get("id"),
+              "magnitude": props.get("mag"),
+              "place": props.get("place"),
+              "time_ms": props.get("time"),
+              "longitude": coordinates[0],
+              "latitude": coordinates[1],
+              "depth_km": coordinates[2]
+          }
+
+          mag = record["magnitude"]
+          if mag is not None:
+              if mag < 4.0:
+                  record["magnitude_band"] = "minor"
+              elif mag < 5.0:
+                  record["magnitude_band"] = "moderate"
+              else:
+                  record["magnitude_band"] = "major"
+          else:
+              record["magnitude_band"] = None
+
+          records.append(record)
+
+      # Post to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response handled, no need for further action

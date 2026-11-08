@@ -1,0 +1,107 @@
+{
+  "id": "bench_cb0c5c2d_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/usgs/earthquakes?run_id=cb0c5c2d_1&attempt=0",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const response = $json;\nconst features = response.features || [];\nconst records = features.map(f => ({\n  id: f.id,\n  magnitude: f.properties.mag,\n  place: f.properties.place,\n  time_ms: f.properties.time,\n  longitude: f.geometry.coordinates[0],\n  latitude: f.geometry.coordinates[1],\n  depth_km: f.geometry.coordinates[2],\n  magnitude_band: f.properties.mag < 4.0 ? 'minor' : f.properties.mag >= 5.0 ? 'major' : 'moderate'\n}));\nreturn [{ json: { records } }];",
+        "options": {}
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/cb0c5c2d_1?attempt=0",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

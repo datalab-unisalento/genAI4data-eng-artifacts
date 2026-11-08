@@ -1,0 +1,135 @@
+services:
+  recorder:
+    build: .
+    container_name: pipeline-bench-recorder
+    user: "${HOST_UID:-0}:${HOST_GID:-0}"
+    environment:
+      BENCH_SINK_LOG: /data/sink-events.jsonl
+      BENCH_HTTP_LOG: /data/http-events.jsonl
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - ./benchmark-results/recorder:/data
+    networks:
+      - harness
+      - host-access
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  airflow:
+    image: apache/airflow@sha256:6499a680a93463846d3a6be980e85d601dc97b0d81e82eed9ef5e5cb9da31b79  # apache/airflow:2.10.5
+    profiles: ["airflow"]
+    command: standalone
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
+      _AIRFLOW_WWW_USER_USERNAME: "${AIRFLOW_USERNAME:-bench}"
+      _AIRFLOW_WWW_USER_PASSWORD: "${AIRFLOW_PASSWORD:-bench-local-only}"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      # Services are kept warm across cells, so new DAG files must be picked up quickly
+      # (the default rescans the DAG folder only every 300 seconds).
+      AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: "5"
+      AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: "5"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./artifacts/airflow:/opt/airflow/dags:ro
+    networks:
+      - harness
+    user: "${AIRFLOW_UID:-50000}:0"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - recorder
+
+  n8n:
+    image: n8nio/n8n@sha256:311aa42efcf79d204475fed75b98a8b82a231901729fc38b4fce51f3159031e8  # n8nio/n8n:1.82.3
+    profiles: ["n8n"]
+    environment:
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_USER_FOLDER: /tmp/n8n-user
+      N8N_RELEASE_DATE: "2025-02-25T00:00:00Z"
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - ./artifacts/n8n:/benchmark:ro
+    networks:
+      - harness
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - recorder
+
+  nifi:
+    image: apache/nifi@sha256:6f7f2840dbf178c6dd3fa13435b9b358f3be3c6fb7417de467a35a267f4d28ad  # apache/nifi:2.12.0
+    profiles: ["nifi"]
+    environment:
+      SINGLE_USER_CREDENTIALS_USERNAME: "${NIFI_USERNAME:-bench}"
+      SINGLE_USER_CREDENTIALS_PASSWORD: "${NIFI_PASSWORD:-bench-local-only-123}"
+      NIFI_WEB_PROXY_HOST: "localhost:8443"
+    networks:
+      - harness
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - recorder
+
+  kestra:
+    image: kestra/kestra@sha256:ecdcf4006ed3578be74c6c20e3f107d0cafdbe5abe63b442689ff8a5495be553  # kestra/kestra:v1.3.45
+    profiles: ["kestra"]
+    command: ["server", "local", "--no-tutorials"]
+    environment:
+      KESTRA_SERVER_BASIC_AUTH_USERNAME: "${KESTRA_USERNAME:-bench@example.com}"
+      KESTRA_SERVER_BASIC_AUTH_PASSWORD: "${KESTRA_PASSWORD:-Bench-local-only-123}"
+    networks:
+      - harness
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - recorder
+
+  python-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.python-runners
+    profiles: ["dagster", "prefect"]
+    command: ["sleep", "infinity"]
+    environment:
+      DAGSTER_HOME: /tmp/dagster
+      PREFECT_HOME: /tmp/prefect
+    volumes:
+      - ./artifacts/python:/benchmark:ro
+    networks:
+      - harness
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  harness:
+    internal: true
+  host-access:

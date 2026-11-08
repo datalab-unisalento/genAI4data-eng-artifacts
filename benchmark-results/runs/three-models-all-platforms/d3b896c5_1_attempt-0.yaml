@@ -1,0 +1,42 @@
+id: bench_d3b896c5_1
+namespace: bench
+
+tasks:
+  - id: process_particulate_data
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+      
+      # Fetch source data
+      with urllib.request.urlopen("http://recorder:8090/source/open-meteo/particulate?run_id=d3b896c5_1&attempt=0") as response:
+          data = json.load(response)
+      
+      times = data["hourly"]["time"]
+      pm2_5_values = data["hourly"]["pm2_5"]
+      
+      # Process and create output records
+      results = []
+      for i in range(2, len(times)):
+          current_time = times[i]
+          window_pm2_5 = pm2_5_values[i-2:i+1]
+          max_pm2_5 = max(window_pm2_5)
+          
+          record = {
+              "time": current_time,
+              "pm2_5": pm2_5_values[i],
+              "pm2_5_peak_3h": max_pm2_5
+          }
+          results.append(record)
+      
+      # Post to sink
+      request = urllib.request.Request(
+          "http://recorder:8090/sink/d3b896c5_1?attempt=0",
+          data=json.dumps(results).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urllib.request.urlopen(request) as response:
+          pass

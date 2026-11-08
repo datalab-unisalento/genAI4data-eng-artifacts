@@ -1,0 +1,41 @@
+id: bench_e407b56f_1
+namespace: bench
+tasks:
+  - id: t1_open_meteo_ingestion
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import urllib.request
+      import json
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=e407b56f_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/e407b56f_1?attempt=0"
+
+      # Fetch source data
+      with urllib.request.urlopen(source_url) as response:
+          data = json.loads(response.read().decode('utf-8'))
+
+      # Extract hourly arrays
+      time_array = data['hourly']['time']
+      pm10_array = data['hourly']['pm10']
+      pm2_5_array = data['hourly']['pm2_5']
+
+      # Convert to list of records
+      records = []
+      for i in range(len(time_array)):
+          record = {
+              "time": time_array[i],
+              "pm10": pm10_array[i],
+              "pm2_5": pm2_5_array[i]
+          }
+          records.append(record)
+
+      # Post to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response ignored per contract

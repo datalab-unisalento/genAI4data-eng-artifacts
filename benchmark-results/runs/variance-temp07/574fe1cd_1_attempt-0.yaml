@@ -1,0 +1,44 @@
+id: bench_574fe1cd_1
+namespace: bench
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=574fe1cd_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/574fe1cd_1?attempt=0"
+
+      # Fetch source data
+      with urllib.request.urlopen(source_url) as response:
+          data = json.loads(response.read().decode('utf-8'))
+
+      hourly = data['hourly']
+      times = hourly['time']
+      pm2_5_values = hourly['pm2_5']
+
+      results = []
+
+      for i in range(2, len(times)):
+          # Get the current and previous two hours' pm2.5 values
+          window = pm2_5_values[i-2:i+1]
+          peak = max(window)
+          
+          record = {
+              "time": times[i],
+              "pm2_5": pm2_5_values[i],
+              "pm2_5_peak_3h": peak
+          }
+          results.append(record)
+
+      # POST to sink
+      request = urllib.request.Request(
+          sink_url,
+          data=json.dumps(results).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(request) as response:
+          pass  # Ignore the response

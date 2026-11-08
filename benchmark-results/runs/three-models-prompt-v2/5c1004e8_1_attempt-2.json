@@ -1,0 +1,162 @@
+{
+  "id": "bench_5c1004e8_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/particulate?run_id=5c1004e8_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/gases?run_id=5c1004e8_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_2",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 2
+      },
+      "id": "merge_sources",
+      "name": "Merge Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        450,
+        90
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const source1 = $['Source 1'].first();\nconst source2 = $['Source 2'].first();\n\nif (!source1 || !source2) {\n  return [{ json: { records: [] } }];\n}\n\nconst data1 = source1.json;\nconst data2 = source2.json;\n\n// Extract hourly arrays from both responses\nconst times1 = data1.hourly.time;\nconst pm10_1 = data1.hourly.pm10;\nconst pm25_1 = data1.hourly.pm2_5;\n\nconst times2 = data2.hourly.time;\nconst no2_2 = data2.hourly.nitrogen_dioxide;\nconst o3_2 = data2.hourly.ozone;\n\n// Build lookup maps from gas data by time\nconst gasMap = {};\nfor (let i = 0; i < times2.length; i++) {\n  gasMap[times2[i]] = {\n    nitrogen_dioxide: no2_2[i],\n    ozone: o3_2[i]\n  };\n}\n\n// Inner join: keep only times present in both datasets\nconst records = [];\nfor (let i = 0; i < times1.length; i++) {\n  const time = times1[i];\n  if (gasMap.hasOwnProperty(time)) {\n    records.push({\n      time: time,\n      pm10: pm10_1[i],\n      pm2_5: pm25_1[i],\n      nitrogen_dioxide: gasMap[time].nitrogen_dioxide,\n      ozone: gasMap[time].ozone\n    });\n  }\n}\n\nreturn [{ json: { records } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/5c1004e8_1?attempt=2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Source 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Merge Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 2": {
+      "main": [
+        [
+          {
+            "node": "Merge Sources",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Sources": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

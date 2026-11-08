@@ -1,0 +1,262 @@
+{
+  "run_id": "4cc3fda4_1",
+  "task": "t2_usgs_etl",
+  "platform": "nifi",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/4cc3fda4_1_attempt-2.groovy",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:888778d45acc002fc762598d89d519739c5ef865f8b4fe127f7e5ba4067b529e"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "invalid_artifact": 1,
+    "runtime_error": 2
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 11.787473486994713,
+    "execution_duration_seconds": 419.3817388970019,
+    "total_duration_seconds": 478.8368274800014,
+    "prompt_tokens": 5121,
+    "output_tokens": 1642,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 28.792074074074073,
+    "peak_cpu_percent": 455.28,
+    "peak_memory_bytes": 1525894085,
+    "resource_sample_count": 135,
+    "mean_gpu_utilization_percent": 3.9060402684563758,
+    "peak_gpu_memory_bytes": 26089619456,
+    "estimated_gpu_energy_wh": 4.330556807408265,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.6666666666666666,
+    "source_request_count": 2,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=4cc3fda4_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/4cc3fda4_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 3.6485755129979225,
+        "ollama_total_duration_seconds": 3.644962632,
+        "model_load_duration_seconds": 0.002948658,
+        "prompt_tokens": 783,
+        "output_tokens": 528,
+        "output_tokens_per_second": 158.85427557185284,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/4cc3fda4_1_attempt-0.groovy",
+      "execution_error": "NiFi processor did not validate: [\"'GroovyScript' is invalid because org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:\\nScriptffffffffd8e66a46.groovy: 1: Unexpected character: '#' @ line 1, column 392.\\n   ;import org.apache.nifi.logging.ComponentLog;# Apache NiFi ExecuteGroo\\n                                                ^\\norg.codehaus.groovy.syntax.SyntaxException: Unexpected character: '#' @ line 1, column 392.\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.createParsingFailedException(AstBuilder.java:4697)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.convertException(AstBuilder.java:256)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:230)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildAST(AstBuilder.java:264)\\n\\tat org.apache.groovy.parser.antlr4.Antlr4ParserPlugin.buildAST(Antlr4ParserPlugin.java:58)\\n\\tat org.codehaus.groovy.control.SourceUnit.buildAST(SourceUnit.java:256)\\n\\tat java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)\\n\\tat java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1939)\\n\\tat java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:639)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\nCaused by: org.apache.groovy.parser.antlr4.GroovySyntaxError: Unexpected character: '#'\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.throwSyntaxError(SyntaxErrorReportable.java:64)\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.require(SyntaxErrorReportable.java:38)\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.require(SyntaxErrorReportable.java:31)\\n\\tat org.apache.groovy.parser.antlr4.GroovyLexer.UNEXPECTED_CHAR_action(GroovyLexer.java:585)\\n\\tat org.apache.groovy.parser.antlr4.GroovyLexer.action(GroovyLexer.java:459)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerCustomAction.execute(LexerCustomAction.java:98)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerActionExecutor.execute(LexerActionExecutor.java:172)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.accept(LexerATNSimulator.java:399)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.failOrAccept(LexerATNSimulator.java:330)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.execATN(LexerATNSimulator.java:251)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.match(LexerATNSimulator.java:138)\\n\\tat groovyjarjarantlr4.v4.runtime.Lexer.nextToken(Lexer.java:145)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.fetch(BufferedTokenStream.java:215)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.sync(BufferedTokenStream.java:198)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.consume(BufferedTokenStream.java:172)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.execDFA(ParserATNSimulator.java:661)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:463)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:399)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser._adaptivePredict(GroovyParser.java:259)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser.scriptStatements(GroovyParser.java:462)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser.compilationUnit(GroovyParser.java:392)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:245)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:218)\\n\\t... 18 more\\n\\n1 error\\n\"]",
+      "failure_stage": "platform_execution",
+      "failure_category": "invalid_artifact",
+      "execution_duration_seconds": 317.4666357690003,
+      "request_metrics": {
+        "run_id": "4cc3fda4_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 103,
+        "mean_cpu_percent": 5.836796116504853,
+        "peak_cpu_percent": 82.1,
+        "peak_memory_bytes": 1525894085,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 0.6116504854368932,
+        "gpu_sample_count": 103,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 103,
+        "estimated_gpu_energy_wh": 2.612051440694359,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=4cc3fda4_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/4cc3fda4_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor did not validate: [\"'GroovyScript' is invalid because org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:\\nScriptffffffffd8e66a46.groovy: 1: Unexpected character: '#' @ line 1, column 392.\\n   ;import org.apache.nifi.logging.ComponentLog;# Apache NiFi ExecuteGroo\\n                                                ^\\norg.codehaus.groovy.syntax.SyntaxException: Unexpected character: '#' @ line 1, column 392.\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.createParsingFailedException(AstBuilder.java:4697)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.convertException(AstBuilder.java:256)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:230)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildAST(AstBuilder.java:264)\\n\\tat org.apache.groovy.parser.antlr4.Antlr4ParserPlugin.buildAST(Antlr4ParserPlugin.java:58)\\n\\tat org.codehaus.groovy.control.SourceUnit.buildAST(SourceUnit.java:256)\\n\\tat java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)\\n\\tat java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1939)\\n\\tat java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:639)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\nCaused by: org.apache.groovy.parser.antlr4.GroovySyntaxError: Unexpected character: '#'\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.throwSyntaxError(SyntaxErrorReportable.java:64)\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.require(SyntaxErrorReportable.java:38)\\n\\tat org.apache.groovy.parser.antlr4.SyntaxErrorReportable.require(SyntaxErrorReportable.java:31)\\n\\tat org.apache.groovy.parser.antlr4.GroovyLexer.UNEXPECTED_CHAR_action(GroovyLexer.java:585)\\n\\tat org.apache.groovy.parser.antlr4.GroovyLexer.action(GroovyLexer.java:459)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerCustomAction.execute(LexerCustomAction.java:98)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerActionExecutor.execute(LexerActionExecutor.java:172)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.accept(LexerATNSimulator.java:399)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.failOrAccept(LexerATNSimulator.java:330)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.execATN(LexerATNSimulator.java:251)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.LexerATNSimulator.match(LexerATNSimulator.java:138)\\n\\tat groovyjarjarantlr4.v4.runtime.Lexer.nextToken(Lexer.java:145)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.fetch(BufferedTokenStream.java:215)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.sync(BufferedTokenStream.java:198)\\n\\tat groovyjarjarantlr4.v4.runtime.BufferedTokenStream.consume(BufferedTokenStream.java:172)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.execDFA(ParserATNSimulator.java:661)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:463)\\n\\tat groovyjarjarantlr4.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:399)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser._adaptivePredict(GroovyParser.java:259)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser.scriptStatements(GroovyParser.java:462)\\n\\tat org.apache.groovy.parser.antlr4.GroovyParser.compilationUnit(GroovyParser.java:392)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:245)\\n\\tat org.apache.groovy.parser.antlr4.AstBuilder.buildCST(AstBuilder.java:218)\\n\\t... 18 more\\n\\n1 error\\n\"]\nPrevious artifact:\n# Apache NiFi ExecuteGroovyScript Source\n\n```groovy\nimport groovy.json.*\nimport java.net.URL\nimport java.net.HttpURLConnection\n\ndef sourceUrl = \"http://recorder:8090/source/usgs/earthquakes?run_id=4cc3fda4_1&attempt=0\"\ndef sinkUrl = \"http://recorder:8090/sink/4cc3fda4_1?attempt=0\"\n\ndef url = new URL(sourceUrl)\ndef connection = url.openConnection()\nconnection.requestMethod = \"GET\"\ndef responseText = connection.getInputStream().text as String\n\ndef slurper = new JsonSlurper()\ndef geoJson = slurper.parseText(responseText)\n\ndef features = geoJson.features as List\ndef records = []\n\nfeatures.each { feature ->\n    def props = feature.properties\n    def geom = feature.geometry\n    def coords = geom.coordinates\n    \n    double magnitude = props.mag as Double\n    String place = props.place as String\n    long timeMs = props.time as Long\n    double longitude = coords[0] as Double\n    double latitude = coords[1] as Double\n    double depthKm = coords[2] as Double\n    \n    String magnitudeBand\n    if (magnitude < 4.0) {\n        magnitudeBand = \"minor\"\n    } else if (magnitude < 5.0) {\n        magnitudeBand = \"moderate\"\n    } else {\n        magnitudeBand = \"major\"\n    }\n    \n    def record = [\n        id: feature.id as String,\n        magnitude: magnitude,\n        place: place,\n        time_ms: timeMs,\n        longitude: longitude,\n        latitude: latitude,\n        depth_km: depthKm,\n        magnitude_band: magnitudeBand\n    ]\n    records.add(record)\n}\n\ndef body = JsonOutput.toJson([records: records] as Object)\n\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.requestMethod = \"POST\"\nsinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\nsinkConn.doOutput = true\nsinkConn.outputStream.withWriter(\"UTF-8\") { writer ->\n    writer.write(body)\n}\ndef responseCode = sinkConn.responseCode\nif (responseCode >= 300) {\n    throw new RuntimeException(\"HTTP error: $responseCode\")\n}\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n```\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 3.8291646229990874,
+        "ollama_total_duration_seconds": 3.820775219,
+        "model_load_duration_seconds": 0.0029966,
+        "prompt_tokens": 2816,
+        "output_tokens": 512,
+        "output_tokens_per_second": 170.6546639553018,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/4cc3fda4_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac02cd3b-01a1-1000-c3aa-9fb9a6dbca64] groovy.lang.MissingMethodException: No signature of method: readText for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: getText(), getText(java.lang.String), read(), reset(), read(), reset(): groovy.lang.MissingMethodException: No signature of method: readText for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: getText(), getText(java.lang.String), read(), reset(), read(), reset()",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 41.26727214400307,
+      "request_metrics": {
+        "run_id": "4cc3fda4_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 13,
+        "mean_cpu_percent": 149.1976923076923,
+        "peak_cpu_percent": 455.28,
+        "peak_memory_bytes": 1399444209,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 13.5,
+        "gpu_sample_count": 20,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 20,
+        "estimated_gpu_energy_wh": 0.7780601739746362,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=4cc3fda4_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/4cc3fda4_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=ac02cd3b-01a1-1000-c3aa-9fb9a6dbca64] groovy.lang.MissingMethodException: No signature of method: readText for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: getText(), getText(java.lang.String), read(), reset(), read(), reset(): groovy.lang.MissingMethodException: No signature of method: readText for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: getText(), getText(java.lang.String), read(), reset(), read(), reset()\nPrevious artifact:\nimport groovy.json.*\nimport java.net.URL\nimport java.net.HttpURLConnection\n\ndef sourceUrl = \"http://recorder:8090/source/usgs/earthquakes?run_id=4cc3fda4_1&attempt=1\"\ndef sinkUrl = \"http://recorder:8090/sink/4cc3fda4_1?attempt=1\"\n\ndef url = new URL(sourceUrl)\ndef connection = url.openConnection()\nconnection.requestMethod = \"GET\"\ndef responseText = connection.getInputStream().readText()\n\ndef slurper = new JsonSlurper()\ndef geoJson = slurper.parseText(responseText)\n\ndef features = geoJson.features as List\ndef records = []\n\nfeatures.each { feature ->\n    def props = feature.properties\n    def geom = feature.geometry\n    def coords = geom.coordinates\n    \n    double magnitude = props.mag as Double\n    String place = props.place as String\n    long timeMs = props.time as Long\n    double longitude = coords[0] as Double\n    double latitude = coords[1] as Double\n    double depthKm = coords[2] as Double\n    \n    String magnitudeBand\n    if (magnitude < 4.0) {\n        magnitudeBand = \"minor\"\n    } else if (magnitude < 5.0) {\n        magnitudeBand = \"moderate\"\n    } else {\n        magnitudeBand = \"major\"\n    }\n    \n    def record = [\n        id: feature.id as String,\n        magnitude: magnitude,\n        place: place,\n        time_ms: timeMs,\n        longitude: longitude,\n        latitude: latitude,\n        depth_km: depthKm,\n        magnitude_band: magnitudeBand\n    ]\n    records.add(record)\n}\n\ndef body = JsonOutput.toJson([records: records] as Object)\n\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.requestMethod = \"POST\"\nsinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\nsinkConn.doOutput = true\nsinkConn.outputStream.withWriter(\"UTF-8\") { writer ->\n    writer.write(body)\n}\ndef responseCode = sinkConn.responseCode\nif (responseCode >= 300) {\n    throw new RuntimeException(\"HTTP error: $responseCode\")\n}\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 4.309733350997703,
+        "ollama_total_duration_seconds": 4.303806562,
+        "model_load_duration_seconds": 0.002961292,
+        "prompt_tokens": 1522,
+        "output_tokens": 602,
+        "output_tokens_per_second": 159.59504216145768,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/4cc3fda4_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac041af9-01a1-1000-d3bd-bc508d453157] groovy.lang.MissingPropertyException: No such property: inputStream for class: [B: groovy.lang.MissingPropertyException: No such property: inputStream for class: [B",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 60.647830983998574,
+      "request_metrics": {
+        "run_id": "4cc3fda4_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 19,
+        "mean_cpu_percent": 70.85105263157895,
+        "peak_cpu_percent": 296.51,
+        "peak_memory_bytes": 1426298240,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 9.576923076923077,
+        "gpu_sample_count": 26,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 26,
+        "estimated_gpu_energy_wh": 0.9404451927392704,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T14:02:09Z"
+}

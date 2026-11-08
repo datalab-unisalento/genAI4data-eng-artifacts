@@ -1,0 +1,153 @@
+{
+  "run_id": "e4b738d4_1",
+  "task": "t5_trailing_three_hour_peak",
+  "platform": "n8n",
+  "model": "qwen3-coder:30b",
+  "status": "passed",
+  "attempts": 1,
+  "artifact_path": "benchmark-results/runs/variance-temp07/e4b738d4_1_attempt-0.json",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.7,
+      "seed": 3,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:642efbddcd3b67ea512394bef490d15d3915bb8de11f8989cdb1f78b68af17cc"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+    "source": {
+      "git_revision": "1efd8f464dcfad2da81990867eedd8839a871976",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {},
+  "metrics": {
+    "first_attempt_passed": true,
+    "first_attempt_f1": 1.0,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 6.612536523000017,
+    "execution_duration_seconds": 21.585090720000153,
+    "total_duration_seconds": 42.301797957003146,
+    "prompt_tokens": 1335,
+    "output_tokens": 837,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 17.452,
+    "peak_cpu_percent": 122.66000000000001,
+    "peak_memory_bytes": 314971258,
+    "resource_sample_count": 10,
+    "mean_gpu_utilization_percent": 14.4,
+    "peak_gpu_memory_bytes": 19754123264,
+    "estimated_gpu_energy_wh": 0.8865315735805483,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 46
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for n8n. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_e4b738d4_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=e4b738d4_1&attempt=0\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/e4b738d4_1?attempt=0\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=e4b738d4_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/e4b738d4_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.7,
+        "seed": 3,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 6.612536523000017,
+        "ollama_total_duration_seconds": 6.606712557,
+        "model_load_duration_seconds": 0.002129493,
+        "prompt_tokens": 1335,
+        "output_tokens": 837,
+        "output_tokens_per_second": 132.80640237928145,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/variance-temp07/e4b738d4_1_attempt-0.json",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 46,
+        "actual_count": 46,
+        "matched_count": 46,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 21.585090720000153,
+      "request_metrics": {
+        "run_id": "e4b738d4_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 46,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 10,
+        "mean_cpu_percent": 17.452,
+        "peak_cpu_percent": 122.66000000000001,
+        "peak_memory_bytes": 314971258,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 14.4,
+        "gpu_sample_count": 10,
+        "peak_gpu_memory_bytes": 19754123264,
+        "gpu_power_sample_count": 10,
+        "estimated_gpu_energy_wh": 0.8865315735805483,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T16:30:22Z"
+}

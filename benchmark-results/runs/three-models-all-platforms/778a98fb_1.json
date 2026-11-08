@@ -1,0 +1,259 @@
+{
+  "run_id": "778a98fb_1",
+  "task": "t5_trailing_three_hour_peak",
+  "platform": "kestra",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/778a98fb_1_attempt-2.yaml",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:3e30f785c7f2ff79856ffd5da92e316c86128a6aeabd35b8e05a958fb881e1c0"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "1f55271104dc9e0706d576f3e83500b6e8f2d427",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "398769fcaf416c1381a577024dcfab10e168e332ce238b5f621aa6e55e52d591"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 7.801532074983697,
+    "execution_duration_seconds": 40.06059089599876,
+    "total_duration_seconds": 89.13647252402734,
+    "prompt_tokens": 3874,
+    "output_tokens": 1133,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 261.99833333333333,
+    "peak_cpu_percent": 691.15,
+    "peak_memory_bytes": 1429601255,
+    "resource_sample_count": 12,
+    "mean_gpu_utilization_percent": 16.366666666666667,
+    "peak_gpu_memory_bytes": 26089619456,
+    "estimated_gpu_energy_wh": 1.3046899468324642,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.0,
+    "source_request_count": 0,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for kestra. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_778a98fb_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. The Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=778a98fb_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/778a98fb_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.5814868209999986,
+        "ollama_total_duration_seconds": 2.577991192,
+        "model_load_duration_seconds": 0.001246716,
+        "prompt_tokens": 753,
+        "output_tokens": 387,
+        "output_tokens_per_second": 173.96182549336382,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/778a98fb_1_attempt-0.yaml",
+      "execution_error": "POST http://172.18.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Unrecognized field \\\"task_id\\\" (class io.kestra.plugin.scripts.python.Script), not marked as ignorable (38 known properties: \\\"allowFailure\\\", \\\"assets\\\", \\\"packageManager\\\", \\\"runIf\\\", \\\"dependencyCacheEnabled\\\", \\\"script\\\", \\\"inputFiles\\\", \\\"allowWarning\\\", \\\"taskRunner\\\", \\\"version\\\", \\\"failFast\\\", \\\"id\\\", \\\"namespaceFiles\\\", \\\"logLevel\\\", \\\"timeout\\\", \\\"beforeCommands\\\", \\\"retry\\\", \\\"dependencies\\\", \\\"outputDirectory\\\", \\\"env\\\", \\\"pluginDefaultsRef\\\", \\\"runner\\\", \\\"uvInstallerVersion\\\", \\\"targetOS\\\", \\\"outputFiles\\\", \\\"type\\\", \\\"logToFile\\\", \\\"description\\\", \\\"taskCache\\\", \\\"containerImage\\\", \\\"pythonVersion\\\", \\\"workerGroup\\\", \\\"uvInstallerSha256\\\", \\\"uvAutoInstallEnabled\\\", \\\"interpreter\\\", \\\"disabled\\\", \\\"warningOnStdErr\\\", \\\"docker\\\")\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"Unrecognized field \\\"task_id\\\" (class io.kestra.plugin.scripts.python.Script), not marked as ignorable (38 known properties: \\\"allowFailure\\\", \\\"assets\\\", \\\"packageManager\\\", \\\"runIf\\\", \\\"dependencyCacheEnabled\\\", \\\"script\\\", \\\"inputFiles\\\", \\\"allowWarning\\\", \\\"taskRunner\\\", \\\"version\\\", \\\"failFast\\\", \\\"id\\\", \\\"namespaceFiles\\\", \\\"logLevel\\\", \\\"timeout\\\", \\\"beforeCommands\\\", \\\"retry\\\", \\\"dependencies\\\", \\\"outputDirectory\\\", \\\"env\\\", \\\"pluginDefaultsRef\\\", \\\"runner\\\", \\\"uvInstallerVersion\\\", \\\"targetOS\\\", \\\"outputFiles\\\", \\\"type\\\", \\\"logToFile\\\", \\\"description\\\", \\\"taskCache\\\", \\\"containerImage\\\", \\\"pythonVersion\\\", \\\"workerGroup\\\", \\\"uvInstallerSha256\\\", \\\"uvAutoInstallEnabled\\\", \\\"interpreter\\\", \\\"disabled\\\", \\\"warningOnStdErr\\\", \\\"docker\\\")\",\"logref\":null,\"path\":\"io.kestra.core.models.flows.FlowWithSource[\\\"tasks\\\"]->java.util.ArrayList[0]->io.kestra.plugin.scripts.python.Script[\\\"task_id\\\"]\",\"_links\":{},\"_embedded\":{}}]}}",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 13.17476073501166,
+      "request_metrics": {
+        "run_id": "778a98fb_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 300.4475,
+        "peak_cpu_percent": 691.15,
+        "peak_memory_bytes": 1170860932,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 13.6,
+        "gpu_sample_count": 10,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 10,
+        "estimated_gpu_energy_wh": 0.43932250585125665,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for kestra. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_778a98fb_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. The Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=778a98fb_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/778a98fb_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nPOST http://172.18.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Unrecognized field \\\"task_id\\\" (class io.kestra.plugin.scripts.python.Script), not marked as ignorable (38 known properties: \\\"allowFailure\\\", \\\"assets\\\", \\\"packageManager\\\", \\\"runIf\\\", \\\"dependencyCacheEnabled\\\", \\\"script\\\", \\\"inputFiles\\\", \\\"allowWarning\\\", \\\"taskRunner\\\", \\\"version\\\", \\\"failFast\\\", \\\"id\\\", \\\"namespaceFiles\\\", \\\"logLevel\\\", \\\"timeout\\\", \\\"beforeCommands\\\", \\\"retry\\\", \\\"dependencies\\\", \\\"outputDirectory\\\", \\\"env\\\", \\\"pluginDefaultsRef\\\", \\\"runner\\\", \\\"uvInstallerVersion\\\", \\\"targetOS\\\", \\\"outputFiles\\\", \\\"type\\\", \\\"logToFile\\\", \\\"description\\\", \\\"taskCache\\\", \\\"containerImage\\\", \\\"pythonVersion\\\", \\\"workerGroup\\\", \\\"uvInstallerSha256\\\", \\\"uvAutoInstallEnabled\\\", \\\"interpreter\\\", \\\"disabled\\\", \\\"warningOnStdErr\\\", \\\"docker\\\")\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"Unrecognized field \\\"task_id\\\" (class io.kestra.plugin.scripts.python.Script), not marked as ignorable (38 known properties: \\\"allowFailure\\\", \\\"assets\\\", \\\"packageManager\\\", \\\"runIf\\\", \\\"dependencyCacheEnabled\\\", \\\"script\\\", \\\"inputFiles\\\", \\\"allowWarning\\\", \\\"taskRunner\\\", \\\"version\\\", \\\"failFast\\\", \\\"id\\\", \\\"namespaceFiles\\\", \\\"logLevel\\\", \\\"timeout\\\", \\\"beforeCommands\\\", \\\"retry\\\", \\\"dependencies\\\", \\\"outputDirectory\\\", \\\"env\\\", \\\"pluginDefaultsRef\\\", \\\"runner\\\", \\\"uvInstallerVersion\\\", \\\"targetOS\\\", \\\"outputFiles\\\", \\\"type\\\", \\\"logToFile\\\", \\\"description\\\", \\\"taskCache\\\", \\\"containerImage\\\", \\\"pythonVersion\\\", \\\"workerGroup\\\", \\\"uvInstallerSha256\\\", \\\"uvAutoInstallEnabled\\\", \\\"interpreter\\\", \\\"disabled\\\", \\\"warningOnStdErr\\\", \\\"docker\\\")\",\"logref\":null,\"path\":\"io.kestra.core.models.flows.FlowWithSource[\\\"tasks\\\"]->java.util.ArrayList[0]->io.kestra.plugin.scripts.python.Script[\\\"task_id\\\"]\",\"_links\":{},\"_embedded\":{}}]}}\nPrevious artifact:\nid: bench_778a98fb_1\nnamespace: bench\n\ntasks:\n  - task_id: t5_trailing_three_hour_peak\n    type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import urllib.request\n      import json\n\n      source_url = \"http://recorder:8090/source/open-meteo/particulate?run_id=778a98fb_1&attempt=0\"\n      sink_url = \"http://recorder:8090/sink/778a98fb_1?attempt=0\"\n\n      response = urllib.request.urlopen(source_url)\n      data = json.loads(response.read().decode('utf-8'))\n\n      times = data[\"hourly\"][\"time\"]\n      pm25_values = data[\"hourly\"][\"pm2_5\"]\n\n      records = []\n      for i in range(2, len(pm25_values)):\n          current_pm25 = pm25_values[i]\n          previous_pm25_1 = pm25_values[i - 1]\n          previous_pm25_2 = pm25_values[i - 2]\n          peak_3h = max(current_pm25, previous_pm25_1, previous_pm25_2)\n          record = {\n              \"time\": times[i],\n              \"pm2_5\": current_pm25,\n              \"pm2_5_peak_3h\": peak_3h\n          }\n          records.append(record)\n\n      json_data = json.dumps(records).encode('utf-8')\n      req = urllib.request.Request(sink_url, data=json_data, headers={'Content-Type': 'application/json'}, method='POST')\n      urllib.request.urlopen(req)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.62035374896368,
+        "ollama_total_duration_seconds": 2.615462565,
+        "model_load_duration_seconds": 0.00155112,
+        "prompt_tokens": 1742,
+        "output_tokens": 373,
+        "output_tokens_per_second": 180.48759725063078,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/778a98fb_1_attempt-1.yaml",
+      "execution_error": "POST http://172.18.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: tasks[0].id: must not be blank\\ntasks[0].id: must not be null\\n\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"must not be blank\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}},{\"message\":\"must not be null\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}}]}}",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 13.27765698597068,
+      "request_metrics": {
+        "run_id": "778a98fb_1",
+        "attempt": 1,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 285.69,
+        "peak_cpu_percent": 654.27,
+        "peak_memory_bytes": 1429601255,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 19.5,
+        "gpu_sample_count": 10,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 10,
+        "estimated_gpu_energy_wh": 0.45921680611424553,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for kestra. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_778a98fb_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. The Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=778a98fb_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/778a98fb_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nPOST http://172.18.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: tasks[0].id: must not be blank\\ntasks[0].id: must not be null\\n\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"must not be blank\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}},{\"message\":\"must not be null\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}}]}}\nPrevious artifact:\nid: bench_778a98fb_1\nnamespace: bench\n\ntasks:\n  - type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import urllib.request\n      import json\n\n      source_url = \"http://recorder:8090/source/open-meteo/particulate?run_id=778a98fb_1&attempt=1\"\n      sink_url = \"http://recorder:8090/sink/778a98fb_1?attempt=1\"\n\n      response = urllib.request.urlopen(source_url)\n      data = json.loads(response.read().decode('utf-8'))\n\n      times = data[\"hourly\"][\"time\"]\n      pm25_values = data[\"hourly\"][\"pm2_5\"]\n\n      records = []\n      for i in range(2, len(pm25_values)):\n          current_pm25 = pm25_values[i]\n          previous_pm25_1 = pm25_values[i - 1]\n          previous_pm25_2 = pm25_values[i - 2]\n          peak_3h = max(current_pm25, previous_pm25_1, previous_pm25_2)\n          record = {\n              \"time\": times[i],\n              \"pm2_5\": current_pm25,\n              \"pm2_5_peak_3h\": peak_3h\n          }\n          records.append(record)\n\n      json_data = json.dumps(records).encode('utf-8')\n      req = urllib.request.Request(sink_url, data=json_data, headers={'Content-Type': 'application/json'}, method='POST')\n      urllib.request.urlopen(req)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.5996915050200187,
+        "ollama_total_duration_seconds": 2.595036792,
+        "model_load_duration_seconds": 0.001653879,
+        "prompt_tokens": 1379,
+        "output_tokens": 373,
+        "output_tokens_per_second": 182.163061824092,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/778a98fb_1_attempt-2.yaml",
+      "execution_error": "POST http://172.19.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: tasks[0].id: must not be blank\\ntasks[0].id: must not be null\\n\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"must not be blank\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}},{\"message\":\"must not be null\",\"logref\":null,\"path\":\"tasks[0].id\",\"_links\":{},\"_embedded\":{}}]}}",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 13.608173175016418,
+      "request_metrics": {
+        "run_id": "778a98fb_1",
+        "attempt": 2,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 199.8575,
+        "peak_cpu_percent": 415.03,
+        "peak_memory_bytes": 1374347591,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 16.0,
+        "gpu_sample_count": 10,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 10,
+        "estimated_gpu_energy_wh": 0.4061506348669621,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T15:34:47Z"
+}

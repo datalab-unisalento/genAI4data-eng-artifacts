@@ -1,0 +1,211 @@
+{
+  "run_id": "a8fa9934_1",
+  "task": "t2_usgs_etl",
+  "platform": "kestra",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "passed",
+  "attempts": 2,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/a8fa9934_1_attempt-1.yaml",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:c167b9977b49907ff9da14e16a072c8c500a39f7f5bdc90392ae4127ae0143ec"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 1
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 5.150068682967685,
+    "execution_duration_seconds": 28.195982233039103,
+    "total_duration_seconds": 58.8821618759539,
+    "prompt_tokens": 2299,
+    "output_tokens": 753,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 200.11111111111111,
+    "peak_cpu_percent": 688.65,
+    "peak_memory_bytes": 1314809445,
+    "resource_sample_count": 9,
+    "mean_gpu_utilization_percent": 19.0,
+    "peak_gpu_memory_bytes": 26091716608,
+    "estimated_gpu_energy_wh": 0.8734935291938635,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.5,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 49
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable ETL workflow for kestra. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_a8fa9934_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. The Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a8fa9934_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/a8fa9934_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.5110522939939983,
+        "ollama_total_duration_seconds": 2.507941045,
+        "model_load_duration_seconds": 0.001188138,
+        "prompt_tokens": 733,
+        "output_tokens": 380,
+        "output_tokens_per_second": 174.39888605006257,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/a8fa9934_1_attempt-0.yaml",
+      "execution_error": "POST http://172.19.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Unrecognized field \\\"execution\\\" (class io.kestra.core.models.flows.FlowWithSource), not marked as ignorable (26 known properties: \\\"workerGroup\\\", \\\"finally\\\", \\\"tenantId\\\", \\\"retry\\\", \\\"inputs\\\", \\\"errors\\\", \\\"tasks\\\", \\\"outputs\\\", \\\"concurrency\\\", \\\"variables\\\", \\\"deleted\\\", \\\"id\\\", \\\"description\\\", \\\"labels\\\", \\\"pluginDefaults\\\", \\\"sla\\\", \\\"checks\\\", \\\"taskDefaults\\\", \\\"namespace\\\", \\\"disabled\\\", \\\"listeners\\\", \\\"revision\\\", \\\"updated\\\", \\\"afterExecution\\\", \\\"triggers\\\", \\\"source\\\")\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"Unrecognized field \\\"execution\\\" (class io.kestra.core.models.flows.FlowWithSource), not marked as ignorable (26 known properties: \\\"workerGroup\\\", \\\"finally\\\", \\\"tenantId\\\", \\\"retry\\\", \\\"inputs\\\", \\\"errors\\\", \\\"tasks\\\", \\\"outputs\\\", \\\"concurrency\\\", \\\"variables\\\", \\\"deleted\\\", \\\"id\\\", \\\"description\\\", \\\"labels\\\", \\\"pluginDefaults\\\", \\\"sla\\\", \\\"checks\\\", \\\"taskDefaults\\\", \\\"namespace\\\", \\\"disabled\\\", \\\"listeners\\\", \\\"revision\\\", \\\"updated\\\", \\\"afterExecution\\\", \\\"triggers\\\", \\\"source\\\")\",\"logref\":null,\"path\":\"io.kestra.core.models.flows.FlowWithSource[\\\"execution\\\"]\",\"_links\":{},\"_embedded\":{}}]}}",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 12.704635538044386,
+      "request_metrics": {
+        "run_id": "a8fa9934_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 177.2875,
+        "peak_cpu_percent": 356.58,
+        "peak_memory_bytes": 1293926006,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 14.444444444444445,
+        "gpu_sample_count": 9,
+        "peak_gpu_memory_bytes": 26091716608,
+        "gpu_power_sample_count": 9,
+        "estimated_gpu_energy_wh": 0.38417974942894867,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable ETL workflow for kestra. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_a8fa9934_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. The Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a8fa9934_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/a8fa9934_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nPOST http://172.19.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Unrecognized field \\\"execution\\\" (class io.kestra.core.models.flows.FlowWithSource), not marked as ignorable (26 known properties: \\\"workerGroup\\\", \\\"finally\\\", \\\"tenantId\\\", \\\"retry\\\", \\\"inputs\\\", \\\"errors\\\", \\\"tasks\\\", \\\"outputs\\\", \\\"concurrency\\\", \\\"variables\\\", \\\"deleted\\\", \\\"id\\\", \\\"description\\\", \\\"labels\\\", \\\"pluginDefaults\\\", \\\"sla\\\", \\\"checks\\\", \\\"taskDefaults\\\", \\\"namespace\\\", \\\"disabled\\\", \\\"listeners\\\", \\\"revision\\\", \\\"updated\\\", \\\"afterExecution\\\", \\\"triggers\\\", \\\"source\\\")\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"Unrecognized field \\\"execution\\\" (class io.kestra.core.models.flows.FlowWithSource), not marked as ignorable (26 known properties: \\\"workerGroup\\\", \\\"finally\\\", \\\"tenantId\\\", \\\"retry\\\", \\\"inputs\\\", \\\"errors\\\", \\\"tasks\\\", \\\"outputs\\\", \\\"concurrency\\\", \\\"variables\\\", \\\"deleted\\\", \\\"id\\\", \\\"description\\\", \\\"labels\\\", \\\"pluginDefaults\\\", \\\"sla\\\", \\\"checks\\\", \\\"taskDefaults\\\", \\\"namespace\\\", \\\"disabled\\\", \\\"listeners\\\", \\\"revision\\\", \\\"updated\\\", \\\"afterExecution\\\", \\\"triggers\\\", \\\"source\\\")\",\"logref\":null,\"path\":\"io.kestra.core.models.flows.FlowWithSource[\\\"execution\\\"]\",\"_links\":{},\"_embedded\":{}}]}}\nPrevious artifact:\nid: bench_a8fa9934_1\nnamespace: bench\nexecution:\n  run: manual\ntasks:\n  - id: t2_usgs_etl\n    type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import urllib.request\n      import json\n\n      source_url = \"http://recorder:8090/source/usgs/earthquakes?run_id=a8fa9934_1&attempt=0\"\n      sink_url = \"http://recorder:8090/sink/a8fa9934_1?attempt=0\"\n\n      response = urllib.request.urlopen(source_url)\n      data = json.loads(response.read().decode('utf-8'))\n\n      records = []\n      for feature in data[\"features\"]:\n          props = feature[\"properties\"]\n          geom = feature[\"geometry\"]\n          coords = geom[\"coordinates\"]\n\n          magnitude = props[\"mag\"]\n          if magnitude < 4.0:\n              mag_band = \"minor\"\n          elif magnitude < 5.0:\n              mag_band = \"moderate\"\n          else:\n              mag_band = \"major\"\n\n          record = {\n              \"id\": feature[\"id\"],\n              \"magnitude\": magnitude,\n              \"place\": props[\"place\"],\n              \"time_ms\": props[\"time\"],\n              \"longitude\": coords[0],\n              \"latitude\": coords[1],\n              \"depth_km\": coords[2],\n              \"magnitude_band\": mag_band\n          }\n          records.append(record)\n\n      payload = json.dumps(records).encode('utf-8')\n      req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')\n      urllib.request.urlopen(req)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.639016388973687,
+        "ollama_total_duration_seconds": 2.634885442,
+        "model_load_duration_seconds": 0.00141168,
+        "prompt_tokens": 1566,
+        "output_tokens": 373,
+        "output_tokens_per_second": 179.31580204881524,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/a8fa9934_1_attempt-1.yaml",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 49,
+        "actual_count": 49,
+        "matched_count": 49,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 15.491346694994718,
+      "request_metrics": {
+        "run_id": "a8fa9934_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 49,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 5,
+        "mean_cpu_percent": 218.36999999999998,
+        "peak_cpu_percent": 688.65,
+        "peak_memory_bytes": 1314809445,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 23.1,
+        "gpu_sample_count": 10,
+        "peak_gpu_memory_bytes": 26091716608,
+        "gpu_power_sample_count": 10,
+        "estimated_gpu_energy_wh": 0.48931377976491475,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T12:08:28Z"
+}

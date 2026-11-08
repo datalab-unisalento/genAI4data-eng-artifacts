@@ -1,0 +1,11 @@
+{
+  "source_id": "usgs_earthquakes",
+  "description": "USGS earthquake events as GeoJSON",
+  "request_url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2024-01-01&endtime=2024-01-02&minmagnitude=4.5&orderby=time-asc",
+  "retrieved_at_utc": "2026-10-28T12:06:29.942663+00:00",
+  "http_status": 200,
+  "response_sha256": "2bd935d93fc2c5e6891bc4c9f3da14860d63a2ad37499a41df75c600b3a4bba3",
+  "saved_json_sha256": "1c8783e09b94775ca7c1eda51bdb6572acbc290167f74c12f0a5214f8222ce81",
+  "payload_file": "fixtures/sources/usgs_earthquakes.json",
+  "payload_bytes": 53378
+}

@@ -1,0 +1,266 @@
+{
+  "run_id": "67cc995f_1",
+  "task": "t3_open_meteo_join",
+  "platform": "nifi",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/67cc995f_1_attempt-2.groovy",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:399a1f837d7e63805be07adca53578b9175fb3ab0aad173228955d493e06b49b"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "runtime_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 18.653120869003033,
+    "execution_duration_seconds": 109.58922978900227,
+    "total_duration_seconds": 178.74820046600144,
+    "prompt_tokens": 8285,
+    "output_tokens": 2702,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 87.81729729729729,
+    "peak_cpu_percent": 381.63,
+    "peak_memory_bytes": 1446772735,
+    "resource_sample_count": 37,
+    "mean_gpu_utilization_percent": 15.736842105263158,
+    "peak_gpu_memory_bytes": 26089619456,
+    "estimated_gpu_energy_wh": 2.8060010797078916,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.3333333333333333,
+    "source_request_count": 2,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=67cc995f_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=67cc995f_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/67cc995f_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 6.040740304000792,
+        "ollama_total_duration_seconds": 6.036065688,
+        "model_load_duration_seconds": 0.002274535,
+        "prompt_tokens": 966,
+        "output_tokens": 904,
+        "output_tokens_per_second": 158.94513878424905,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/67cc995f_1_attempt-0.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac04ba42-01a1-1000-ef7e-ba090d89e88c] groovy.lang.MissingPropertyException: No such property: sessionFactory for class: Scriptffffffff90796099: groovy.lang.MissingPropertyException: No such property: sessionFactory for class: Scriptffffffff90796099",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 18.95961207900109,
+      "request_metrics": {
+        "run_id": "67cc995f_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_gases",
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 8,
+        "mean_cpu_percent": 2.0275,
+        "peak_cpu_percent": 3.32,
+        "peak_memory_bytes": 1446772735,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 14.222222222222221,
+        "gpu_sample_count": 9,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 9,
+        "estimated_gpu_energy_wh": 0.7994353516019816,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=67cc995f_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=67cc995f_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/67cc995f_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=ac04ba42-01a1-1000-ef7e-ba090d89e88c] groovy.lang.MissingPropertyException: No such property: sessionFactory for class: Scriptffffffff90796099: groovy.lang.MissingPropertyException: No such property: sessionFactory for class: Scriptffffffff90796099\nPrevious artifact:\n// Groovy script for ExecuteGroovyScript processor\n// This script retrieves Open-Meteo particulate and gas data, converts hourly columns into records,\n// inner-joins on exact time, and posts matching records to the HTTP sink.\n\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\nimport java.net.URL\nimport java.net.HttpURLConnection\n\ndef session = sessionFactory.session\n\n// Source URLs from contract\ndef particulateUrl = \"http://recorder:8090/source/open-meteo/particulate?run_id=67cc995f_1&attempt=0\"\ndef gasesUrl = \"http://recorder:8090/source/open-meteo/gases?run_id=67cc995f_1&attempt=0\"\n\n// Sink URL from contract\ndef sinkUrl = \"http://recorder:8090/sink/67cc995f_1?attempt=0\"\n\ntry {\n    // Fetch particulate source\n    def particulateConn = new URL(particulateUrl).openConnection()\n    particulateConn.requestMethod = \"GET\"\n    particulateConn.connect()\n    def particulateText = particulateConn.getInputStream().text\n    def particulateData = new JsonSlurper().parse(particulateText)\n    \n    // Fetch gases source\n    def gasesConn = new URL(gasesUrl).openConnection()\n    gasesConn.requestMethod = \"GET\"\n    gasesConn.connect()\n    def gasesText = gasesConn.getInputStream().text\n    def gasesData = new JsonSlurper().parse(gasesText)\n    \n    // Extract hourly arrays from particulate\n    def pTimes = particulateData.hourly.time as List<String>\n    def pPm10 = particulateData.hourly.pm10 as List<Number>\n    def pPm25 = particulateData.hourly.pm2_5 as List<Number>\n    \n    // Extract hourly arrays from gases\n    def gTimes = gasesData.hourly.time as List<String>\n    def gNitrogenDioxide = gasesData.hourly.nitrogen_dioxide as List<Number>\n    def gOzone = gasesData.hourly.ozone as List<Number>\n    \n    // Build time-to-index maps for both datasets\n    def pTimeIndex = [:]\n    pTimes.eachWithIndex { time, idx -> pTimeIndex[time] = idx }\n    \n    def gTimeIndex = [:]\n    gTimes.eachWithIndex { time, idx -> gTimeIndex[time] = idx }\n    \n    // Find common times (inner join on exact time values)\n    def commonTimes = pTimeIndex.keySet().intersect(gTimeIndex.keySet())\n    \n    // Build matching records\n    def records = []\n    commonTimes.each { time ->\n        def pIdx = pTimeIndex[time]\n        def gIdx = gTimeIndex[time]\n        records.add([\n            time: time,\n            pm10: pPm10[pIdx],\n            pm2_5: pPm25[pIdx],\n            nitrogen_dioxide: gNitrogenDioxide[gIdx],\n            ozone: gOzone[gIdx]\n        ])\n    }\n    \n    // Build sink body as JSON array\n    def sinkBody = JsonOutput.toJson(records)\n    \n    // POST to sink URL\n    def sinkConn = new URL(sinkUrl).openConnection()\n    sinkConn.requestMethod = \"POST\"\n    sinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\n    sinkConn.doOutput = true\n    sinkConn.outputStream.withWriter(\"UTF-8\") { writer ->\n        writer.write(sinkBody)\n    }\n    // Read response to ensure request is sent\n    def responseCode = sinkConn.getResponseCode()\n    if (responseCode >= 300) {\n        throw new RuntimeException(\"Sink returned HTTP status: $responseCode\")\n    }\n    \n    // Create and transfer FlowFile on success\n    def flowFile = session.create()\n    session.transfer(flowFile, REL_SUCCESS)\n    \n} catch (e) {\n    // Re-throw to signal processor error; NiFi treats uncaught exceptions as errors\n    throw e\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 5.894077222001215,
+        "ollama_total_duration_seconds": 5.884411452,
+        "model_load_duration_seconds": 0.00138559,
+        "prompt_tokens": 2040,
+        "output_tokens": 897,
+        "output_tokens_per_second": 170.13654168743582,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/67cc995f_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac05c50f-01a1-1000-5274-2521d5378faf] groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL): groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL)",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 50.45768444800342,
+      "request_metrics": {
+        "run_id": "67cc995f_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.5,
+        "missing_source_ids": [
+          "open_meteo_gases"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 16,
+        "mean_cpu_percent": 108.21625,
+        "peak_cpu_percent": 381.63,
+        "peak_memory_bytes": 1441320140,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 13.2,
+        "gpu_sample_count": 25,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 25,
+        "estimated_gpu_energy_wh": 0.9923876919720435,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=67cc995f_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=67cc995f_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/67cc995f_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=ac05c50f-01a1-1000-5274-2521d5378faf] groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL): groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL)\nPrevious artifact:\n// Groovy script for ExecuteGroovyScript processor\n// This script retrieves Open-Meteo particulate and gas data, converts hourly columns into records,\n// inner-joins on exact time, and posts matching records to the HTTP sink.\n\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\nimport java.net.URL\nimport java.net.HttpURLConnection\n\n// Source URLs from contract\ndef particulateUrl = \"http://recorder:8090/source/open-meteo/particulate?run_id=67cc995f_1&attempt=1\"\ndef gasesUrl = \"http://recorder:8090/source/open-meteo/gases?run_id=67cc995f_1&attempt=1\"\n\n// Sink URL from contract\ndef sinkUrl = \"http://recorder:8090/sink/67cc995f_1?attempt=1\"\n\ntry {\n    // Fetch particulate source\n    def particulateConn = new URL(particulateUrl).openConnection()\n    particulateConn.requestMethod = \"GET\"\n    particulateConn.connect()\n    def particulateText = particulateConn.getInputStream().text\n    def particulateData = new JsonSlurper().parse(particulateText)\n    \n    // Fetch gases source\n    def gasesConn = new URL(gasesUrl).openConnection()\n    gasesConn.requestMethod = \"GET\"\n    gasesConn.connect()\n    def gasesText = gasesConn.getInputStream().text\n    def gasesData = new JsonSlurper().parse(gasesText)\n    \n    // Extract hourly arrays from particulate\n    def pTimes = particulateData.hourly.time as List<String>\n    def pPm10 = particulateData.hourly.pm10 as List<Number>\n    def pPm25 = particulateData.hourly.pm2_5 as List<Number>\n    \n    // Extract hourly arrays from gases\n    def gTimes = gasesData.hourly.time as List<String>\n    def gNitrogenDioxide = gasesData.hourly.nitrogen_dioxide as List<Number>\n    def gOzone = gasesData.hourly.ozone as List<Number>\n    \n    // Build time-to-index maps for both datasets\n    def pTimeIndex = [:]\n    pTimes.eachWithIndex { time, idx -> pTimeIndex[time] = idx }\n    \n    def gTimeIndex = [:]\n    gTimes.eachWithIndex { time, idx -> gTimeIndex[time] = idx }\n    \n    // Find common times (inner join on exact time values)\n    def commonTimes = pTimeIndex.keySet().intersect(gTimeIndex.keySet())\n    \n    // Build matching records\n    def records = []\n    commonTimes.each { time ->\n        def pIdx = pTimeIndex[time]\n        def gIdx = gTimeIndex[time]\n        records.add([\n            time: time,\n            pm10: pPm10[pIdx],\n            pm2_5: pPm25[pIdx],\n            nitrogen_dioxide: gNitrogenDioxide[gIdx],\n            ozone: gOzone[gIdx]\n        ])\n    }\n    \n    // Build sink body as JSON array\n    def sinkBody = JsonOutput.toJson(records)\n    \n    // POST to sink URL\n    def sinkConn = new URL(sinkUrl).openConnection()\n    sinkConn.requestMethod = \"POST\"\n    sinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\n    sinkConn.doOutput = true\n    sinkConn.outputStream.withWriter(\"UTF-8\") { writer ->\n        writer.write(sinkBody)\n    }\n    // Read response to ensure request is sent\n    def responseCode = sinkConn.getResponseCode()\n    if (responseCode >= 300) {\n        throw new RuntimeException(\"Sink returned HTTP status: $responseCode\")\n    }\n    \n    // Create and transfer FlowFile on success\n    def flowFile = session.create()\n    session.transfer(flowFile, REL_SUCCESS)\n    \n} catch (e) {\n    // Re-throw to signal processor error; NiFi treats uncaught exceptions as errors\n    throw e\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 6.7183033430010255,
+        "ollama_total_duration_seconds": 6.710778383,
+        "model_load_duration_seconds": 0.001394548,
+        "prompt_tokens": 5279,
+        "output_tokens": 901,
+        "output_tokens_per_second": 168.5854093725255,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/67cc995f_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac0701d2-01a1-1000-a0c2-d3baa130fa6b] groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL): groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [{\"latitude\": 37.800003, \"longitude\": -122.399994, \"generationtime_ms\": 0.28312206268310547, \"utc_offset_seconds\": 0, \"timezone\": \"GMT\", \"timezone_abbreviation\": \"GMT\", \"elevation\": 18.0, \"hourly_units\": {\"time\": \"iso8601\", \"pm10\": \"\\u03bcg/m\\u00b3\", \"pm2_5\": \"\\u03bcg/m\\u00b3\"}, \"hourly\": {\"time\": [\"2024-01-01T00:00\", \"2024-01-01T01:00\", \"2024-01-01T02:00\", \"2024-01-01T03:00\", \"2024-01-01T04:00\", \"2024-01-01T05:00\", \"2024-01-01T06:00\", \"2024-01-01T07:00\", \"2024-01-01T08:00\", \"2024-01-01T09:00\", \"2024-01-01T10:00\", \"2024-01-01T11:00\", \"2024-01-01T12:00\", \"2024-01-01T13:00\", \"2024-01-01T14:00\", \"2024-01-01T15:00\", \"2024-01-01T16:00\", \"2024-01-01T17:00\", \"2024-01-01T18:00\", \"2024-01-01T19:00\", \"2024-01-01T20:00\", \"2024-01-01T21:00\", \"2024-01-01T22:00\", \"2024-01-01T23:00\", \"2024-01-02T00:00\", \"2024-01-02T01:00\", \"2024-01-02T02:00\", \"2024-01-02T03:00\", \"2024-01-02T04:00\", \"2024-01-02T05:00\", \"2024-01-02T06:00\", \"2024-01-02T07:00\", \"2024-01-02T08:00\", \"2024-01-02T09:00\", \"2024-01-02T10:00\", \"2024-01-02T11:00\", \"2024-01-02T12:00\", \"2024-01-02T13:00\", \"2024-01-02T14:00\", \"2024-01-02T15:00\", \"2024-01-02T16:00\", \"2024-01-02T17:00\", \"2024-01-02T18:00\", \"2024-01-02T19:00\", \"2024-01-02T20:00\", \"2024-01-02T21:00\", \"2024-01-02T22:00\", \"2024-01-02T23:00\"], \"pm10\": [10.9, 13.6, 14.1, 14.4, 15.7, 16.8, 16.5, 16.4, 15.9, 15.4, 14.6, 14.3, 16.4, 16.7, 17.6, 19.5, 21.8, 23.6, 24.7, 25.1, 24.6, 24.3, 23.2, 23.2, 14.8, 15.7, 16.9, 18.0, 17.5, 18.3, 21.4, 23.6, 22.9, 21.4, 19.3, 17.2, 12.9, 11.5, 10.0, 9.4, 10.0, 10.9, 11.4, 10.9, 9.9, 9.2, 9.1, 8.1], \"pm2_5\": [6.5, 8.4, 8.9, 9.2, 10.3, 11.1, 11.1, 11.2, 10.9, 10.5, 10.0, 9.8, 11.2, 11.4, 11.8, 13.0, 14.6, 15.8, 16.5, 16.6, 16.1, 15.7, 14.7, 14.7, 10.0, 10.6, 11.4, 12.2, 11.9, 12.5, 14.7, 16.4, 15.9, 14.7, 13.1, 11.4, 8.9, 7.7, 6.4, 5.8, 6.0, 6.4, 6.6, 6.1, 5.2, 4.8, 4.8, 4.5]}}]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL)",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 40.171933261997765,
+      "request_metrics": {
+        "run_id": "67cc995f_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.5,
+        "missing_source_ids": [
+          "open_meteo_gases"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 13,
+        "mean_cpu_percent": 115.50461538461538,
+        "peak_cpu_percent": 363.71,
+        "peak_memory_bytes": 1411815308,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 19.08695652173913,
+        "gpu_sample_count": 23,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 23,
+        "estimated_gpu_energy_wh": 1.0141780361338664,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T14:05:08Z"
+}

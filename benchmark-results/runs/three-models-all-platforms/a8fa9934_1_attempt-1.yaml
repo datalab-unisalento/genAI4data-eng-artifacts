@@ -1,0 +1,45 @@
+id: bench_a8fa9934_1
+namespace: bench
+tasks:
+  - id: t2_usgs_etl
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import urllib.request
+      import json
+
+      source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=a8fa9934_1&attempt=1"
+      sink_url = "http://recorder:8090/sink/a8fa9934_1?attempt=1"
+
+      response = urllib.request.urlopen(source_url)
+      data = json.loads(response.read().decode('utf-8'))
+
+      records = []
+      for feature in data["features"]:
+          props = feature["properties"]
+          geom = feature["geometry"]
+          coords = geom["coordinates"]
+
+          magnitude = props["mag"]
+          if magnitude < 4.0:
+              mag_band = "minor"
+          elif magnitude < 5.0:
+              mag_band = "moderate"
+          else:
+              mag_band = "major"
+
+          record = {
+              "id": feature["id"],
+              "magnitude": magnitude,
+              "place": props["place"],
+              "time_ms": props["time"],
+              "longitude": coords[0],
+              "latitude": coords[1],
+              "depth_km": coords[2],
+              "magnitude_band": mag_band
+          }
+          records.append(record)
+
+      payload = json.dumps(records).encode('utf-8')
+      req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+      urllib.request.urlopen(req)

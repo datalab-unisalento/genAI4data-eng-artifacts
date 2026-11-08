@@ -1,0 +1,151 @@
+{
+  "run_id": "79a3e892_1",
+  "task": "t1_open_meteo_ingestion",
+  "platform": "airflow",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "passed",
+  "attempts": 1,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/79a3e892_1_attempt-0.py",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:68af139d48c9c43404bae32ffc522c44e4423fb0f9bb1b0d9ebf3c5f61fe55cd"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {},
+  "metrics": {
+    "first_attempt_passed": true,
+    "first_attempt_f1": 1.0,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 36.76362911803881,
+    "execution_duration_seconds": 74.49474106397247,
+    "total_duration_seconds": 128.63268827600405,
+    "prompt_tokens": 758,
+    "output_tokens": 377,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 61.982499999999995,
+    "peak_cpu_percent": 255.29999999999998,
+    "peak_memory_bytes": 1808158162,
+    "resource_sample_count": 24,
+    "mean_gpu_utilization_percent": 7.0,
+    "peak_gpu_memory_bytes": 26081230848,
+    "estimated_gpu_energy_wh": 1.6884889440058855,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 48
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for airflow. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired airflow artifact: Return only a complete Python Apache Airflow DAG file. Define exactly one DAG with dag_id='bench_79a3e892_1'. Use this structure: include the explicit imports `from airflow import DAG`, `from airflow.operators.python import PythonOperator`, and `from datetime import datetime`. `with DAG(dag_id=..., start_date=datetime(2024, 1, 1), schedule=None, catchup=False) as dag:` and declare a PythonOperator inside that context manager; do not call `dag.add`. The task callable must take no required arguments and must not suppress exceptions. Use the exact source and sink URLs from the current contract, not URLs copied from a previous attempt. Fetch each source using urllib.request.urlopen. To deliver output, construct `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')` and pass that request to `urlopen`. Include imports and all task logic in this single file. Do not access files, environment secrets, or network destinations other than the listed fixture URLs and sink.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=79a3e892_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/79a3e892_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 36.76362911803881,
+        "ollama_total_duration_seconds": 36.759983361,
+        "model_load_duration_seconds": 33.957311579,
+        "prompt_tokens": 758,
+        "output_tokens": 377,
+        "output_tokens_per_second": 170.92436075649218,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/79a3e892_1_attempt-0.py",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 48,
+        "actual_count": 48,
+        "matched_count": 48,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 74.49474106397247,
+      "request_metrics": {
+        "run_id": "79a3e892_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 48,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 24,
+        "mean_cpu_percent": 61.982499999999995,
+        "peak_cpu_percent": 255.29999999999998,
+        "peak_memory_bytes": 1808158162,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 7.0,
+        "gpu_sample_count": 61,
+        "peak_gpu_memory_bytes": 26081230848,
+        "gpu_power_sample_count": 61,
+        "estimated_gpu_energy_wh": 1.6884889440058855,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T11:33:16Z"
+}

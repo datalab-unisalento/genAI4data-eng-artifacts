@@ -1,0 +1,43 @@
+id: bench_077137eb_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=077137eb_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/077137eb_1?attempt=0"
+
+      response = urllib.request.urlopen(source_url)
+      data = json.loads(response.read().decode('utf-8'))
+
+      records_by_date = {}
+      times = data["hourly"]["time"]
+      pm25 = data["hourly"]["pm2_5"]
+      pm10 = data["hourly"]["pm10"]
+
+      for i, t in enumerate(times):
+          date = t[:10]
+          if date not in records_by_date:
+              records_by_date[date] = {"count": 0, "pm25_vals": [], "pm10_vals": []}
+          records_by_date[date]["count"] += 1
+          records_by_date[date]["pm25_vals"].append(pm25[i])
+          records_by_date[date]["pm10_vals"].append(pm10[i])
+
+      summary_records = []
+      for date, info in records_by_date.items():
+          record = {
+              "date": date,
+              "hours": info["count"],
+              "pm2_5_max": max(info["pm25_vals"]),
+              "pm10_max": max(info["pm10_vals"])
+          }
+          summary_records.append(record)
+
+      payload = json.dumps(summary_records).encode('utf-8')
+      req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+      urllib.request.urlopen(req)

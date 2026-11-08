@@ -1,0 +1,41 @@
+id: bench_e1f519db_1
+namespace: bench
+tasks:
+- task_id: t4_daily_particulate_summary
+  type: io.kestra.plugin.scripts.python.Script
+  runner: PROCESS
+  script: |
+    import urllib.request
+    import json
+
+    source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=e1f519db_1&attempt=0"
+    sink_url = "http://recorder:8090/sink/e1f519db_1?attempt=0"
+
+    response = urllib.request.urlopen(source_url)
+    data = json.loads(response.read().decode('utf-8'))
+
+    times = data["hourly"]["time"]
+    pm25 = data["hourly"]["pm2_5"]
+    pm10 = data["hourly"]["pm10"]
+
+    # Group by date (first 10 chars of ISO timestamp)
+    groups = {}
+    for i, t in enumerate(times):
+        date = t[:10]
+        if date not in groups:
+            groups[date] = {"pm25": [], "pm10": []}
+        groups[date]["pm25"].append(pm25[i])
+        groups[date]["pm10"].append(pm10[i])
+
+    records = []
+    for date, vals in groups.items():
+        records.append({
+            "date": date,
+            "hours": len(vals["pm25"]),
+            "pm2_5_max": max(vals["pm25"]),
+            "pm10_max": max(vals["pm10"])
+        })
+
+    body = json.dumps(records)
+    req = urllib.request.Request(sink_url, data=body.encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')
+    urllib.request.urlopen(req)

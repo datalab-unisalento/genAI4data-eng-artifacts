@@ -1,0 +1,153 @@
+{
+  "run_id": "7f2d1697_1",
+  "task": "t5_trailing_three_hour_peak",
+  "platform": "prefect",
+  "model": "cogito:32b",
+  "status": "passed",
+  "attempts": 1,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/7f2d1697_1_attempt-0.py",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:d678fc3d96c98404fe98f3aee00e8763abac98f9d4182ee5e57f6b9a1a3a6c39"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {},
+  "metrics": {
+    "first_attempt_passed": true,
+    "first_attempt_f1": 1.0,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 11.430097128999478,
+    "execution_duration_seconds": 27.568687198003317,
+    "total_duration_seconds": 39.40043515200159,
+    "prompt_tokens": 718,
+    "output_tokens": 328,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 0.03588235294117647,
+    "peak_cpu_percent": 0.38,
+    "peak_memory_bytes": 23551016,
+    "resource_sample_count": 17,
+    "mean_gpu_utilization_percent": 24.94736842105263,
+    "peak_gpu_memory_bytes": 22352494592,
+    "estimated_gpu_energy_wh": 1.4238919981832348,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 46
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for prefect. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired prefect artifact: Return one complete Python file defining a Prefect flow named `bench_7f2d1697_1` with `@flow`. Include the explicit import `from prefect import flow`; do not import any other Prefect symbols. Implement the task inside the flow; use only the current fixture source URLs and HTTP sink URL from the contract. Fetch each source with `urllib.request.urlopen(source_url)`, transform rows exactly as specified, then create `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')` and pass that request to `urllib.request.urlopen(request)`. Import `json` and `urllib.request`. Do not suppress exceptions or access any other network destination. Invoke the flow under `if __name__ == '__main__':` so the file executes it when run with Python.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=7f2d1697_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/7f2d1697_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 11.430097128999478,
+        "ollama_total_duration_seconds": 11.425983458,
+        "model_load_duration_seconds": 0.000969936,
+        "prompt_tokens": 718,
+        "output_tokens": 328,
+        "output_tokens_per_second": 30.279151622482495,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/7f2d1697_1_attempt-0.py",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 46,
+        "actual_count": 46,
+        "matched_count": 46,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 27.568687198003317,
+      "request_metrics": {
+        "run_id": "7f2d1697_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 46,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 17,
+        "mean_cpu_percent": 0.03588235294117647,
+        "peak_cpu_percent": 0.38,
+        "peak_memory_bytes": 23551016,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 24.94736842105263,
+        "gpu_sample_count": 19,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 19,
+        "estimated_gpu_energy_wh": 1.4238919981832348,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T13:34:55Z"
+}

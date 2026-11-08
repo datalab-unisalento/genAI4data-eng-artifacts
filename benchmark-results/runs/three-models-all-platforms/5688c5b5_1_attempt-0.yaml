@@ -1,0 +1,59 @@
+id: bench_5688c5b5_1
+namespace: bench
+
+tasks:
+  - id: process_earthquakes
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+      
+      # Fetch earthquake data from source URL
+      with urllib.request.urlopen("http://recorder:8090/source/usgs/earthquakes?run_id=5688c5b5_1&attempt=0") as response:
+          data = json.load(response)
+      
+      # Initialize band statistics
+      bands = {
+          "minor": {"count": 0, "max_mag": -float('inf'), "max_depth": -float('inf')},
+          "moderate": {"count": 0, "max_mag": -float('inf'), "max_depth": -float('inf')},
+          "major": {"count": 0, "max_mag": -float('inf'), "max_depth": -float('inf')}
+      }
+      
+      # Process each earthquake event
+      for feature in data["features"]:
+          mag = feature["properties"]["mag"]
+          depth = feature["geometry"]["coordinates"][2]
+          
+          if mag < 4.0:
+              band_key = "minor"
+          elif 4.0 <= mag < 5.0:
+              band_key = "moderate"
+          else:
+              band_key = "major"
+              
+          bands[band_key]["count"] += 1
+          bands[band_key]["max_mag"] = max(bands[band_key]["max_mag"], mag)
+          bands[band_key]["max_depth"] = max(bands[band_key]["max_depth"], depth)
+      
+      # Prepare output records
+      records = []
+      for band, stats in bands.items():
+          if stats["count"] > 0:
+              records.append({
+                  "magnitude_band": band,
+                  "event_count": stats["count"],
+                  "max_magnitude": stats["max_mag"],
+                  "max_depth_km": stats["max_depth"]
+              })
+      
+      # Post results to sink
+      request = urllib.request.Request(
+          "http://recorder:8090/sink/5688c5b5_1?attempt=0",
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urllib.request.urlopen(request) as response:
+          pass

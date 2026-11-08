@@ -1,0 +1,63 @@
+id: bench_f4a85649_1
+namespace: bench
+tasks:
+  - id: t3_open_meteo_join
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      particulate_url = "http://recorder:8090/source/open-meteo/particulate?run_id=f4a85649_1&attempt=0"
+      gases_url = "http://recorder:8090/source/open-meteo/gases?run_id=f4a85649_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/f4a85649_1?attempt=0"
+
+      # Fetch particulate data
+      with urllib.request.urlopen(particulate_url) as response:
+          particulate_data = json.loads(response.read().decode('utf-8'))
+
+      # Fetch gases data
+      with urllib.request.urlopen(gases_url) as response:
+          gases_data = json.loads(response.read().decode('utf-8'))
+
+      # Convert hourly arrays to records for particulates
+      particulate_records = []
+      for i, time in enumerate(particulate_data['hourly']['time']):
+          record = {
+              'time': time,
+              'pm10': particulate_data['hourly']['pm10'][i],
+              'pm2_5': particulate_data['hourly']['pm2_5'][i]
+          }
+          particulate_records.append(record)
+
+      # Convert hourly arrays to records for gases
+      gases_records = []
+      for i, time in enumerate(gases_data['hourly']['time']):
+          record = {
+              'time': time,
+              'nitrogen_dioxide': gases_data['hourly']['nitrogen_dioxide'][i],
+              'ozone': gases_data['hourly']['ozone'][i]
+          }
+          gases_records.append(record)
+
+      # Create a lookup dictionary for gases by time
+      gases_by_time = {record['time']: record for record in gases_records}
+
+      # Inner join records on exact time match
+      joined_records = []
+      for p_record in particulate_records:
+          time = p_record['time']
+          if time in gases_by_time:
+              g_record = gases_by_time[time]
+              combined = {**p_record, **g_record}
+              joined_records.append(combined)
+
+      # POST to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(joined_records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response ignored per contract

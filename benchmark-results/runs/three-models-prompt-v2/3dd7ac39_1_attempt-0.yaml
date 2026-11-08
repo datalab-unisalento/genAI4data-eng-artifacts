@@ -1,0 +1,52 @@
+id: bench_3dd7ac39_1
+namespace: bench
+
+tasks:
+  - id: t2_usgs_etl
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      from urllib.request import urlopen, Request
+      
+      # Fetch source data
+      with urlopen("http://recorder:8090/source/usgs/earthquakes?run_id=3dd7ac39_1&attempt=0") as response:
+          data = json.load(response)
+      
+      records = []
+      for feature in data["features"]:
+          # Extract coordinates
+          coords = feature["geometry"]["coordinates"]
+          
+          # Create record with required fields
+          record = {
+              "id": feature["id"],
+              "magnitude": feature["properties"]["mag"],
+              "place": feature["properties"]["place"],
+              "time_ms": feature["properties"]["time"],
+              "longitude": coords[0],
+              "latitude": coords[1],
+              "depth_km": coords[2]
+          }
+          
+          # Determine magnitude band
+          mag = record["magnitude"]
+          if mag < 4.0:
+              record["magnitude_band"] = "minor"
+          elif 4.0 <= mag < 5.0:
+              record["magnitude_band"] = "moderate"
+          else:
+              record["magnitude_band"] = "major"
+              
+          records.append(record)
+      
+      # Post to sink
+      request = Request(
+          url="http://recorder:8090/sink/3dd7ac39_1?attempt=0",
+          data=json.dumps({"records": records}).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urlopen(request) as response:
+          pass

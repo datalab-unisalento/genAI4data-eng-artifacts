@@ -1,0 +1,1012 @@
+{
+  "run_id": "33e11636_1",
+  "task": "t1_open_meteo_ingestion",
+  "platform": "nifi",
+  "model": "cogito:32b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/33e11636_1_attempt-2.groovy",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:3d86316fa23352aa62d107669b72998bd04ba7acd621982ce32360c1957f5963"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "incorrect_output": 3
+  },
+  "metrics": {
+    "first_attempt_passed": false,
+    "first_attempt_f1": 0.0,
+    "best_f1": 0.0,
+    "generation_duration_seconds": 37.79241276200628,
+    "execution_duration_seconds": 186.79568724200362,
+    "total_duration_seconds": 287.2391273629619,
+    "prompt_tokens": 7864,
+    "output_tokens": 918,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 68.9522033898305,
+    "peak_cpu_percent": 464.84999999999997,
+    "peak_memory_bytes": 1334457662,
+    "resource_sample_count": 59,
+    "mean_gpu_utilization_percent": 30.723809523809525,
+    "peak_gpu_memory_bytes": 22354591744,
+    "estimated_gpu_energy_wh": 5.197512781786788,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 3,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=33e11636_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/33e11636_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 11.057781383045949,
+        "ollama_total_duration_seconds": 11.052475805,
+        "model_load_duration_seconds": 0.001198948,
+        "prompt_tokens": 706,
+        "output_tokens": 306,
+        "output_tokens_per_second": 29.927613318805072,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/33e11636_1_attempt-0.groovy",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 48,
+        "actual_count": 0,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.5,
+            "time": "2024-01-01T00:00"
+          },
+          {
+            "pm10": 13.6,
+            "pm2_5": 8.4,
+            "time": "2024-01-01T01:00"
+          },
+          {
+            "pm10": 14.1,
+            "pm2_5": 8.9,
+            "time": "2024-01-01T02:00"
+          },
+          {
+            "pm10": 14.4,
+            "pm2_5": 9.2,
+            "time": "2024-01-01T03:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.3,
+            "time": "2024-01-01T04:00"
+          },
+          {
+            "pm10": 16.8,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T05:00"
+          },
+          {
+            "pm10": 16.5,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T06:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T07:00"
+          },
+          {
+            "pm10": 15.9,
+            "pm2_5": 10.9,
+            "time": "2024-01-01T08:00"
+          },
+          {
+            "pm10": 15.4,
+            "pm2_5": 10.5,
+            "time": "2024-01-01T09:00"
+          },
+          {
+            "pm10": 14.6,
+            "pm2_5": 10.0,
+            "time": "2024-01-01T10:00"
+          },
+          {
+            "pm10": 14.3,
+            "pm2_5": 9.8,
+            "time": "2024-01-01T11:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T12:00"
+          },
+          {
+            "pm10": 16.7,
+            "pm2_5": 11.4,
+            "time": "2024-01-01T13:00"
+          },
+          {
+            "pm10": 17.6,
+            "pm2_5": 11.8,
+            "time": "2024-01-01T14:00"
+          },
+          {
+            "pm10": 19.5,
+            "pm2_5": 13.0,
+            "time": "2024-01-01T15:00"
+          },
+          {
+            "pm10": 21.8,
+            "pm2_5": 14.6,
+            "time": "2024-01-01T16:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 15.8,
+            "time": "2024-01-01T17:00"
+          },
+          {
+            "pm10": 24.7,
+            "pm2_5": 16.5,
+            "time": "2024-01-01T18:00"
+          },
+          {
+            "pm10": 25.1,
+            "pm2_5": 16.6,
+            "time": "2024-01-01T19:00"
+          },
+          {
+            "pm10": 24.6,
+            "pm2_5": 16.1,
+            "time": "2024-01-01T20:00"
+          },
+          {
+            "pm10": 24.3,
+            "pm2_5": 15.7,
+            "time": "2024-01-01T21:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T22:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T23:00"
+          },
+          {
+            "pm10": 14.8,
+            "pm2_5": 10.0,
+            "time": "2024-01-02T00:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.6,
+            "time": "2024-01-02T01:00"
+          },
+          {
+            "pm10": 16.9,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T02:00"
+          },
+          {
+            "pm10": 18.0,
+            "pm2_5": 12.2,
+            "time": "2024-01-02T03:00"
+          },
+          {
+            "pm10": 17.5,
+            "pm2_5": 11.9,
+            "time": "2024-01-02T04:00"
+          },
+          {
+            "pm10": 18.3,
+            "pm2_5": 12.5,
+            "time": "2024-01-02T05:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T06:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 16.4,
+            "time": "2024-01-02T07:00"
+          },
+          {
+            "pm10": 22.9,
+            "pm2_5": 15.9,
+            "time": "2024-01-02T08:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T09:00"
+          },
+          {
+            "pm10": 19.3,
+            "pm2_5": 13.1,
+            "time": "2024-01-02T10:00"
+          },
+          {
+            "pm10": 17.2,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T11:00"
+          },
+          {
+            "pm10": 12.9,
+            "pm2_5": 8.9,
+            "time": "2024-01-02T12:00"
+          },
+          {
+            "pm10": 11.5,
+            "pm2_5": 7.7,
+            "time": "2024-01-02T13:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T14:00"
+          },
+          {
+            "pm10": 9.4,
+            "pm2_5": 5.8,
+            "time": "2024-01-02T15:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.0,
+            "time": "2024-01-02T16:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T17:00"
+          },
+          {
+            "pm10": 11.4,
+            "pm2_5": 6.6,
+            "time": "2024-01-02T18:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.1,
+            "time": "2024-01-02T19:00"
+          },
+          {
+            "pm10": 9.9,
+            "pm2_5": 5.2,
+            "time": "2024-01-02T20:00"
+          },
+          {
+            "pm10": 9.2,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T21:00"
+          },
+          {
+            "pm10": 9.1,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T22:00"
+          },
+          {
+            "pm10": 8.1,
+            "pm2_5": 4.5,
+            "time": "2024-01-02T23:00"
+          }
+        ],
+        "unexpected_rows": []
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 70.8780913510127,
+      "request_metrics": {
+        "run_id": "33e11636_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 22,
+        "mean_cpu_percent": 57.256818181818176,
+        "peak_cpu_percent": 217.57999999999998,
+        "peak_memory_bytes": 1272646204,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 26.0,
+        "gpu_sample_count": 36,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 36,
+        "estimated_gpu_energy_wh": 1.6629582876705902,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=33e11636_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/33e11636_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\n{\n  \"passed\": false,\n  \"expected_count\": 48,\n  \"actual_count\": 0,\n  \"matched_count\": 0,\n  \"precision\": 0.0,\n  \"recall\": 0.0,\n  \"f1\": 0.0,\n  \"missing_rows\": [\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.5,\n      \"time\": \"2024-01-01T00:00\"\n    },\n    {\n      \"pm10\": 13.6,\n      \"pm2_5\": 8.4,\n      \"time\": \"2024-01-01T01:00\"\n    },\n    {\n      \"pm10\": 14.1,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-01T02:00\"\n    },\n    {\n      \"pm10\": 14.4,\n      \"pm2_5\": 9.2,\n      \"time\": \"2024-01-01T03:00\"\n    },\n    {\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.3,\n      \"time\": \"2024-01-01T04:00\"\n    },\n    {\n      \"pm10\": 16.8,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T05:00\"\n    },\n    {\n      \"pm10\": 16.5,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T06:00\"\n    },\n    {\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T07:00\"\n    },\n    {\n      \"pm10\": 15.9,\n      \"pm2_5\": 10.9,\n      \"time\": \"2024-01-01T08:00\"\n    },\n    {\n      \"pm10\": 15.4,\n      \"pm2_5\": 10.5,\n      \"time\": \"2024-01-01T09:00\"\n    },\n    {\n      \"pm10\": 14.6,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-01T10:00\"\n    },\n    {\n      \"pm10\": 14.3,\n      \"pm2_5\": 9.8,\n      \"time\": \"2024-01-01T11:00\"\n    },\n    {\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T12:00\"\n    },\n    {\n      \"pm10\": 16.7,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-01T13:00\"\n    },\n    {\n      \"pm10\": 17.6,\n      \"pm2_5\": 11.8,\n      \"time\": \"2024-01-01T14:00\"\n    },\n    {\n      \"pm10\": 19.5,\n      \"pm2_5\": 13.0,\n      \"time\": \"2024-01-01T15:00\"\n    },\n    {\n      \"pm10\": 21.8,\n      \"pm2_5\": 14.6,\n      \"time\": \"2024-01-01T16:00\"\n    },\n    {\n      \"pm10\": 23.6,\n      \"pm2_5\": 15.8,\n      \"time\": \"2024-01-01T17:00\"\n    },\n    {\n      \"pm10\": 24.7,\n      \"pm2_5\": 16.5,\n      \"time\": \"2024-01-01T18:00\"\n    },\n    {\n      \"pm10\": 25.1,\n      \"pm2_5\": 16.6,\n      \"time\": \"2024-01-01T19:00\"\n    },\n    {\n      \"pm10\": 24.6,\n      \"pm2_5\": 16.1,\n      \"time\": \"2024-01-01T20:00\"\n    },\n    {\n      \"pm10\": 24.3,\n      \"pm2_5\": 15.7,\n      \"time\": \"2024-01-01T21:00\"\n    },\n    {\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T22:00\"\n    },\n    {\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T23:00\"\n    },\n    {\n      \"pm10\": 14.8,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-02T00:00\"\n    },\n    {\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.6,\n      \"time\": \"2024-01-02T01:00\"\n    },\n    {\n      \"pm10\": 16.9,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T02:00\"\n    },\n    {\n      \"pm10\": 18.0,\n      \"pm2_5\": 12.2,\n      \"time\": \"2024-01-02T03:00\"\n    },\n    {\n      \"pm10\": 17.5,\n      \"pm2_5\": 11.9,\n      \"time\": \"2024-01-02T04:00\"\n    },\n    {\n      \"pm10\": 18.3,\n      \"pm2_5\": 12.5,\n      \"time\": \"2024-01-02T05:00\"\n    },\n    {\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T06:00\"\n    },\n    {\n      \"pm10\": 23.6,\n      \"pm2_5\": 16.4,\n      \"time\": \"2024-01-02T07:00\"\n    },\n    {\n      \"pm10\": 22.9,\n      \"pm2_5\": 15.9,\n      \"time\": \"2024-01-02T08:00\"\n    },\n    {\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T09:00\"\n    },\n    {\n      \"pm10\": 19.3,\n      \"pm2_5\": 13.1,\n      \"time\": \"2024-01-02T10:00\"\n    },\n    {\n      \"pm10\": 17.2,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T11:00\"\n    },\n    {\n      \"pm10\": 12.9,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-02T12:00\"\n    },\n    {\n      \"pm10\": 11.5,\n      \"pm2_5\": 7.7,\n      \"time\": \"2024-01-02T13:00\"\n    },\n    {\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T14:00\"\n    },\n    {\n      \"pm10\": 9.4,\n      \"pm2_5\": 5.8,\n      \"time\": \"2024-01-02T15:00\"\n    },\n    {\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.0,\n      \"time\": \"2024-01-02T16:00\"\n    },\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T17:00\"\n    },\n    {\n      \"pm10\": 11.4,\n      \"pm2_5\": 6.6,\n      \"time\": \"2024-01-02T18:00\"\n    },\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.1,\n      \"time\": \"2024-01-02T19:00\"\n    },\n    {\n      \"pm10\": 9.9,\n      \"pm2_5\": 5.2,\n      \"time\": \"2024-01-02T20:00\"\n    },\n    {\n      \"pm10\": 9.2,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T21:00\"\n    },\n    {\n      \"pm10\": 9.1,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T22:00\"\n    },\n    {\n      \"pm10\": 8.1,\n      \"pm2_5\": 4.5,\n      \"time\": \"2024-01-02T23:00\"\n    }\n  ],\n  \"unexpected_rows\": []\n}\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef sourceUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=33e11636_1&attempt=0'\ndef sinkUrl = 'http://recorder:8090/sink/33e11636_1?attempt=0'\n\ndef sourceConnection = new URL(sourceUrl).openConnection()\nsourceConnection.connectTimeout = 5000\nsourceConnection.readTimeout = 5000\n\ndef sourceResponse = sourceConnection.inputStream.text\ndef jsonSlurper = new JsonSlurper()\ndef data = jsonSlurper.parseText(sourceResponse)\n\ndef records = []\nfor (int i = 0; i < data.hourly.time.size(); i++) {\n    def record = [\n        time: data.hourly.time[i],\n        pm10: data.hourly.pm10[i],\n        pm2_5: data.hourly.pm2_5[i]\n    ]\n    records << record\n}\n\ndef sinkConnection = new URL(sinkUrl).openConnection()\nsinkConnection.setRequestMethod('POST')\nsinkConnection.setDoOutput(true)\nsinkConnection.setRequestProperty('Content-Type', 'application/json')\n\ndef jsonBody = JsonOutput.toJson([records: records])\nsinkConnection.outputStream.write(jsonBody.bytes)\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 13.19641066197073,
+        "ollama_total_duration_seconds": 13.189482453,
+        "model_load_duration_seconds": 0.001613729,
+        "prompt_tokens": 3579,
+        "output_tokens": 306,
+        "output_tokens_per_second": 29.04507482381457,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/33e11636_1_attempt-1.groovy",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 48,
+        "actual_count": 0,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.5,
+            "time": "2024-01-01T00:00"
+          },
+          {
+            "pm10": 13.6,
+            "pm2_5": 8.4,
+            "time": "2024-01-01T01:00"
+          },
+          {
+            "pm10": 14.1,
+            "pm2_5": 8.9,
+            "time": "2024-01-01T02:00"
+          },
+          {
+            "pm10": 14.4,
+            "pm2_5": 9.2,
+            "time": "2024-01-01T03:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.3,
+            "time": "2024-01-01T04:00"
+          },
+          {
+            "pm10": 16.8,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T05:00"
+          },
+          {
+            "pm10": 16.5,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T06:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T07:00"
+          },
+          {
+            "pm10": 15.9,
+            "pm2_5": 10.9,
+            "time": "2024-01-01T08:00"
+          },
+          {
+            "pm10": 15.4,
+            "pm2_5": 10.5,
+            "time": "2024-01-01T09:00"
+          },
+          {
+            "pm10": 14.6,
+            "pm2_5": 10.0,
+            "time": "2024-01-01T10:00"
+          },
+          {
+            "pm10": 14.3,
+            "pm2_5": 9.8,
+            "time": "2024-01-01T11:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T12:00"
+          },
+          {
+            "pm10": 16.7,
+            "pm2_5": 11.4,
+            "time": "2024-01-01T13:00"
+          },
+          {
+            "pm10": 17.6,
+            "pm2_5": 11.8,
+            "time": "2024-01-01T14:00"
+          },
+          {
+            "pm10": 19.5,
+            "pm2_5": 13.0,
+            "time": "2024-01-01T15:00"
+          },
+          {
+            "pm10": 21.8,
+            "pm2_5": 14.6,
+            "time": "2024-01-01T16:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 15.8,
+            "time": "2024-01-01T17:00"
+          },
+          {
+            "pm10": 24.7,
+            "pm2_5": 16.5,
+            "time": "2024-01-01T18:00"
+          },
+          {
+            "pm10": 25.1,
+            "pm2_5": 16.6,
+            "time": "2024-01-01T19:00"
+          },
+          {
+            "pm10": 24.6,
+            "pm2_5": 16.1,
+            "time": "2024-01-01T20:00"
+          },
+          {
+            "pm10": 24.3,
+            "pm2_5": 15.7,
+            "time": "2024-01-01T21:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T22:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T23:00"
+          },
+          {
+            "pm10": 14.8,
+            "pm2_5": 10.0,
+            "time": "2024-01-02T00:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.6,
+            "time": "2024-01-02T01:00"
+          },
+          {
+            "pm10": 16.9,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T02:00"
+          },
+          {
+            "pm10": 18.0,
+            "pm2_5": 12.2,
+            "time": "2024-01-02T03:00"
+          },
+          {
+            "pm10": 17.5,
+            "pm2_5": 11.9,
+            "time": "2024-01-02T04:00"
+          },
+          {
+            "pm10": 18.3,
+            "pm2_5": 12.5,
+            "time": "2024-01-02T05:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T06:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 16.4,
+            "time": "2024-01-02T07:00"
+          },
+          {
+            "pm10": 22.9,
+            "pm2_5": 15.9,
+            "time": "2024-01-02T08:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T09:00"
+          },
+          {
+            "pm10": 19.3,
+            "pm2_5": 13.1,
+            "time": "2024-01-02T10:00"
+          },
+          {
+            "pm10": 17.2,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T11:00"
+          },
+          {
+            "pm10": 12.9,
+            "pm2_5": 8.9,
+            "time": "2024-01-02T12:00"
+          },
+          {
+            "pm10": 11.5,
+            "pm2_5": 7.7,
+            "time": "2024-01-02T13:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T14:00"
+          },
+          {
+            "pm10": 9.4,
+            "pm2_5": 5.8,
+            "time": "2024-01-02T15:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.0,
+            "time": "2024-01-02T16:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T17:00"
+          },
+          {
+            "pm10": 11.4,
+            "pm2_5": 6.6,
+            "time": "2024-01-02T18:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.1,
+            "time": "2024-01-02T19:00"
+          },
+          {
+            "pm10": 9.9,
+            "pm2_5": 5.2,
+            "time": "2024-01-02T20:00"
+          },
+          {
+            "pm10": 9.2,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T21:00"
+          },
+          {
+            "pm10": 9.1,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T22:00"
+          },
+          {
+            "pm10": 8.1,
+            "pm2_5": 4.5,
+            "time": "2024-01-02T23:00"
+          }
+        ],
+        "unexpected_rows": []
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 68.28360136999981,
+      "request_metrics": {
+        "run_id": "33e11636_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 22,
+        "mean_cpu_percent": 68.15727272727273,
+        "peak_cpu_percent": 295.4,
+        "peak_memory_bytes": 1323627970,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 30.07894736842105,
+        "gpu_sample_count": 38,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 38,
+        "estimated_gpu_energy_wh": 1.8301227134117555,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=33e11636_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/33e11636_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\n{\n  \"passed\": false,\n  \"expected_count\": 48,\n  \"actual_count\": 0,\n  \"matched_count\": 0,\n  \"precision\": 0.0,\n  \"recall\": 0.0,\n  \"f1\": 0.0,\n  \"missing_rows\": [\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.5,\n      \"time\": \"2024-01-01T00:00\"\n    },\n    {\n      \"pm10\": 13.6,\n      \"pm2_5\": 8.4,\n      \"time\": \"2024-01-01T01:00\"\n    },\n    {\n      \"pm10\": 14.1,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-01T02:00\"\n    },\n    {\n      \"pm10\": 14.4,\n      \"pm2_5\": 9.2,\n      \"time\": \"2024-01-01T03:00\"\n    },\n    {\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.3,\n      \"time\": \"2024-01-01T04:00\"\n    },\n    {\n      \"pm10\": 16.8,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T05:00\"\n    },\n    {\n      \"pm10\": 16.5,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T06:00\"\n    },\n    {\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T07:00\"\n    },\n    {\n      \"pm10\": 15.9,\n      \"pm2_5\": 10.9,\n      \"time\": \"2024-01-01T08:00\"\n    },\n    {\n      \"pm10\": 15.4,\n      \"pm2_5\": 10.5,\n      \"time\": \"2024-01-01T09:00\"\n    },\n    {\n      \"pm10\": 14.6,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-01T10:00\"\n    },\n    {\n      \"pm10\": 14.3,\n      \"pm2_5\": 9.8,\n      \"time\": \"2024-01-01T11:00\"\n    },\n    {\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T12:00\"\n    },\n    {\n      \"pm10\": 16.7,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-01T13:00\"\n    },\n    {\n      \"pm10\": 17.6,\n      \"pm2_5\": 11.8,\n      \"time\": \"2024-01-01T14:00\"\n    },\n    {\n      \"pm10\": 19.5,\n      \"pm2_5\": 13.0,\n      \"time\": \"2024-01-01T15:00\"\n    },\n    {\n      \"pm10\": 21.8,\n      \"pm2_5\": 14.6,\n      \"time\": \"2024-01-01T16:00\"\n    },\n    {\n      \"pm10\": 23.6,\n      \"pm2_5\": 15.8,\n      \"time\": \"2024-01-01T17:00\"\n    },\n    {\n      \"pm10\": 24.7,\n      \"pm2_5\": 16.5,\n      \"time\": \"2024-01-01T18:00\"\n    },\n    {\n      \"pm10\": 25.1,\n      \"pm2_5\": 16.6,\n      \"time\": \"2024-01-01T19:00\"\n    },\n    {\n      \"pm10\": 24.6,\n      \"pm2_5\": 16.1,\n      \"time\": \"2024-01-01T20:00\"\n    },\n    {\n      \"pm10\": 24.3,\n      \"pm2_5\": 15.7,\n      \"time\": \"2024-01-01T21:00\"\n    },\n    {\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T22:00\"\n    },\n    {\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T23:00\"\n    },\n    {\n      \"pm10\": 14.8,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-02T00:00\"\n    },\n    {\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.6,\n      \"time\": \"2024-01-02T01:00\"\n    },\n    {\n      \"pm10\": 16.9,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T02:00\"\n    },\n    {\n      \"pm10\": 18.0,\n      \"pm2_5\": 12.2,\n      \"time\": \"2024-01-02T03:00\"\n    },\n    {\n      \"pm10\": 17.5,\n      \"pm2_5\": 11.9,\n      \"time\": \"2024-01-02T04:00\"\n    },\n    {\n      \"pm10\": 18.3,\n      \"pm2_5\": 12.5,\n      \"time\": \"2024-01-02T05:00\"\n    },\n    {\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T06:00\"\n    },\n    {\n      \"pm10\": 23.6,\n      \"pm2_5\": 16.4,\n      \"time\": \"2024-01-02T07:00\"\n    },\n    {\n      \"pm10\": 22.9,\n      \"pm2_5\": 15.9,\n      \"time\": \"2024-01-02T08:00\"\n    },\n    {\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T09:00\"\n    },\n    {\n      \"pm10\": 19.3,\n      \"pm2_5\": 13.1,\n      \"time\": \"2024-01-02T10:00\"\n    },\n    {\n      \"pm10\": 17.2,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T11:00\"\n    },\n    {\n      \"pm10\": 12.9,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-02T12:00\"\n    },\n    {\n      \"pm10\": 11.5,\n      \"pm2_5\": 7.7,\n      \"time\": \"2024-01-02T13:00\"\n    },\n    {\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T14:00\"\n    },\n    {\n      \"pm10\": 9.4,\n      \"pm2_5\": 5.8,\n      \"time\": \"2024-01-02T15:00\"\n    },\n    {\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.0,\n      \"time\": \"2024-01-02T16:00\"\n    },\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T17:00\"\n    },\n    {\n      \"pm10\": 11.4,\n      \"pm2_5\": 6.6,\n      \"time\": \"2024-01-02T18:00\"\n    },\n    {\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.1,\n      \"time\": \"2024-01-02T19:00\"\n    },\n    {\n      \"pm10\": 9.9,\n      \"pm2_5\": 5.2,\n      \"time\": \"2024-01-02T20:00\"\n    },\n    {\n      \"pm10\": 9.2,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T21:00\"\n    },\n    {\n      \"pm10\": 9.1,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T22:00\"\n    },\n    {\n      \"pm10\": 8.1,\n      \"pm2_5\": 4.5,\n      \"time\": \"2024-01-02T23:00\"\n    }\n  ],\n  \"unexpected_rows\": []\n}\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef sourceUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=33e11636_1&attempt=1'\ndef sinkUrl = 'http://recorder:8090/sink/33e11636_1?attempt=1'\n\ndef sourceConnection = new URL(sourceUrl).openConnection()\nsourceConnection.connectTimeout = 5000\nsourceConnection.readTimeout = 5000\n\ndef sourceResponse = sourceConnection.inputStream.text\ndef jsonSlurper = new JsonSlurper()\ndef data = jsonSlurper.parseText(sourceResponse)\n\ndef records = []\nfor (int i = 0; i < data.hourly.time.size(); i++) {\n    def record = [\n        time: data.hourly.time[i],\n        pm10: data.hourly.pm10[i],\n        pm2_5: data.hourly.pm2_5[i]\n    ]\n    records << record\n}\n\ndef sinkConnection = new URL(sinkUrl).openConnection()\nsinkConnection.setRequestMethod('POST')\nsinkConnection.setDoOutput(true)\nsinkConnection.setRequestProperty('Content-Type', 'application/json')\n\ndef jsonBody = JsonOutput.toJson([records: records])\nsinkConnection.outputStream.write(jsonBody.bytes)\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 13.5382207169896,
+        "ollama_total_duration_seconds": 13.531012901,
+        "model_load_duration_seconds": 0.001424401,
+        "prompt_tokens": 3579,
+        "output_tokens": 306,
+        "output_tokens_per_second": 29.072142616910867,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/33e11636_1_attempt-2.groovy",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 48,
+        "actual_count": 0,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.5,
+            "time": "2024-01-01T00:00"
+          },
+          {
+            "pm10": 13.6,
+            "pm2_5": 8.4,
+            "time": "2024-01-01T01:00"
+          },
+          {
+            "pm10": 14.1,
+            "pm2_5": 8.9,
+            "time": "2024-01-01T02:00"
+          },
+          {
+            "pm10": 14.4,
+            "pm2_5": 9.2,
+            "time": "2024-01-01T03:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.3,
+            "time": "2024-01-01T04:00"
+          },
+          {
+            "pm10": 16.8,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T05:00"
+          },
+          {
+            "pm10": 16.5,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T06:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T07:00"
+          },
+          {
+            "pm10": 15.9,
+            "pm2_5": 10.9,
+            "time": "2024-01-01T08:00"
+          },
+          {
+            "pm10": 15.4,
+            "pm2_5": 10.5,
+            "time": "2024-01-01T09:00"
+          },
+          {
+            "pm10": 14.6,
+            "pm2_5": 10.0,
+            "time": "2024-01-01T10:00"
+          },
+          {
+            "pm10": 14.3,
+            "pm2_5": 9.8,
+            "time": "2024-01-01T11:00"
+          },
+          {
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T12:00"
+          },
+          {
+            "pm10": 16.7,
+            "pm2_5": 11.4,
+            "time": "2024-01-01T13:00"
+          },
+          {
+            "pm10": 17.6,
+            "pm2_5": 11.8,
+            "time": "2024-01-01T14:00"
+          },
+          {
+            "pm10": 19.5,
+            "pm2_5": 13.0,
+            "time": "2024-01-01T15:00"
+          },
+          {
+            "pm10": 21.8,
+            "pm2_5": 14.6,
+            "time": "2024-01-01T16:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 15.8,
+            "time": "2024-01-01T17:00"
+          },
+          {
+            "pm10": 24.7,
+            "pm2_5": 16.5,
+            "time": "2024-01-01T18:00"
+          },
+          {
+            "pm10": 25.1,
+            "pm2_5": 16.6,
+            "time": "2024-01-01T19:00"
+          },
+          {
+            "pm10": 24.6,
+            "pm2_5": 16.1,
+            "time": "2024-01-01T20:00"
+          },
+          {
+            "pm10": 24.3,
+            "pm2_5": 15.7,
+            "time": "2024-01-01T21:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T22:00"
+          },
+          {
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T23:00"
+          },
+          {
+            "pm10": 14.8,
+            "pm2_5": 10.0,
+            "time": "2024-01-02T00:00"
+          },
+          {
+            "pm10": 15.7,
+            "pm2_5": 10.6,
+            "time": "2024-01-02T01:00"
+          },
+          {
+            "pm10": 16.9,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T02:00"
+          },
+          {
+            "pm10": 18.0,
+            "pm2_5": 12.2,
+            "time": "2024-01-02T03:00"
+          },
+          {
+            "pm10": 17.5,
+            "pm2_5": 11.9,
+            "time": "2024-01-02T04:00"
+          },
+          {
+            "pm10": 18.3,
+            "pm2_5": 12.5,
+            "time": "2024-01-02T05:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T06:00"
+          },
+          {
+            "pm10": 23.6,
+            "pm2_5": 16.4,
+            "time": "2024-01-02T07:00"
+          },
+          {
+            "pm10": 22.9,
+            "pm2_5": 15.9,
+            "time": "2024-01-02T08:00"
+          },
+          {
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T09:00"
+          },
+          {
+            "pm10": 19.3,
+            "pm2_5": 13.1,
+            "time": "2024-01-02T10:00"
+          },
+          {
+            "pm10": 17.2,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T11:00"
+          },
+          {
+            "pm10": 12.9,
+            "pm2_5": 8.9,
+            "time": "2024-01-02T12:00"
+          },
+          {
+            "pm10": 11.5,
+            "pm2_5": 7.7,
+            "time": "2024-01-02T13:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T14:00"
+          },
+          {
+            "pm10": 9.4,
+            "pm2_5": 5.8,
+            "time": "2024-01-02T15:00"
+          },
+          {
+            "pm10": 10.0,
+            "pm2_5": 6.0,
+            "time": "2024-01-02T16:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T17:00"
+          },
+          {
+            "pm10": 11.4,
+            "pm2_5": 6.6,
+            "time": "2024-01-02T18:00"
+          },
+          {
+            "pm10": 10.9,
+            "pm2_5": 6.1,
+            "time": "2024-01-02T19:00"
+          },
+          {
+            "pm10": 9.9,
+            "pm2_5": 5.2,
+            "time": "2024-01-02T20:00"
+          },
+          {
+            "pm10": 9.2,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T21:00"
+          },
+          {
+            "pm10": 9.1,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T22:00"
+          },
+          {
+            "pm10": 8.1,
+            "pm2_5": 4.5,
+            "time": "2024-01-02T23:00"
+          }
+        ],
+        "unexpected_rows": []
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 47.63399452099111,
+      "request_metrics": {
+        "run_id": "33e11636_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 15,
+        "mean_cpu_percent": 87.27133333333333,
+        "peak_cpu_percent": 464.84999999999997,
+        "peak_memory_bytes": 1334457662,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 37.0,
+        "gpu_sample_count": 31,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 31,
+        "estimated_gpu_energy_wh": 1.7044317807044422,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T12:34:00Z"
+}

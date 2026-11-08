@@ -1,0 +1,110 @@
+{
+  "id": "bench_3fd378c4_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": []
+        }
+      },
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/particulate?run_id=3fd378c4_1&attempt=1",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $('Source 1').first().json;\n\n// Initialize a map to group by date\nconst dailyData = new Map();\n\n// Process each hourly record\nfor (let i = 0; i < data.hourly.time.length; i++) {\n  const time = data.hourly.time[i];\n  const date = time.substring(0, 10); // Extract YYYY-MM-DD\n  \n  if (!dailyData.has(date)) {\n    dailyData.set(date, {\n      date,\n      hours: 0,\n      pm2_5_max: -Infinity,\n      pm10_max: -Infinity\n    });\n  }\n  \n  const record = dailyData.get(date);\n  record.hours++;\n  \n  // Update max values\n  if (data.hourly.pm2_5[i] > record.pm2_5_max) {\n    record.pm2_5_max = data.hourly.pm2_5[i];\n  }\n  \n  if (data.hourly.pm10[i] > record.pm10_max) {\n    record.pm10_max = data.hourly.pm10[i];\n  }\n}\n\n// Convert map values to array and remove Infinity placeholders\nconst records = Array.from(dailyData.values()).map(record => {\n  if (record.pm2_5_max === -Infinity) record.pm2_5_max = null;\n  if (record.pm10_max === -Infinity) record.pm10_max = null;\n  return record;\n});\n\nreturn [{ json: { records } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/3fd378c4_1?attempt=1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

@@ -1,0 +1,13 @@
+model,platform,task,seeds,passed,pass_rate,ci95_low,ci95_high
+qwen3-coder:30b,airflow,t2_usgs_etl,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,airflow,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,dagster,t2_usgs_etl,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,dagster,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,kestra,t2_usgs_etl,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,kestra,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,n8n,t2_usgs_etl,5,1,0.2,0.036224108632430196,0.6244653702374748
+qwen3-coder:30b,n8n,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,nifi,t2_usgs_etl,5,0,0.0,0.0,0.43448246478317487
+qwen3-coder:30b,nifi,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,prefect,t2_usgs_etl,5,5,1.0,0.5655175352168252,1.0
+qwen3-coder:30b,prefect,t5_trailing_three_hour_peak,5,5,1.0,0.5655175352168252,1.0

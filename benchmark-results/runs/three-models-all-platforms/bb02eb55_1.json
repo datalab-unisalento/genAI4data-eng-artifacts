@@ -1,0 +1,259 @@
+{
+  "run_id": "bb02eb55_1",
+  "task": "t2_usgs_etl",
+  "platform": "nifi",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/bb02eb55_1_attempt-2.groovy",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:38b943cc5144c0d6097a3372fcb6adadcb7114e4ece14fd6723c8c2331e62819"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 8.106743536016438,
+    "execution_duration_seconds": 154.2151960230549,
+    "total_duration_seconds": 236.8652521740296,
+    "prompt_tokens": 3310,
+    "output_tokens": 1133,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 99.11836734693875,
+    "peak_cpu_percent": 363.08,
+    "peak_memory_bytes": 1400205475,
+    "resource_sample_count": 49,
+    "mean_gpu_utilization_percent": 8.567164179104477,
+    "peak_gpu_memory_bytes": 26089619456,
+    "estimated_gpu_energy_wh": 2.3509950912726514,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.0,
+    "source_request_count": 0,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=bb02eb55_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/bb02eb55_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.729727508034557,
+        "ollama_total_duration_seconds": 2.725677438,
+        "model_load_duration_seconds": 0.001369203,
+        "prompt_tokens": 742,
+        "output_tokens": 375,
+        "output_tokens_per_second": 157.86834790142447,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/bb02eb55_1_attempt-0.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c1be197-01a1-1000-b146-1927e17a67f4] groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection: groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 60.40003534499556,
+      "request_metrics": {
+        "run_id": "bb02eb55_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 19,
+        "mean_cpu_percent": 79.13526315789473,
+        "peak_cpu_percent": 363.08,
+        "peak_memory_bytes": 1400205475,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 5.04,
+        "gpu_sample_count": 25,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 25,
+        "estimated_gpu_energy_wh": 0.8452012203930337,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=bb02eb55_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/bb02eb55_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=9c1be197-01a1-1000-b146-1927e17a67f4] groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection: groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef source_url = \"http://recorder:8090/source/usgs/earthquakes?run_id=bb02eb55_1&attempt=0\"\ndef sink_url = \"http://recorder:8090/sink/bb02eb55_1?attempt=0\"\n\ndef text = new URL(source_url).openConnection().getInputStream.text\ndef collection = new JsonSlurper().parse(text)\ndef features = collection.features\n\ndef records = []\nfeatures.each { feature ->\n    def props = feature.properties\n    def geom = feature.geometry\n    def coords = geom.coordinates\n    double magnitude = props.mag as double\n    String magnitude_band\n    if (magnitude < 4.0) {\n        magnitude_band = \"minor\"\n    } else if (magnitude < 5.0) {\n        magnitude_band = \"moderate\"\n    } else {\n        magnitude_band = \"major\"\n    }\n    def record = [\n            id: feature.id,\n            magnitude: magnitude,\n            place: props.place,\n            time_ms: props.time,\n            longitude: coords[0],\n            latitude: coords[1],\n            depth_km: coords[2],\n            magnitude_band: magnitude_band\n    ]\n    records.add(record)\n}\n\ndef body = JsonOutput.toJson([records: records])\ndef conn = new URL(sink_url).openConnection()\nconn.setRequestMethod(\"POST\")\nconn.setRequestProperty(\"Content-Type\", \"application/json\")\nconn.setDoOutput(true)\nconn.getOutputStream().write(body.bytes)\nconn.getInputStream.text\nsession.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.728993689001072,
+        "ollama_total_duration_seconds": 2.724740204,
+        "model_load_duration_seconds": 0.001583351,
+        "prompt_tokens": 1283,
+        "output_tokens": 379,
+        "output_tokens_per_second": 172.00080962914083,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/bb02eb55_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c1ccb48-01a1-1000-7c14-c54a80adabd0] groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection: groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 43.7818969580112,
+      "request_metrics": {
+        "run_id": "bb02eb55_1",
+        "attempt": 1,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 14,
+        "mean_cpu_percent": 124.71357142857143,
+        "peak_cpu_percent": 327.15999999999997,
+        "peak_memory_bytes": 1395910508,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 11.2,
+        "gpu_sample_count": 20,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 20,
+        "estimated_gpu_energy_wh": 0.73589827824218,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable ETL workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=bb02eb55_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/bb02eb55_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=9c1ccb48-01a1-1000-7c14-c54a80adabd0] groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection: groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef source_url = \"http://recorder:8090/source/usgs/earthquakes?run_id=bb02eb55_1&attempt=1\"\ndef sink_url = \"http://recorder:8090/sink/bb02eb55_1?attempt=1\"\n\ndef text = new URL(source_url).openConnection().getInputStream.text\ndef collection = new JsonSlurper().parse(text)\ndef features = collection.features\n\ndef records = []\nfeatures.each { feature ->\n    def props = feature.properties\n    def geom = feature.geometry\n    def coords = geom.coordinates\n    double magnitude = props.mag as double\n    String magnitude_band\n    if (magnitude < 4.0) {\n        magnitude_band = \"minor\"\n    } else if (magnitude < 5.0) {\n        magnitude_band = \"moderate\"\n    } else {\n        magnitude_band = \"major\"\n    }\n    def record = [\n            id: feature.id,\n            magnitude: magnitude,\n            place: props.place,\n            time_ms: props.time,\n            longitude: coords[0],\n            latitude: coords[1],\n            depth_km: coords[2],\n            magnitude_band: magnitude_band\n    ]\n    records.add(record)\n}\n\ndef body = JsonOutput.toJson([records: records])\ndef conn = new URL(sink_url).openConnection()\nconn.setRequestMethod(\"POST\")\nconn.setRequestProperty(\"Content-Type\", \"application/json\")\nconn.setDoOutput(true)\nconn.getOutputStream().write(body.bytes)\nconn.getInputStream.text\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.648022338980809,
+        "ollama_total_duration_seconds": 2.64397899,
+        "model_load_duration_seconds": 0.001670839,
+        "prompt_tokens": 1285,
+        "output_tokens": 379,
+        "output_tokens_per_second": 171.36085385632003,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/bb02eb55_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c1dfce9-01a1-1000-1124-0cde27948fc0] groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection: groovy.lang.MissingPropertyException: No such property: getInputStream for class: sun.net.www.protocol.http.HttpURLConnection",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 50.033263720048126,
+      "request_metrics": {
+        "run_id": "bb02eb55_1",
+        "attempt": 2,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 16,
+        "mean_cpu_percent": 100.4525,
+        "peak_cpu_percent": 325.18,
+        "peak_memory_bytes": 1399131734,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 10.181818181818182,
+        "gpu_sample_count": 22,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 22,
+        "estimated_gpu_energy_wh": 0.7698955926374378,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T11:56:52Z"
+}

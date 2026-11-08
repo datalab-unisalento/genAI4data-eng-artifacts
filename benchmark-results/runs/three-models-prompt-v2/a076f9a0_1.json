@@ -1,0 +1,298 @@
+{
+  "run_id": "a076f9a0_1",
+  "task": "t6_earthquake_band_summary",
+  "platform": "n8n",
+  "model": "cogito:32b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/a076f9a0_1_attempt-2.json",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:71c73306f06758a0dc944aeee3bc2c1185e01abcca495b1554cfdeeb882b3bfb"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "incorrect_output": 1,
+    "invalid_artifact": 2
+  },
+  "metrics": {
+    "first_attempt_passed": false,
+    "first_attempt_f1": 0.0,
+    "best_f1": 0.0,
+    "generation_duration_seconds": 116.6536343480002,
+    "execution_duration_seconds": 32.66282181399583,
+    "total_duration_seconds": 184.3219394279986,
+    "prompt_tokens": 6583,
+    "output_tokens": 3269,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 10.825454545454546,
+    "peak_cpu_percent": 129.35999999999999,
+    "peak_memory_bytes": 333111623,
+    "resource_sample_count": 22,
+    "mean_gpu_utilization_percent": 77.57,
+    "peak_gpu_memory_bytes": 22354591744,
+    "estimated_gpu_energy_wh": 10.29518801542627,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.3333333333333333,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 2
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_a076f9a0_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=0\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=0\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 39.07803948700166,
+        "ollama_total_duration_seconds": 39.070756642,
+        "model_load_duration_seconds": 0.001011783,
+        "prompt_tokens": 1317,
+        "output_tokens": 1125,
+        "output_tokens_per_second": 29.613056846882255,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/a076f9a0_1_attempt-0.json",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 2,
+        "actual_count": 2,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "event_count": 36,
+            "magnitude_band": "moderate",
+            "max_depth_km": 540.187,
+            "max_magnitude": 4.9
+          },
+          {
+            "event_count": 13,
+            "magnitude_band": "major",
+            "max_depth_km": 81.212,
+            "max_magnitude": 7.5
+          }
+        ],
+        "unexpected_rows": [
+          {
+            "event_count": 38,
+            "magnitude_band": "moderate",
+            "max_depth_km": 540.187,
+            "max_magnitude": 5
+          },
+          {
+            "event_count": 11,
+            "magnitude_band": "major",
+            "max_depth_km": 81.212,
+            "max_magnitude": 7.5
+          }
+        ]
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 21.205923944999086,
+      "request_metrics": {
+        "run_id": "a076f9a0_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 2,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 20,
+        "mean_cpu_percent": 11.9055,
+        "peak_cpu_percent": 129.35999999999999,
+        "peak_memory_bytes": 333111623,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 61.2,
+        "gpu_sample_count": 20,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 20,
+        "estimated_gpu_energy_wh": 3.6484383757799312,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_a076f9a0_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=1\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=1\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\n{\n  \"passed\": false,\n  \"expected_count\": 2,\n  \"actual_count\": 2,\n  \"matched_count\": 0,\n  \"precision\": 0.0,\n  \"recall\": 0.0,\n  \"f1\": 0.0,\n  \"missing_rows\": [\n    {\n      \"event_count\": 36,\n      \"magnitude_band\": \"moderate\",\n      \"max_depth_km\": 540.187,\n      \"max_magnitude\": 4.9\n    },\n    {\n      \"event_count\": 13,\n      \"magnitude_band\": \"major\",\n      \"max_depth_km\": 81.212,\n      \"max_magnitude\": 7.5\n    }\n  ],\n  \"unexpected_rows\": [\n    {\n      \"event_count\": 38,\n      \"magnitude_band\": \"moderate\",\n      \"max_depth_km\": 540.187,\n      \"max_magnitude\": 5\n    },\n    {\n      \"event_count\": 11,\n      \"magnitude_band\": \"major\",\n      \"max_depth_km\": 81.212,\n      \"max_magnitude\": 7.5\n    }\n  ]\n}\nPrevious artifact:\n{\n  \"id\": \"bench_a076f9a0_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=0\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\n\\n// Get earthquake data from source\\nconst earthquakes = $('Source 1').first().json.features || [];\\n\\n// Initialize band counters and max values\\nlet minorCount = 0, moderateCount = 0, majorCount = 0;\\nlet minorMaxMag = -Infinity, moderateMaxMag = -Infinity, majorMaxMag = -Infinity;\\nlet minorMaxDepth = -Infinity, moderateMaxDepth = -Infinity, majorMaxDepth = -Infinity;\\n\\n// Process each earthquake\\nearthquakes.forEach(earthquake => {\\n  const mag = earthquake.properties.mag || 0;\\n  const depth = earthquake.geometry.coordinates[2] || 0;\\n\\n  if (mag < 4.0) {\\n    minorCount++;\\n    minorMaxMag = Math.max(minorMaxMag, mag);\\n    minorMaxDepth = Math.max(minorMaxDepth, depth);\\n  } else if (mag >= 4.0 && mag <= 5.0) {\\n    moderateCount++;\\n    moderateMaxMag = Math.max(moderateMaxMag, mag);\\n    moderateMaxDepth = Math.max(moderateMaxDepth, depth);\\n  } else {\\n    majorCount++;\\n    majorMaxMag = Math.max(majorMaxMag, mag);\\n    majorMaxDepth = Math.max(majorMaxDepth, depth);\\n  }\\n});\\n\\n// Create records for bands with events\\nif (minorCount > 0) {\\n  records.push({\\n    magnitude_band: 'minor',\\n    event_count: minorCount,\\n    max_magnitude: minorMaxMag,\\n    max_depth_km: minorMaxDepth\\n  });\\n}\\nif (moderateCount > 0) {\\n  records.push({\\n    magnitude_band: 'moderate',\\n    event_count: moderateCount,\\n    max_magnitude: moderateMaxMag,\\n    max_depth_km: moderateMaxDepth\\n  });\\n}\\nif (majorCount > 0) {\\n  records.push({\\n    magnitude_band: 'major',\\n    event_count: majorCount,\\n    max_magnitude: majorMaxMag,\\n    max_depth_km: majorMaxDepth\\n  });\\n}\\n\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=0\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 38.93757302399899,
+        "ollama_total_duration_seconds": 38.929232005,
+        "model_load_duration_seconds": 0.001056883,
+        "prompt_tokens": 2770,
+        "output_tokens": 1072,
+        "output_tokens_per_second": 29.19978824705799,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/a076f9a0_1_attempt-1.json",
+      "execution_error": "n8n sink node 'Sink' must set parameters.sendBody=true, parameters.specifyBody='json', and parameters.jsonBody='={{ $json }}'; received jsonBody='{{ $json }}'",
+      "failure_stage": "platform_execution",
+      "failure_category": "invalid_artifact",
+      "execution_duration_seconds": 5.844675940999878,
+      "request_metrics": {
+        "run_id": "a076f9a0_1",
+        "attempt": 1,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 1,
+        "mean_cpu_percent": 0.02,
+        "peak_cpu_percent": 0.02,
+        "peak_memory_bytes": 23834132,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 82.875,
+        "gpu_sample_count": 40,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 40,
+        "estimated_gpu_energy_wh": 3.332712880323493,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_a076f9a0_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=2\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=2\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nn8n sink node 'Sink' must set parameters.sendBody=true, parameters.specifyBody='json', and parameters.jsonBody='={{ $json }}'; received jsonBody='{{ $json }}'\nPrevious artifact:\n{\n  \"id\": \"bench_a076f9a0_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.manualTrigger\",\n      \"typeVersion\": 1,\n      \"position\": [0, 0]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=1\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [300, 0]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\n\\n// Get earthquake data from source\\nconst earthquakes = $('Source 1').first().json.features || [];\\n\\n// Initialize band counters and max values\\nlet minorCount = 0, moderateCount = 0, majorCount = 0;\\nlet minorMaxMag = -Infinity, moderateMaxMag = -Infinity, majorMaxMag = -Infinity;\\nlet minorMaxDepth = -Infinity, moderateMaxDepth = -Infinity, majorMaxDepth = -Infinity;\\n\\n// Process each earthquake\\nearthquakes.forEach(earthquake => {\\n  const mag = earthquake.properties.mag || 0;\\n  const depth = Math.abs(earthquake.geometry.coordinates[2] || 0);\\n\\n  if (mag < 4.0) {\\n    minorCount++;\\n    minorMaxMag = Math.max(minorMaxMag, mag);\\n    minorMaxDepth = Math.max(minorMaxDepth, depth);\\n  } else if (mag >= 4.0 && mag <= 5.0) {\\n    moderateCount++;\\n    moderateMaxMag = Math.max(moderateMaxMag, mag);\\n    moderateMaxDepth = Math.max(moderateMaxDepth, depth);\\n  } else {\\n    majorCount++;\\n    majorMaxMag = Math.max(majorMaxMag, mag);\\n    majorMaxDepth = Math.max(majorMaxDepth, depth);\\n  }\\n});\\n\\n// Create records for bands with events\\nif (minorCount > 0) {\\n  records.push({\\n    magnitude_band: 'minor',\\n    event_count: minorCount,\\n    max_magnitude: minorMaxMag,\\n    max_depth_km: minorMaxDepth\\n  });\\n}\\nif (moderateCount > 0) {\\n  records.push({\\n    magnitude_band: 'moderate',\\n    event_count: moderateCount,\\n    max_magnitude: moderateMaxMag,\\n    max_depth_km: moderateMaxDepth\\n  });\\n}\\nif (majorCount > 0) {\\n  records.push({\\n    magnitude_band: 'major',\\n    event_count: majorCount,\\n    max_magnitude: majorMaxMag,\\n    max_depth_km: majorMaxDepth\\n  });\\n}\\n\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [600, 0]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/a076f9a0_1?attempt=1\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"{{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [900, 0]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [[{\"node\": \"Source 1\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"Source 1\": {\n      \"main\": [[{\"node\": \"Transform\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"Transform\": {\n      \"main\": [[{\"node\": \"Sink\", \"type\": \"main\", \"index\": 0}]]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 38.63802183699954,
+        "ollama_total_duration_seconds": 38.629988729,
+        "model_load_duration_seconds": 0.001772263,
+        "prompt_tokens": 2496,
+        "output_tokens": 1072,
+        "output_tokens_per_second": 29.265616482395206,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/a076f9a0_1_attempt-2.json",
+      "execution_error": "n8n sink node 'Sink' must set parameters.sendBody=true, parameters.specifyBody='json', and parameters.jsonBody='={{ $json }}'; received jsonBody='{{ $json }}'",
+      "failure_stage": "platform_execution",
+      "failure_category": "invalid_artifact",
+      "execution_duration_seconds": 5.61222192799687,
+      "request_metrics": {
+        "run_id": "a076f9a0_1",
+        "attempt": 2,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 1,
+        "mean_cpu_percent": 0.03,
+        "peak_cpu_percent": 0.03,
+        "peak_memory_bytes": 26445086,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 80.45,
+        "gpu_sample_count": 40,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 40,
+        "estimated_gpu_energy_wh": 3.3140367593228452,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T13:13:07Z"
+}

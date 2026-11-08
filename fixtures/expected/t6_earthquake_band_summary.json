@@ -1,0 +1,14 @@
+[
+  {
+    "magnitude_band": "moderate",
+    "event_count": 36,
+    "max_magnitude": 4.9,
+    "max_depth_km": 540.187
+  },
+  {
+    "magnitude_band": "major",
+    "event_count": 13,
+    "max_magnitude": 7.5,
+    "max_depth_km": 81.212
+  }
+]

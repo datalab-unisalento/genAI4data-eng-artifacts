@@ -1,0 +1,1252 @@
+{
+  "run_id": "d6eaec87_1",
+  "task": "t2_usgs_etl",
+  "platform": "dagster",
+  "model": "cogito:32b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/d6eaec87_1_attempt-2.py",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:e7c0c62e9bbf765659f1521aca5eb28b6399d9c0b42c1d7b2540c67ab8714179"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 2,
+    "incorrect_output": 1
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": 0.0,
+    "generation_duration_seconds": 50.94706175400643,
+    "execution_duration_seconds": 28.832194509974215,
+    "total_duration_seconds": 113.96975863096304,
+    "prompt_tokens": 7643,
+    "output_tokens": 1302,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 0.06555555555555555,
+    "peak_cpu_percent": 0.25,
+    "peak_memory_bytes": 23037214,
+    "resource_sample_count": 9,
+    "mean_gpu_utilization_percent": 62.35820895522388,
+    "peak_gpu_memory_bytes": 22352494592,
+    "estimated_gpu_energy_wh": 4.768416975898811,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.6666666666666666,
+    "source_request_count": 2,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 49
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable ETL workflow for dagster. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired dagster artifact: Return one complete Python file. Import only `op` and `job` from Dagster, plus standard-library modules needed for JSON and HTTP. The file MUST start with the exact line `from dagster import op, job`. Define one zero-argument op using exactly `@op` (not `@op()`), with no decorator arguments; inside it, use the literal current source and sink URLs from the contract, fetch the source with urllib.request, transform the records exactly as specified, and POST them to the sink using urllib.request.Request with a JSON body and Content-Type application/json. Do not use Dagster context, resources, op inputs, output schemas, or output mappings. Then include exactly this job declaration, with no decorator arguments:\n`@job\\ndef bench_d6eaec87_1():\\n    ingest_pipeline()`\nThe op function must be named `ingest_pipeline`. Do not suppress exceptions or access any other network destination. The job must be loadable by `dagster job execute -f FILE -j bench_d6eaec87_1`.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=d6eaec87_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/d6eaec87_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 12.941385603975505,
+        "ollama_total_duration_seconds": 12.9367675,
+        "model_load_duration_seconds": 0.001276738,
+        "prompt_tokens": 719,
+        "output_tokens": 366,
+        "output_tokens_per_second": 30.23098454552423,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/d6eaec87_1_attempt-0.py",
+      "execution_error": "docker compose --profile dagster run --rm -T --no-deps python-runner sh -c mkdir -p \"$DAGSTER_HOME\" && exec dagster job execute -f /benchmark/dagster_d6eaec87_1.py -j bench_d6eaec87_1 failed: No dagster instance configuration file (dagster.yaml) found at /tmp/dagster. Defaulting to loading and storing all metadata with /tmp/dagster. If this is the desired behavior, create an empty dagster.yaml file in /tmp/dagster.\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - RUN_START - Started execution of run for \"bench_d6eaec87_1\".\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ENGINE_EVENT - Executing steps using multiprocess executor: parent process (pid: 1)\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - STEP_WORKER_STARTING - Launching subprocess for \"ingest_pipeline\".\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_WORKER_STARTED - Executing step \"ingest_pipeline\" in subprocess.\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - RESOURCE_INIT_STARTED - Starting initialization of resources [io_manager].\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - RESOURCE_INIT_SUCCESS - Finished initialization of resources [io_manager].\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - LOGS_CAPTURED - Started capturing logs in process (pid: 11).\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_START - Started execution of step \"ingest_pipeline\".\n2026-11-02 12:24:44 +0000 - dagster - ERROR - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_FAILURE - Execution of step \"ingest_pipeline\" failed.\n\ndagster._core.errors.DagsterExecutionStepExecutionError: Error occurred while executing op \"ingest_pipeline\"::\n\nKeyError: 'id'\n\nStack Trace:\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/utils.py\", line 56, in op_execution_error_boundary\n    yield\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_utils/__init__.py\", line 480, in iterate_with_context\n    next_output = next(iterator)\n                  ^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py\", line 127, in _coerce_op_compute_fn_to_iterator\n    result = invoke_compute_fn(\n             ^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py\", line 115, in invoke_compute_fn\n    return fn(context, **args_to_pass) if context_arg_provided else fn(**args_to_pass)\n                                                                    ^^^^^^^^^^^^^^^^^^\n  File \"/benchmark/dagster_d6eaec87_1.py\", line 27, in ingest_pipeline\n    \"id\": feature[\"properties\"][\"id\"],\n          ~~~~~~~~~~~~~~~~~~~~~^^^^^^\n\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ENGINE_EVENT - Multiprocess executor: parent process exiting after 1.3s (pid: 1)\n2026-11-02 12:24:45 +0000 - dagster - ERROR - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - RUN_FAILURE - Execution of run for \"bench_d6eaec87_1\" failed. Steps failed: ['ingest_pipeline'].\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - RESOURCE_INIT_STARTED - Starting initialization of resources [io_manager].\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - RESOURCE_INIT_SUCCESS - Finished initialization of resources [io_manager].\nError: Run 3de5e63a-963b-4dda-bf85-8562fa6c2488 resulted in failure.",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 10.108205563970841,
+      "request_metrics": {
+        "run_id": "d6eaec87_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 3,
+        "mean_cpu_percent": 0.05666666666666667,
+        "peak_cpu_percent": 0.14,
+        "peak_memory_bytes": 23037214,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 54.94736842105263,
+        "gpu_sample_count": 19,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 19,
+        "estimated_gpu_energy_wh": 1.2673281545053672,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable ETL workflow for dagster. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired dagster artifact: Return one complete Python file. Import only `op` and `job` from Dagster, plus standard-library modules needed for JSON and HTTP. The file MUST start with the exact line `from dagster import op, job`. Define one zero-argument op using exactly `@op` (not `@op()`), with no decorator arguments; inside it, use the literal current source and sink URLs from the contract, fetch the source with urllib.request, transform the records exactly as specified, and POST them to the sink using urllib.request.Request with a JSON body and Content-Type application/json. Do not use Dagster context, resources, op inputs, output schemas, or output mappings. Then include exactly this job declaration, with no decorator arguments:\n`@job\\ndef bench_d6eaec87_1():\\n    ingest_pipeline()`\nThe op function must be named `ingest_pipeline`. Do not suppress exceptions or access any other network destination. The job must be loadable by `dagster job execute -f FILE -j bench_d6eaec87_1`.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=d6eaec87_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/d6eaec87_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\ndocker compose --profile dagster run --rm -T --no-deps python-runner sh -c mkdir -p \"$DAGSTER_HOME\" && exec dagster job execute -f /benchmark/dagster_d6eaec87_1.py -j bench_d6eaec87_1 failed: No dagster instance configuration file (dagster.yaml) found at /tmp/dagster. Defaulting to loading and storing all metadata with /tmp/dagster. If this is the desired behavior, create an empty dagster.yaml file in /tmp/dagster.\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - RUN_START - Started execution of run for \"bench_d6eaec87_1\".\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ENGINE_EVENT - Executing steps using multiprocess executor: parent process (pid: 1)\n2026-11-02 12:24:43 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - STEP_WORKER_STARTING - Launching subprocess for \"ingest_pipeline\".\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_WORKER_STARTED - Executing step \"ingest_pipeline\" in subprocess.\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - RESOURCE_INIT_STARTED - Starting initialization of resources [io_manager].\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - RESOURCE_INIT_SUCCESS - Finished initialization of resources [io_manager].\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - LOGS_CAPTURED - Started capturing logs in process (pid: 11).\n2026-11-02 12:24:44 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_START - Started execution of step \"ingest_pipeline\".\n2026-11-02 12:24:44 +0000 - dagster - ERROR - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 11 - ingest_pipeline - STEP_FAILURE - Execution of step \"ingest_pipeline\" failed.\n\ndagster._core.errors.DagsterExecutionStepExecutionError: Error occurred while executing op \"ingest_pipeline\"::\n\nKeyError: 'id'\n\nStack Trace:\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/utils.py\", line 56, in op_execution_error_boundary\n    yield\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_utils/__init__.py\", line 480, in iterate_with_context\n    next_output = next(iterator)\n                  ^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py\", line 127, in _coerce_op_compute_fn_to_iterator\n    result = invoke_compute_fn(\n             ^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/execution/plan/compute_generator.py\", line 115, in invoke_compute_fn\n    return fn(context, **args_to_pass) if context_arg_provided else fn(**args_to_pass)\n                                                                    ^^^^^^^^^^^^^^^^^^\n  File \"/benchmark/dagster_d6eaec87_1.py\", line 27, in ingest_pipeline\n    \"id\": feature[\"properties\"][\"id\"],\n          ~~~~~~~~~~~~~~~~~~~~~^^^^^^\n\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ENGINE_EVENT - Multiprocess executor: parent process exiting after 1.3s (pid: 1)\n2026-11-02 12:24:45 +0000 - dagster - ERROR - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - RUN_FAILURE - Execution of run for \"bench_d6eaec87_1\" failed. Steps failed: ['ingest_pipeline'].\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - RESOURCE_INIT_STARTED - Starting initialization of resources [io_manager].\n2026-11-02 12:24:45 +0000 - dagster - DEBUG - bench_d6eaec87_1 - 3de5e63a-963b-4dda-bf85-8562fa6c2488 - 1 - ingest_pipeline - RESOURCE_INIT_SUCCESS - Finished initialization of resources [io_manager].\nError: Run 3de5e63a-963b-4dda-bf85-8562fa6c2488 resulted in failure.\nPrevious artifact:\nfrom dagster import op, job\n\nimport json\nimport urllib.request\n\n@op\ndef ingest_pipeline():\n    source_url = \"http://recorder:8090/source/usgs/earthquakes?run_id=d6eaec87_1&attempt=0\"\n    sink_url = \"http://recorder:8090/sink/d6eaec87_1?attempt=0\"\n\n    with urllib.request.urlopen(source_url) as response:\n        data = json.load(response)\n\n    records = []\n    for feature in data[\"features\"]:\n        magnitude = feature[\"properties\"][\"mag\"]\n        \n        # Determine magnitude_band\n        if magnitude < 4.0:\n            magnitude_band = \"minor\"\n        elif 4.0 <= magnitude < 5.0:\n            magnitude_band = \"moderate\"\n        else:\n            magnitude_band = \"major\"\n\n        record = {\n            \"id\": feature[\"properties\"][\"id\"],\n            \"magnitude\": magnitude,\n            \"place\": feature[\"properties\"][\"place\"],\n            \"time_ms\": feature[\"properties\"][\"time\"],\n            \"longitude\": feature[\"geometry\"][\"coordinates\"][0],\n            \"latitude\": feature[\"geometry\"][\"coordinates\"][1],\n            \"depth_km\": feature[\"geometry\"][\"coordinates\"][2],\n            \"magnitude_band\": magnitude_band\n        }\n        records.append(record)\n\n    # Prepare the request body\n    payload = {\"records\": records}\n    \n    # Create and send POST request\n    req = urllib.request.Request(\n        sink_url,\n        data=json.dumps(payload).encode('utf-8'),\n        headers={'Content-Type': 'application/json'}\n    )\n    with urllib.request.urlopen(req) as response:\n        pass\n\n@job\ndef bench_d6eaec87_1():\n    ingest_pipeline()\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 14.558399599045515,
+        "ollama_total_duration_seconds": 14.550389078,
+        "model_load_duration_seconds": 0.00125025,
+        "prompt_tokens": 2826,
+        "output_tokens": 366,
+        "output_tokens_per_second": 29.52180721856583,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/d6eaec87_1_attempt-1.py",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 49,
+        "actual_count": 49,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "depth_km": 384.941,
+            "id": "us6000m0w6",
+            "latitude": 17.6625,
+            "longitude": 145.4596,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "272 km N of Saipan, Northern Mariana Islands",
+            "time_ms": 1704069429096
+          },
+          {
+            "depth_km": 513.317,
+            "id": "us6000m0wc",
+            "latitude": -24.412,
+            "longitude": 179.8704,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "south of the Fiji Islands",
+            "time_ms": 1704073394869
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0wm",
+            "latitude": 76.065,
+            "longitude": 17.4987,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "245 km S of Longyearbyen, Svalbard and Jan Mayen",
+            "time_ms": 1704078240096
+          },
+          {
+            "depth_km": 35,
+            "id": "us6000m0x6",
+            "latitude": 44.4338,
+            "longitude": 149.243,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "139 km SE of Kuril\u2019sk, Russia",
+            "time_ms": 1704084541244
+          },
+          {
+            "depth_km": 540.187,
+            "id": "us6000m0x8",
+            "latitude": -23.3645,
+            "longitude": -179.8743,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "south of the Fiji Islands",
+            "time_ms": 1704086340363
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0x9",
+            "latitude": -7.8936,
+            "longitude": 117.8591,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "70 km NE of Pototano, Indonesia",
+            "time_ms": 1704086573884
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xj",
+            "latitude": 37.4933,
+            "longitude": 137.2491,
+            "magnitude": 5.8,
+            "magnitude_band": "major",
+            "place": "42 km NE of Anamizu, Japan",
+            "time_ms": 1704092765477
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xl",
+            "latitude": 37.4874,
+            "longitude": 137.271,
+            "magnitude": 7.5,
+            "magnitude_band": "major",
+            "place": "2024 Noto Peninsula, Japan Earthquake",
+            "time_ms": 1704093009476
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xm",
+            "latitude": 37.1895,
+            "longitude": 136.8272,
+            "magnitude": 6.2,
+            "magnitude_band": "major",
+            "place": "8 km SW of Anamizu, Japan",
+            "time_ms": 1704093521584
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m34g",
+            "latitude": 37.3802,
+            "longitude": 137.2254,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "33 km ENE of Anamizu, Japan",
+            "time_ms": 1704094048747
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m33l",
+            "latitude": 37.3496,
+            "longitude": 136.8046,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "15 km NNW of Anamizu, Japan",
+            "time_ms": 1704094095144
+          },
+          {
+            "depth_km": 10.997,
+            "id": "us6000m34h",
+            "latitude": 37.4638,
+            "longitude": 137.2642,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "41 km NE of Anamizu, Japan",
+            "time_ms": 1704094144242
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xn",
+            "latitude": 37.4861,
+            "longitude": 137.4519,
+            "magnitude": 5.2,
+            "magnitude_band": "major",
+            "place": "56 km ENE of Anamizu, Japan",
+            "time_ms": 1704094789268
+          },
+          {
+            "depth_km": 9.896,
+            "id": "us6000m33v",
+            "latitude": 37.4693,
+            "longitude": 137.2483,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "40 km NE of Anamizu, Japan",
+            "time_ms": 1704094963430
+          },
+          {
+            "depth_km": 4.785,
+            "id": "us6000m33u",
+            "latitude": 37.7823,
+            "longitude": 137.7515,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "59 km WSW of Sado, Japan",
+            "time_ms": 1704095130869
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xp",
+            "latitude": 37.2779,
+            "longitude": 136.8374,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "7 km NW of Anamizu, Japan",
+            "time_ms": 1704095294335
+          },
+          {
+            "depth_km": 81.212,
+            "id": "us6000m0xq",
+            "latitude": -0.1092,
+            "longitude": 123.6177,
+            "magnitude": 5.3,
+            "magnitude_band": "major",
+            "place": "94 km SE of Gorontalo, Indonesia",
+            "time_ms": 1704095563251
+          },
+          {
+            "depth_km": 8.243,
+            "id": "us6000m33m",
+            "latitude": 37.6242,
+            "longitude": 137.5518,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "70 km NNW of Itoigawa, Japan",
+            "time_ms": 1704095661406
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xt",
+            "latitude": 37.2997,
+            "longitude": 136.8875,
+            "magnitude": 5.6,
+            "magnitude_band": "major",
+            "place": "7 km N of Anamizu, Japan",
+            "time_ms": 1704095807661
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m33s",
+            "latitude": 20.6354,
+            "longitude": 145.0047,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "Maug Islands region, Northern Mariana Islands",
+            "time_ms": 1704096121200
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xu",
+            "latitude": 37.5444,
+            "longitude": 137.401,
+            "magnitude": 5,
+            "magnitude_band": "major",
+            "place": "56 km NE of Anamizu, Japan",
+            "time_ms": 1704096164840
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xw",
+            "latitude": 37.1718,
+            "longitude": 136.6149,
+            "magnitude": 5.1,
+            "magnitude_band": "major",
+            "place": "26 km WSW of Anamizu, Japan",
+            "time_ms": 1704096430627
+          },
+          {
+            "depth_km": 9.216,
+            "id": "us6000m33y",
+            "latitude": 37.5918,
+            "longitude": 137.3097,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "53 km NE of Anamizu, Japan",
+            "time_ms": 1704096938177
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xx",
+            "latitude": 37.5012,
+            "longitude": 137.2009,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "39 km NE of Anamizu, Japan",
+            "time_ms": 1704097066634
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0xy",
+            "latitude": 37.4631,
+            "longitude": 137.2239,
+            "magnitude": 4.9,
+            "magnitude_band": "moderate",
+            "place": "38 km NE of Anamizu, Japan",
+            "time_ms": 1704097330846
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0y1",
+            "latitude": 37.5787,
+            "longitude": 137.5274,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "66 km NNW of Itoigawa, Japan",
+            "time_ms": 1704097742262
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m341",
+            "latitude": 37.6483,
+            "longitude": 137.6044,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "71 km NNW of Itoigawa, Japan",
+            "time_ms": 1704098524871
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0y7",
+            "latitude": 37.8651,
+            "longitude": 137.5542,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "72 km WSW of Sado, Japan",
+            "time_ms": 1704098901162
+          },
+          {
+            "depth_km": 35,
+            "id": "us6000m0y4",
+            "latitude": 12.4653,
+            "longitude": -89.0159,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "103 km SSW of Puerto El Triunfo, El Salvador",
+            "time_ms": 1704099242503
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0y9",
+            "latitude": 37.5339,
+            "longitude": 137.4185,
+            "magnitude": 5.5,
+            "magnitude_band": "major",
+            "place": "56 km NE of Anamizu, Japan",
+            "time_ms": 1704099828859
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m35b",
+            "latitude": 37.4672,
+            "longitude": 137.4557,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "55 km ENE of Anamizu, Japan",
+            "time_ms": 1704099973801
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0ya",
+            "latitude": 37.5146,
+            "longitude": 137.4029,
+            "magnitude": 5.6,
+            "magnitude_band": "major",
+            "place": "54 km NE of Anamizu, Japan",
+            "time_ms": 1704100097603
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0ye",
+            "latitude": 37.4998,
+            "longitude": 137.3585,
+            "magnitude": 5.2,
+            "magnitude_band": "major",
+            "place": "50 km NE of Anamizu, Japan",
+            "time_ms": 1704101421401
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0yf",
+            "latitude": 37.1479,
+            "longitude": 136.6562,
+            "magnitude": 5,
+            "magnitude_band": "major",
+            "place": "23 km WSW of Anamizu, Japan",
+            "time_ms": 1704101999811
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0yg",
+            "latitude": 37.8107,
+            "longitude": 137.5664,
+            "magnitude": 5.1,
+            "magnitude_band": "major",
+            "place": "73 km WSW of Sado, Japan",
+            "time_ms": 1704102326217
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0yh",
+            "latitude": 37.5516,
+            "longitude": 137.3728,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "54 km NE of Anamizu, Japan",
+            "time_ms": 1704102555275
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0yr",
+            "latitude": 37.8468,
+            "longitude": 137.6625,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "64 km WSW of Sado, Japan",
+            "time_ms": 1704103614649
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0yw",
+            "latitude": 37.5375,
+            "longitude": 137.2865,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "48 km NE of Anamizu, Japan",
+            "time_ms": 1704106235645
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0z3",
+            "latitude": 37.1664,
+            "longitude": 136.6946,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "19 km WSW of Anamizu, Japan",
+            "time_ms": 1704108932459
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0zf",
+            "latitude": 37.3826,
+            "longitude": 137.1399,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "26 km NE of Anamizu, Japan",
+            "time_ms": 1704114657324
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m0zk",
+            "latitude": -6.6246,
+            "longitude": 107.7514,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "25 km NE of Lembang, Indonesia",
+            "time_ms": 1704116805922
+          },
+          {
+            "depth_km": 35,
+            "id": "us6000m34l",
+            "latitude": -15.0526,
+            "longitude": 166.8954,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "19 km W of Port-Olry, Vanuatu",
+            "time_ms": 1704116923860
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m34m",
+            "latitude": -28.3121,
+            "longitude": 62.8497,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "Southwest Indian Ridge",
+            "time_ms": 1704118218232
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m10e",
+            "latitude": 37.5711,
+            "longitude": 137.4761,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "63 km NE of Anamizu, Japan",
+            "time_ms": 1704130410185
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m110",
+            "latitude": 37.0652,
+            "longitude": 136.6184,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "24 km NW of Hakui, Japan",
+            "time_ms": 1704137234289
+          },
+          {
+            "depth_km": 10,
+            "id": "us6000m113",
+            "latitude": 37.2247,
+            "longitude": 136.6924,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "18 km W of Anamizu, Japan",
+            "time_ms": 1704138126006
+          },
+          {
+            "depth_km": 82.85,
+            "id": "us6000m11n",
+            "latitude": 26.0489,
+            "longitude": 95.4358,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "65 km ESE of Tuensang, India",
+            "time_ms": 1704145552330
+          },
+          {
+            "depth_km": 15.301,
+            "id": "us6000m11s",
+            "latitude": 37.3362,
+            "longitude": 136.9617,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "12 km NNE of Anamizu, Japan",
+            "time_ms": 1704147210239
+          },
+          {
+            "depth_km": 134.512,
+            "id": "us6000m120",
+            "latitude": -6.9605,
+            "longitude": 129.8294,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "Banda Sea",
+            "time_ms": 1704150634990
+          }
+        ],
+        "unexpected_rows": [
+          {
+            "depth_km": 384.941,
+            "id": 4.7,
+            "latitude": 17.6625,
+            "longitude": 145.4596,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "272 km N of Saipan, Northern Mariana Islands",
+            "time_ms": 1704069429096
+          },
+          {
+            "depth_km": 513.317,
+            "id": 4.6,
+            "latitude": -24.412,
+            "longitude": 179.8704,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "south of the Fiji Islands",
+            "time_ms": 1704073394869
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": 76.065,
+            "longitude": 17.4987,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "245 km S of Longyearbyen, Svalbard and Jan Mayen",
+            "time_ms": 1704078240096
+          },
+          {
+            "depth_km": 35,
+            "id": 4.5,
+            "latitude": 44.4338,
+            "longitude": 149.243,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "139 km SE of Kuril\u2019sk, Russia",
+            "time_ms": 1704084541244
+          },
+          {
+            "depth_km": 540.187,
+            "id": 4.5,
+            "latitude": -23.3645,
+            "longitude": -179.8743,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "south of the Fiji Islands",
+            "time_ms": 1704086340363
+          },
+          {
+            "depth_km": 10,
+            "id": 4.7,
+            "latitude": -7.8936,
+            "longitude": 117.8591,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "70 km NE of Pototano, Indonesia",
+            "time_ms": 1704086573884
+          },
+          {
+            "depth_km": 10,
+            "id": 5.8,
+            "latitude": 37.4933,
+            "longitude": 137.2491,
+            "magnitude": 5.8,
+            "magnitude_band": "major",
+            "place": "42 km NE of Anamizu, Japan",
+            "time_ms": 1704092765477
+          },
+          {
+            "depth_km": 10,
+            "id": 7.5,
+            "latitude": 37.4874,
+            "longitude": 137.271,
+            "magnitude": 7.5,
+            "magnitude_band": "major",
+            "place": "2024 Noto Peninsula, Japan Earthquake",
+            "time_ms": 1704093009476
+          },
+          {
+            "depth_km": 10,
+            "id": 6.2,
+            "latitude": 37.1895,
+            "longitude": 136.8272,
+            "magnitude": 6.2,
+            "magnitude_band": "major",
+            "place": "8 km SW of Anamizu, Japan",
+            "time_ms": 1704093521584
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.3802,
+            "longitude": 137.2254,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "33 km ENE of Anamizu, Japan",
+            "time_ms": 1704094048747
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.3496,
+            "longitude": 136.8046,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "15 km NNW of Anamizu, Japan",
+            "time_ms": 1704094095144
+          },
+          {
+            "depth_km": 10.997,
+            "id": 4.7,
+            "latitude": 37.4638,
+            "longitude": 137.2642,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "41 km NE of Anamizu, Japan",
+            "time_ms": 1704094144242
+          },
+          {
+            "depth_km": 10,
+            "id": 5.2,
+            "latitude": 37.4861,
+            "longitude": 137.4519,
+            "magnitude": 5.2,
+            "magnitude_band": "major",
+            "place": "56 km ENE of Anamizu, Japan",
+            "time_ms": 1704094789268
+          },
+          {
+            "depth_km": 9.896,
+            "id": 4.8,
+            "latitude": 37.4693,
+            "longitude": 137.2483,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "40 km NE of Anamizu, Japan",
+            "time_ms": 1704094963430
+          },
+          {
+            "depth_km": 4.785,
+            "id": 4.7,
+            "latitude": 37.7823,
+            "longitude": 137.7515,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "59 km WSW of Sado, Japan",
+            "time_ms": 1704095130869
+          },
+          {
+            "depth_km": 10,
+            "id": 4.8,
+            "latitude": 37.2779,
+            "longitude": 136.8374,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "7 km NW of Anamizu, Japan",
+            "time_ms": 1704095294335
+          },
+          {
+            "depth_km": 81.212,
+            "id": 5.3,
+            "latitude": -0.1092,
+            "longitude": 123.6177,
+            "magnitude": 5.3,
+            "magnitude_band": "major",
+            "place": "94 km SE of Gorontalo, Indonesia",
+            "time_ms": 1704095563251
+          },
+          {
+            "depth_km": 8.243,
+            "id": 4.7,
+            "latitude": 37.6242,
+            "longitude": 137.5518,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "70 km NNW of Itoigawa, Japan",
+            "time_ms": 1704095661406
+          },
+          {
+            "depth_km": 10,
+            "id": 5.6,
+            "latitude": 37.2997,
+            "longitude": 136.8875,
+            "magnitude": 5.6,
+            "magnitude_band": "major",
+            "place": "7 km N of Anamizu, Japan",
+            "time_ms": 1704095807661
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": 20.6354,
+            "longitude": 145.0047,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "Maug Islands region, Northern Mariana Islands",
+            "time_ms": 1704096121200
+          },
+          {
+            "depth_km": 10,
+            "id": 5,
+            "latitude": 37.5444,
+            "longitude": 137.401,
+            "magnitude": 5,
+            "magnitude_band": "major",
+            "place": "56 km NE of Anamizu, Japan",
+            "time_ms": 1704096164840
+          },
+          {
+            "depth_km": 10,
+            "id": 5.1,
+            "latitude": 37.1718,
+            "longitude": 136.6149,
+            "magnitude": 5.1,
+            "magnitude_band": "major",
+            "place": "26 km WSW of Anamizu, Japan",
+            "time_ms": 1704096430627
+          },
+          {
+            "depth_km": 9.216,
+            "id": 4.5,
+            "latitude": 37.5918,
+            "longitude": 137.3097,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "53 km NE of Anamizu, Japan",
+            "time_ms": 1704096938177
+          },
+          {
+            "depth_km": 10,
+            "id": 4.8,
+            "latitude": 37.5012,
+            "longitude": 137.2009,
+            "magnitude": 4.8,
+            "magnitude_band": "moderate",
+            "place": "39 km NE of Anamizu, Japan",
+            "time_ms": 1704097066634
+          },
+          {
+            "depth_km": 10,
+            "id": 4.9,
+            "latitude": 37.4631,
+            "longitude": 137.2239,
+            "magnitude": 4.9,
+            "magnitude_band": "moderate",
+            "place": "38 km NE of Anamizu, Japan",
+            "time_ms": 1704097330846
+          },
+          {
+            "depth_km": 10,
+            "id": 4.7,
+            "latitude": 37.5787,
+            "longitude": 137.5274,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "66 km NNW of Itoigawa, Japan",
+            "time_ms": 1704097742262
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.6483,
+            "longitude": 137.6044,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "71 km NNW of Itoigawa, Japan",
+            "time_ms": 1704098524871
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": 37.8651,
+            "longitude": 137.5542,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "72 km WSW of Sado, Japan",
+            "time_ms": 1704098901162
+          },
+          {
+            "depth_km": 35,
+            "id": 4.5,
+            "latitude": 12.4653,
+            "longitude": -89.0159,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "103 km SSW of Puerto El Triunfo, El Salvador",
+            "time_ms": 1704099242503
+          },
+          {
+            "depth_km": 10,
+            "id": 5.5,
+            "latitude": 37.5339,
+            "longitude": 137.4185,
+            "magnitude": 5.5,
+            "magnitude_band": "major",
+            "place": "56 km NE of Anamizu, Japan",
+            "time_ms": 1704099828859
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.4672,
+            "longitude": 137.4557,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "55 km ENE of Anamizu, Japan",
+            "time_ms": 1704099973801
+          },
+          {
+            "depth_km": 10,
+            "id": 5.6,
+            "latitude": 37.5146,
+            "longitude": 137.4029,
+            "magnitude": 5.6,
+            "magnitude_band": "major",
+            "place": "54 km NE of Anamizu, Japan",
+            "time_ms": 1704100097603
+          },
+          {
+            "depth_km": 10,
+            "id": 5.2,
+            "latitude": 37.4998,
+            "longitude": 137.3585,
+            "magnitude": 5.2,
+            "magnitude_band": "major",
+            "place": "50 km NE of Anamizu, Japan",
+            "time_ms": 1704101421401
+          },
+          {
+            "depth_km": 10,
+            "id": 5,
+            "latitude": 37.1479,
+            "longitude": 136.6562,
+            "magnitude": 5,
+            "magnitude_band": "major",
+            "place": "23 km WSW of Anamizu, Japan",
+            "time_ms": 1704101999811
+          },
+          {
+            "depth_km": 10,
+            "id": 5.1,
+            "latitude": 37.8107,
+            "longitude": 137.5664,
+            "magnitude": 5.1,
+            "magnitude_band": "major",
+            "place": "73 km WSW of Sado, Japan",
+            "time_ms": 1704102326217
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.5516,
+            "longitude": 137.3728,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "54 km NE of Anamizu, Japan",
+            "time_ms": 1704102555275
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.8468,
+            "longitude": 137.6625,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "64 km WSW of Sado, Japan",
+            "time_ms": 1704103614649
+          },
+          {
+            "depth_km": 10,
+            "id": 4.7,
+            "latitude": 37.5375,
+            "longitude": 137.2865,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "48 km NE of Anamizu, Japan",
+            "time_ms": 1704106235645
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.1664,
+            "longitude": 136.6946,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "19 km WSW of Anamizu, Japan",
+            "time_ms": 1704108932459
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": 37.3826,
+            "longitude": 137.1399,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "26 km NE of Anamizu, Japan",
+            "time_ms": 1704114657324
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": -6.6246,
+            "longitude": 107.7514,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "25 km NE of Lembang, Indonesia",
+            "time_ms": 1704116805922
+          },
+          {
+            "depth_km": 35,
+            "id": 4.6,
+            "latitude": -15.0526,
+            "longitude": 166.8954,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "19 km W of Port-Olry, Vanuatu",
+            "time_ms": 1704116923860
+          },
+          {
+            "depth_km": 10,
+            "id": 4.7,
+            "latitude": -28.3121,
+            "longitude": 62.8497,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "Southwest Indian Ridge",
+            "time_ms": 1704118218232
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.5711,
+            "longitude": 137.4761,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "63 km NE of Anamizu, Japan",
+            "time_ms": 1704130410185
+          },
+          {
+            "depth_km": 10,
+            "id": 4.5,
+            "latitude": 37.0652,
+            "longitude": 136.6184,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "24 km NW of Hakui, Japan",
+            "time_ms": 1704137234289
+          },
+          {
+            "depth_km": 10,
+            "id": 4.6,
+            "latitude": 37.2247,
+            "longitude": 136.6924,
+            "magnitude": 4.6,
+            "magnitude_band": "moderate",
+            "place": "18 km W of Anamizu, Japan",
+            "time_ms": 1704138126006
+          },
+          {
+            "depth_km": 82.85,
+            "id": 4.5,
+            "latitude": 26.0489,
+            "longitude": 95.4358,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "65 km ESE of Tuensang, India",
+            "time_ms": 1704145552330
+          },
+          {
+            "depth_km": 15.301,
+            "id": 4.5,
+            "latitude": 37.3362,
+            "longitude": 136.9617,
+            "magnitude": 4.5,
+            "magnitude_band": "moderate",
+            "place": "12 km NNE of Anamizu, Japan",
+            "time_ms": 1704147210239
+          },
+          {
+            "depth_km": 134.512,
+            "id": 4.7,
+            "latitude": -6.9605,
+            "longitude": 129.8294,
+            "magnitude": 4.7,
+            "magnitude_band": "moderate",
+            "place": "Banda Sea",
+            "time_ms": 1704150634990
+          }
+        ]
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 9.93301054800395,
+      "request_metrics": {
+        "run_id": "d6eaec87_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 49,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 3,
+        "mean_cpu_percent": 0.09666666666666666,
+        "peak_cpu_percent": 0.25,
+        "peak_memory_bytes": 20761804,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 57.1,
+        "gpu_sample_count": 20,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 20,
+        "estimated_gpu_energy_wh": 1.3855627102561616,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable ETL workflow for dagster. Retrieve the supplied USGS earthquake GeoJSON, flatten each feature into a record containing the specified fields, derive magnitude_band using the supplied thresholds, and post the records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired dagster artifact: Return one complete Python file. Import only `op` and `job` from Dagster, plus standard-library modules needed for JSON and HTTP. The file MUST start with the exact line `from dagster import op, job`. Define one zero-argument op using exactly `@op` (not `@op()`), with no decorator arguments; inside it, use the literal current source and sink URLs from the contract, fetch the source with urllib.request, transform the records exactly as specified, and POST them to the sink using urllib.request.Request with a JSON body and Content-Type application/json. Do not use Dagster context, resources, op inputs, output schemas, or output mappings. Then include exactly this job declaration, with no decorator arguments:\n`@job\\ndef bench_d6eaec87_1():\\n    ingest_pipeline()`\nThe op function must be named `ingest_pipeline`. Do not suppress exceptions or access any other network destination. The job must be loadable by `dagster job execute -f FILE -j bench_d6eaec87_1`.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t2_usgs_etl\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=d6eaec87_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/d6eaec87_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"id\",\n    \"magnitude\",\n    \"place\",\n    \"time_ms\",\n    \"longitude\",\n    \"latitude\",\n    \"depth_km\",\n    \"magnitude_band\"\n  ],\n  \"task_details\": \"Create fields id, magnitude, place, time_ms, longitude, latitude, depth_km, and magnitude_band. Set magnitude_band to minor when magnitude < 4.0, moderate when 4.0 <= magnitude < 5.0, and major when magnitude >= 5.0.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\n{\n  \"passed\": false,\n  \"expected_count\": 49,\n  \"actual_count\": 49,\n  \"matched_count\": 0,\n  \"precision\": 0.0,\n  \"recall\": 0.0,\n  \"f1\": 0.0,\n  \"missing_rows\": [\n    {\n      \"depth_km\": 384.941,\n      \"id\": \"us6000m0w6\",\n      \"latitude\": 17.6625,\n      \"longitude\": 145.4596,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"272 km N of Saipan, Northern Mariana Islands\",\n      \"time_ms\": 1704069429096\n    },\n    {\n      \"depth_km\": 513.317,\n      \"id\": \"us6000m0wc\",\n      \"latitude\": -24.412,\n      \"longitude\": 179.8704,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"south of the Fiji Islands\",\n      \"time_ms\": 1704073394869\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0wm\",\n      \"latitude\": 76.065,\n      \"longitude\": 17.4987,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"245 km S of Longyearbyen, Svalbard and Jan Mayen\",\n      \"time_ms\": 1704078240096\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": \"us6000m0x6\",\n      \"latitude\": 44.4338,\n      \"longitude\": 149.243,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"139 km SE of Kuril\\u2019sk, Russia\",\n      \"time_ms\": 1704084541244\n    },\n    {\n      \"depth_km\": 540.187,\n      \"id\": \"us6000m0x8\",\n      \"latitude\": -23.3645,\n      \"longitude\": -179.8743,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"south of the Fiji Islands\",\n      \"time_ms\": 1704086340363\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0x9\",\n      \"latitude\": -7.8936,\n      \"longitude\": 117.8591,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"70 km NE of Pototano, Indonesia\",\n      \"time_ms\": 1704086573884\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xj\",\n      \"latitude\": 37.4933,\n      \"longitude\": 137.2491,\n      \"magnitude\": 5.8,\n      \"magnitude_band\": \"major\",\n      \"place\": \"42 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704092765477\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xl\",\n      \"latitude\": 37.4874,\n      \"longitude\": 137.271,\n      \"magnitude\": 7.5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"2024 Noto Peninsula, Japan Earthquake\",\n      \"time_ms\": 1704093009476\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xm\",\n      \"latitude\": 37.1895,\n      \"longitude\": 136.8272,\n      \"magnitude\": 6.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"8 km SW of Anamizu, Japan\",\n      \"time_ms\": 1704093521584\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m34g\",\n      \"latitude\": 37.3802,\n      \"longitude\": 137.2254,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"33 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704094048747\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m33l\",\n      \"latitude\": 37.3496,\n      \"longitude\": 136.8046,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"15 km NNW of Anamizu, Japan\",\n      \"time_ms\": 1704094095144\n    },\n    {\n      \"depth_km\": 10.997,\n      \"id\": \"us6000m34h\",\n      \"latitude\": 37.4638,\n      \"longitude\": 137.2642,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"41 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704094144242\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xn\",\n      \"latitude\": 37.4861,\n      \"longitude\": 137.4519,\n      \"magnitude\": 5.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704094789268\n    },\n    {\n      \"depth_km\": 9.896,\n      \"id\": \"us6000m33v\",\n      \"latitude\": 37.4693,\n      \"longitude\": 137.2483,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"40 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704094963430\n    },\n    {\n      \"depth_km\": 4.785,\n      \"id\": \"us6000m33u\",\n      \"latitude\": 37.7823,\n      \"longitude\": 137.7515,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"59 km WSW of Sado, Japan\",\n      \"time_ms\": 1704095130869\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xp\",\n      \"latitude\": 37.2779,\n      \"longitude\": 136.8374,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"7 km NW of Anamizu, Japan\",\n      \"time_ms\": 1704095294335\n    },\n    {\n      \"depth_km\": 81.212,\n      \"id\": \"us6000m0xq\",\n      \"latitude\": -0.1092,\n      \"longitude\": 123.6177,\n      \"magnitude\": 5.3,\n      \"magnitude_band\": \"major\",\n      \"place\": \"94 km SE of Gorontalo, Indonesia\",\n      \"time_ms\": 1704095563251\n    },\n    {\n      \"depth_km\": 8.243,\n      \"id\": \"us6000m33m\",\n      \"latitude\": 37.6242,\n      \"longitude\": 137.5518,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"70 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704095661406\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xt\",\n      \"latitude\": 37.2997,\n      \"longitude\": 136.8875,\n      \"magnitude\": 5.6,\n      \"magnitude_band\": \"major\",\n      \"place\": \"7 km N of Anamizu, Japan\",\n      \"time_ms\": 1704095807661\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m33s\",\n      \"latitude\": 20.6354,\n      \"longitude\": 145.0047,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Maug Islands region, Northern Mariana Islands\",\n      \"time_ms\": 1704096121200\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xu\",\n      \"latitude\": 37.5444,\n      \"longitude\": 137.401,\n      \"magnitude\": 5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704096164840\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xw\",\n      \"latitude\": 37.1718,\n      \"longitude\": 136.6149,\n      \"magnitude\": 5.1,\n      \"magnitude_band\": \"major\",\n      \"place\": \"26 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704096430627\n    },\n    {\n      \"depth_km\": 9.216,\n      \"id\": \"us6000m33y\",\n      \"latitude\": 37.5918,\n      \"longitude\": 137.3097,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"53 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704096938177\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xx\",\n      \"latitude\": 37.5012,\n      \"longitude\": 137.2009,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"39 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704097066634\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0xy\",\n      \"latitude\": 37.4631,\n      \"longitude\": 137.2239,\n      \"magnitude\": 4.9,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"38 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704097330846\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0y1\",\n      \"latitude\": 37.5787,\n      \"longitude\": 137.5274,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"66 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704097742262\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m341\",\n      \"latitude\": 37.6483,\n      \"longitude\": 137.6044,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"71 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704098524871\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0y7\",\n      \"latitude\": 37.8651,\n      \"longitude\": 137.5542,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"72 km WSW of Sado, Japan\",\n      \"time_ms\": 1704098901162\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": \"us6000m0y4\",\n      \"latitude\": 12.4653,\n      \"longitude\": -89.0159,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"103 km SSW of Puerto El Triunfo, El Salvador\",\n      \"time_ms\": 1704099242503\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0y9\",\n      \"latitude\": 37.5339,\n      \"longitude\": 137.4185,\n      \"magnitude\": 5.5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704099828859\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m35b\",\n      \"latitude\": 37.4672,\n      \"longitude\": 137.4557,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"55 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704099973801\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0ya\",\n      \"latitude\": 37.5146,\n      \"longitude\": 137.4029,\n      \"magnitude\": 5.6,\n      \"magnitude_band\": \"major\",\n      \"place\": \"54 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704100097603\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0ye\",\n      \"latitude\": 37.4998,\n      \"longitude\": 137.3585,\n      \"magnitude\": 5.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"50 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704101421401\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0yf\",\n      \"latitude\": 37.1479,\n      \"longitude\": 136.6562,\n      \"magnitude\": 5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"23 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704101999811\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0yg\",\n      \"latitude\": 37.8107,\n      \"longitude\": 137.5664,\n      \"magnitude\": 5.1,\n      \"magnitude_band\": \"major\",\n      \"place\": \"73 km WSW of Sado, Japan\",\n      \"time_ms\": 1704102326217\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0yh\",\n      \"latitude\": 37.5516,\n      \"longitude\": 137.3728,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"54 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704102555275\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0yr\",\n      \"latitude\": 37.8468,\n      \"longitude\": 137.6625,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"64 km WSW of Sado, Japan\",\n      \"time_ms\": 1704103614649\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0yw\",\n      \"latitude\": 37.5375,\n      \"longitude\": 137.2865,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"48 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704106235645\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0z3\",\n      \"latitude\": 37.1664,\n      \"longitude\": 136.6946,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"19 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704108932459\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0zf\",\n      \"latitude\": 37.3826,\n      \"longitude\": 137.1399,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"26 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704114657324\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m0zk\",\n      \"latitude\": -6.6246,\n      \"longitude\": 107.7514,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"25 km NE of Lembang, Indonesia\",\n      \"time_ms\": 1704116805922\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": \"us6000m34l\",\n      \"latitude\": -15.0526,\n      \"longitude\": 166.8954,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"19 km W of Port-Olry, Vanuatu\",\n      \"time_ms\": 1704116923860\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m34m\",\n      \"latitude\": -28.3121,\n      \"longitude\": 62.8497,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Southwest Indian Ridge\",\n      \"time_ms\": 1704118218232\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m10e\",\n      \"latitude\": 37.5711,\n      \"longitude\": 137.4761,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"63 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704130410185\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m110\",\n      \"latitude\": 37.0652,\n      \"longitude\": 136.6184,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"24 km NW of Hakui, Japan\",\n      \"time_ms\": 1704137234289\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": \"us6000m113\",\n      \"latitude\": 37.2247,\n      \"longitude\": 136.6924,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"18 km W of Anamizu, Japan\",\n      \"time_ms\": 1704138126006\n    },\n    {\n      \"depth_km\": 82.85,\n      \"id\": \"us6000m11n\",\n      \"latitude\": 26.0489,\n      \"longitude\": 95.4358,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"65 km ESE of Tuensang, India\",\n      \"time_ms\": 1704145552330\n    },\n    {\n      \"depth_km\": 15.301,\n      \"id\": \"us6000m11s\",\n      \"latitude\": 37.3362,\n      \"longitude\": 136.9617,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"12 km NNE of Anamizu, Japan\",\n      \"time_ms\": 1704147210239\n    },\n    {\n      \"depth_km\": 134.512,\n      \"id\": \"us6000m120\",\n      \"latitude\": -6.9605,\n      \"longitude\": 129.8294,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Banda Sea\",\n      \"time_ms\": 1704150634990\n    }\n  ],\n  \"unexpected_rows\": [\n    {\n      \"depth_km\": 384.941,\n      \"id\": 4.7,\n      \"latitude\": 17.6625,\n      \"longitude\": 145.4596,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"272 km N of Saipan, Northern Mariana Islands\",\n      \"time_ms\": 1704069429096\n    },\n    {\n      \"depth_km\": 513.317,\n      \"id\": 4.6,\n      \"latitude\": -24.412,\n      \"longitude\": 179.8704,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"south of the Fiji Islands\",\n      \"time_ms\": 1704073394869\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": 76.065,\n      \"longitude\": 17.4987,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"245 km S of Longyearbyen, Svalbard and Jan Mayen\",\n      \"time_ms\": 1704078240096\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": 4.5,\n      \"latitude\": 44.4338,\n      \"longitude\": 149.243,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"139 km SE of Kuril\\u2019sk, Russia\",\n      \"time_ms\": 1704084541244\n    },\n    {\n      \"depth_km\": 540.187,\n      \"id\": 4.5,\n      \"latitude\": -23.3645,\n      \"longitude\": -179.8743,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"south of the Fiji Islands\",\n      \"time_ms\": 1704086340363\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.7,\n      \"latitude\": -7.8936,\n      \"longitude\": 117.8591,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"70 km NE of Pototano, Indonesia\",\n      \"time_ms\": 1704086573884\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.8,\n      \"latitude\": 37.4933,\n      \"longitude\": 137.2491,\n      \"magnitude\": 5.8,\n      \"magnitude_band\": \"major\",\n      \"place\": \"42 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704092765477\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 7.5,\n      \"latitude\": 37.4874,\n      \"longitude\": 137.271,\n      \"magnitude\": 7.5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"2024 Noto Peninsula, Japan Earthquake\",\n      \"time_ms\": 1704093009476\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 6.2,\n      \"latitude\": 37.1895,\n      \"longitude\": 136.8272,\n      \"magnitude\": 6.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"8 km SW of Anamizu, Japan\",\n      \"time_ms\": 1704093521584\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.3802,\n      \"longitude\": 137.2254,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"33 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704094048747\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.3496,\n      \"longitude\": 136.8046,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"15 km NNW of Anamizu, Japan\",\n      \"time_ms\": 1704094095144\n    },\n    {\n      \"depth_km\": 10.997,\n      \"id\": 4.7,\n      \"latitude\": 37.4638,\n      \"longitude\": 137.2642,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"41 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704094144242\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.2,\n      \"latitude\": 37.4861,\n      \"longitude\": 137.4519,\n      \"magnitude\": 5.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704094789268\n    },\n    {\n      \"depth_km\": 9.896,\n      \"id\": 4.8,\n      \"latitude\": 37.4693,\n      \"longitude\": 137.2483,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"40 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704094963430\n    },\n    {\n      \"depth_km\": 4.785,\n      \"id\": 4.7,\n      \"latitude\": 37.7823,\n      \"longitude\": 137.7515,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"59 km WSW of Sado, Japan\",\n      \"time_ms\": 1704095130869\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.8,\n      \"latitude\": 37.2779,\n      \"longitude\": 136.8374,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"7 km NW of Anamizu, Japan\",\n      \"time_ms\": 1704095294335\n    },\n    {\n      \"depth_km\": 81.212,\n      \"id\": 5.3,\n      \"latitude\": -0.1092,\n      \"longitude\": 123.6177,\n      \"magnitude\": 5.3,\n      \"magnitude_band\": \"major\",\n      \"place\": \"94 km SE of Gorontalo, Indonesia\",\n      \"time_ms\": 1704095563251\n    },\n    {\n      \"depth_km\": 8.243,\n      \"id\": 4.7,\n      \"latitude\": 37.6242,\n      \"longitude\": 137.5518,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"70 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704095661406\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.6,\n      \"latitude\": 37.2997,\n      \"longitude\": 136.8875,\n      \"magnitude\": 5.6,\n      \"magnitude_band\": \"major\",\n      \"place\": \"7 km N of Anamizu, Japan\",\n      \"time_ms\": 1704095807661\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": 20.6354,\n      \"longitude\": 145.0047,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Maug Islands region, Northern Mariana Islands\",\n      \"time_ms\": 1704096121200\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5,\n      \"latitude\": 37.5444,\n      \"longitude\": 137.401,\n      \"magnitude\": 5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704096164840\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.1,\n      \"latitude\": 37.1718,\n      \"longitude\": 136.6149,\n      \"magnitude\": 5.1,\n      \"magnitude_band\": \"major\",\n      \"place\": \"26 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704096430627\n    },\n    {\n      \"depth_km\": 9.216,\n      \"id\": 4.5,\n      \"latitude\": 37.5918,\n      \"longitude\": 137.3097,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"53 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704096938177\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.8,\n      \"latitude\": 37.5012,\n      \"longitude\": 137.2009,\n      \"magnitude\": 4.8,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"39 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704097066634\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.9,\n      \"latitude\": 37.4631,\n      \"longitude\": 137.2239,\n      \"magnitude\": 4.9,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"38 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704097330846\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.7,\n      \"latitude\": 37.5787,\n      \"longitude\": 137.5274,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"66 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704097742262\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.6483,\n      \"longitude\": 137.6044,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"71 km NNW of Itoigawa, Japan\",\n      \"time_ms\": 1704098524871\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": 37.8651,\n      \"longitude\": 137.5542,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"72 km WSW of Sado, Japan\",\n      \"time_ms\": 1704098901162\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": 4.5,\n      \"latitude\": 12.4653,\n      \"longitude\": -89.0159,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"103 km SSW of Puerto El Triunfo, El Salvador\",\n      \"time_ms\": 1704099242503\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.5,\n      \"latitude\": 37.5339,\n      \"longitude\": 137.4185,\n      \"magnitude\": 5.5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"56 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704099828859\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.4672,\n      \"longitude\": 137.4557,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"55 km ENE of Anamizu, Japan\",\n      \"time_ms\": 1704099973801\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.6,\n      \"latitude\": 37.5146,\n      \"longitude\": 137.4029,\n      \"magnitude\": 5.6,\n      \"magnitude_band\": \"major\",\n      \"place\": \"54 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704100097603\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.2,\n      \"latitude\": 37.4998,\n      \"longitude\": 137.3585,\n      \"magnitude\": 5.2,\n      \"magnitude_band\": \"major\",\n      \"place\": \"50 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704101421401\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5,\n      \"latitude\": 37.1479,\n      \"longitude\": 136.6562,\n      \"magnitude\": 5,\n      \"magnitude_band\": \"major\",\n      \"place\": \"23 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704101999811\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 5.1,\n      \"latitude\": 37.8107,\n      \"longitude\": 137.5664,\n      \"magnitude\": 5.1,\n      \"magnitude_band\": \"major\",\n      \"place\": \"73 km WSW of Sado, Japan\",\n      \"time_ms\": 1704102326217\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.5516,\n      \"longitude\": 137.3728,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"54 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704102555275\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.8468,\n      \"longitude\": 137.6625,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"64 km WSW of Sado, Japan\",\n      \"time_ms\": 1704103614649\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.7,\n      \"latitude\": 37.5375,\n      \"longitude\": 137.2865,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"48 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704106235645\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.1664,\n      \"longitude\": 136.6946,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"19 km WSW of Anamizu, Japan\",\n      \"time_ms\": 1704108932459\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": 37.3826,\n      \"longitude\": 137.1399,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"26 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704114657324\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": -6.6246,\n      \"longitude\": 107.7514,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"25 km NE of Lembang, Indonesia\",\n      \"time_ms\": 1704116805922\n    },\n    {\n      \"depth_km\": 35,\n      \"id\": 4.6,\n      \"latitude\": -15.0526,\n      \"longitude\": 166.8954,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"19 km W of Port-Olry, Vanuatu\",\n      \"time_ms\": 1704116923860\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.7,\n      \"latitude\": -28.3121,\n      \"longitude\": 62.8497,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Southwest Indian Ridge\",\n      \"time_ms\": 1704118218232\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.5711,\n      \"longitude\": 137.4761,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"63 km NE of Anamizu, Japan\",\n      \"time_ms\": 1704130410185\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.5,\n      \"latitude\": 37.0652,\n      \"longitude\": 136.6184,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"24 km NW of Hakui, Japan\",\n      \"time_ms\": 1704137234289\n    },\n    {\n      \"depth_km\": 10,\n      \"id\": 4.6,\n      \"latitude\": 37.2247,\n      \"longitude\": 136.6924,\n      \"magnitude\": 4.6,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"18 km W of Anamizu, Japan\",\n      \"time_ms\": 1704138126006\n    },\n    {\n      \"depth_km\": 82.85,\n      \"id\": 4.5,\n      \"latitude\": 26.0489,\n      \"longitude\": 95.4358,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"65 km ESE of Tuensang, India\",\n      \"time_ms\": 1704145552330\n    },\n    {\n      \"depth_km\": 15.301,\n      \"id\": 4.5,\n      \"latitude\": 37.3362,\n      \"longitude\": 136.9617,\n      \"magnitude\": 4.5,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"12 km NNE of Anamizu, Japan\",\n      \"time_ms\": 1704147210239\n    },\n    {\n      \"depth_km\": 134.512,\n      \"id\": 4.7,\n      \"latitude\": -6.9605,\n      \"longitude\": 129.8294,\n      \"magnitude\": 4.7,\n      \"magnitude_band\": \"moderate\",\n      \"place\": \"Banda Sea\",\n      \"time_ms\": 1704150634990\n    }\n  ]\n}\nPrevious artifact:\nfrom dagster import op, job\n\nimport json\nimport urllib.request\n\n@op\ndef ingest_pipeline():\n    source_url = \"http://recorder:8090/source/usgs/earthquakes?run_id=d6eaec87_1&attempt=1\"\n    sink_url = \"http://recorder:8090/sink/d6eaec87_1?attempt=1\"\n\n    with urllib.request.urlopen(source_url) as response:\n        data = json.load(response)\n\n    records = []\n    for feature in data[\"features\"]:\n        magnitude = feature[\"properties\"][\"mag\"]\n        \n        # Determine magnitude_band\n        if magnitude < 4.0:\n            magnitude_band = \"minor\"\n        elif 4.0 <= magnitude < 5.0:\n            magnitude_band = \"moderate\"\n        else:\n            magnitude_band = \"major\"\n\n        record = {\n            \"id\": feature[\"properties\"][\"mag\"],\n            \"magnitude\": magnitude,\n            \"place\": feature[\"properties\"][\"place\"],\n            \"time_ms\": feature[\"properties\"][\"time\"],\n            \"longitude\": feature[\"geometry\"][\"coordinates\"][0],\n            \"latitude\": feature[\"geometry\"][\"coordinates\"][1],\n            \"depth_km\": feature[\"geometry\"][\"coordinates\"][2],\n            \"magnitude_band\": magnitude_band\n        }\n        records.append(record)\n\n    # Prepare the request body\n    payload = {\"records\": records}\n    \n    # Create and send POST request\n    req = urllib.request.Request(\n        sink_url,\n        data=json.dumps(payload).encode('utf-8'),\n        headers={'Content-Type': 'application/json'}\n    )\n    with urllib.request.urlopen(req) as response:\n        pass\n\n@job\ndef bench_d6eaec87_1():\n    ingest_pipeline()\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 23.447276550985407,
+        "ollama_total_duration_seconds": 23.428778151,
+        "model_load_duration_seconds": 0.001628411,
+        "prompt_tokens": 4098,
+        "output_tokens": 570,
+        "output_tokens_per_second": 29.007782686313043,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/d6eaec87_1_attempt-2.py",
+      "execution_error": "docker compose --profile dagster run --rm -T --no-deps python-runner sh -c mkdir -p \"$DAGSTER_HOME\" && exec dagster job execute -f /benchmark/dagster_d6eaec87_1.py -j bench_d6eaec87_1 failed: No dagster instance configuration file (dagster.yaml) found at /tmp/dagster. Defaulting to loading and storing all metadata with /tmp/dagster. If this is the desired behavior, create an empty dagster.yaml file in /tmp/dagster.\nTraceback (most recent call last):\n  File \"/usr/local/bin/dagster\", line 8, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/__init__.py\", line 50, in main\n    cli(auto_envvar_prefix=ENV_PREFIX)\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 1161, in __call__\n    return self.main(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 1082, in main\n    rv = self.invoke(ctx)\n         ^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 1697, in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 1697, in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 1443, in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/click/core.py\", line 788, in invoke\n    return __callback(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/job.py\", line 312, in job_execute_command\n    execute_execute_command(\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/telemetry.py\", line 161, in wrap\n    result = f(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/job.py\", line 343, in execute_execute_command\n    job_origin = _get_job_python_origin_from_cli_opts(python_pointer_opts, repository, job_name)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/job.py\", line 373, in _get_job_python_origin_from_cli_opts\n    repository_origin = get_repository_python_origin_from_cli_opts(\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/workspace/cli_target.py\", line 703, in get_repository_python_origin_from_cli_opts\n    code_pointer_dict = _get_code_pointer_dict_from_python_pointer_opts(params)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_cli/workspace/cli_target.py\", line 633, in _get_code_pointer_dict_from_python_pointer_opts\n    loadable_targets = get_loadable_targets(\n                       ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_grpc/utils.py\", line 41, in get_loadable_targets\n    else loadable_targets_from_python_file(python_file, working_directory)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/workspace/autodiscovery.py\", line 24, in loadable_targets_from_python_file\n    loaded_module = load_python_file(python_file, working_directory)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_core/code_pointer.py\", line 84, in load_python_file\n    return import_module_from_path(module_name, python_file)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/dagster/_seven/__init__.py\", line 47, in import_module_from_path\n    spec.loader.exec_module(module)\n  File \"<frozen importlib._bootstrap_external>\", line 936, in exec_module\n  File \"<frozen importlib._bootstrap_external>\", line 1074, in get_code\n  File \"<frozen importlib._bootstrap_external>\", line 1004, in source_to_code\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n  File \"/benchmark/dagster_d6eaec87_1.py\", line 1\n    I'll help you update the code to handle the new data structure. The main changes needed are:\n     ^\nSyntaxError: unterminated string literal (detected at line 1)",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 8.790978397999424,
+      "request_metrics": {
+        "run_id": "d6eaec87_1",
+        "attempt": 2,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 3,
+        "mean_cpu_percent": 0.043333333333333335,
+        "peak_cpu_percent": 0.09,
+        "peak_memory_bytes": 21307064,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 71.14285714285714,
+        "gpu_sample_count": 28,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 28,
+        "estimated_gpu_energy_wh": 2.1155261111372816,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T12:26:16Z"
+}

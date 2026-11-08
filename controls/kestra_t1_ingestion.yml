@@ -1,0 +1,29 @@
+id: bench_control_t1
+namespace: bench
+tasks:
+  - id: ingest_particulate
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=control-t1&attempt=0"
+      sink_url = "http://recorder:8090/sink/control-t1?attempt=0"
+
+      with urllib.request.urlopen(source_url, timeout=30) as response:
+          payload = json.loads(response.read())
+
+      hourly = payload["hourly"]
+      records = [
+          {"time": time, "pm10": pm10, "pm2_5": pm2_5}
+          for time, pm10, pm2_5 in zip(hourly["time"], hourly["pm10"], hourly["pm2_5"])
+      ]
+      request = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode("utf-8"),
+          headers={"Content-Type": "application/json"},
+          method="POST",
+      )
+      with urllib.request.urlopen(request, timeout=30) as response:
+          response.read()

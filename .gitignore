@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+artifacts/
+results/
+
+# LaTeX build products (main.pdf is tracked)
+paper/icde2027/*.aux
+paper/icde2027/*.fls
+paper/icde2027/*.fdb_latexmk
+paper/icde2027/*.synctex.gz
+paper/icde2027/*.out
+paper/icde2027/*.bbl
+paper/icde2027/*.blg
+paper/icde2027/*.log

@@ -1,0 +1,57 @@
+id: bench_8bdbe64f_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_particulate_url = "http://recorder:8090/source/open-meteo/particulate?run_id=8bdbe64f_1&attempt=0"
+      source_gases_url = "http://recorder:8090/source/open-meteo/gases?run_id=8bdbe64f_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/8bdbe64f_1?attempt=0"
+
+      resp_part = urllib.request.urlopen(source_particulate_url)
+      data_part = json.loads(resp_part.read().decode('utf-8'))
+
+      resp_gas = urllib.request.urlopen(source_gases_url)
+      data_gas = json.loads(resp_gas.read().decode('utf-8'))
+
+      times_p = data_part["hourly"]["time"]
+      pm10_vals = data_part["hourly"]["pm10"]
+      pm25_vals = data_part["hourly"]["pm2_5"]
+
+      times_g = data_gas["hourly"]["time"]
+      no2_vals = data_gas["hourly"]["nitrogen_dioxide"]
+      o3_vals = data_gas["hourly"]["ozone"]
+
+      time_to_pm10 = {}
+      time_to_pm25 = {}
+      for t, p10, p25 in zip(times_p, pm10_vals, pm25_vals):
+          time_to_pm10[t] = p10
+          time_to_pm25[t] = p25
+
+      time_to_no2 = {}
+      time_to_o3 = {}
+      for t, n2, o3 in zip(times_g, no2_vals, o3_vals):
+          time_to_no2[t] = n2
+          time_to_o3[t] = o3
+
+      common_times = sorted(set(time_to_pm10.keys()) & set(time_to_no2.keys()))
+
+      records = []
+      for t in common_times:
+          record = {
+              "time": t,
+              "pm10": time_to_pm10[t],
+              "pm2_5": time_to_pm25[t],
+              "nitrogen_dioxide": time_to_no2[t],
+              "ozone": time_to_o3[t]
+          }
+          records.append(record)
+
+      payload = json.dumps(records).encode('utf-8')
+      req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+      urllib.request.urlopen(req)

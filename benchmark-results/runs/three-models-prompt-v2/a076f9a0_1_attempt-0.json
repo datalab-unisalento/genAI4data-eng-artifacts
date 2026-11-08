@@ -1,0 +1,106 @@
+{
+  "id": "bench_a076f9a0_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/usgs/earthquakes?run_id=a076f9a0_1&attempt=0",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const records = [];\n\n// Get earthquake data from source\nconst earthquakes = $('Source 1').first().json.features || [];\n\n// Initialize band counters and max values\nlet minorCount = 0, moderateCount = 0, majorCount = 0;\nlet minorMaxMag = -Infinity, moderateMaxMag = -Infinity, majorMaxMag = -Infinity;\nlet minorMaxDepth = -Infinity, moderateMaxDepth = -Infinity, majorMaxDepth = -Infinity;\n\n// Process each earthquake\nearthquakes.forEach(earthquake => {\n  const mag = earthquake.properties.mag || 0;\n  const depth = earthquake.geometry.coordinates[2] || 0;\n\n  if (mag < 4.0) {\n    minorCount++;\n    minorMaxMag = Math.max(minorMaxMag, mag);\n    minorMaxDepth = Math.max(minorMaxDepth, depth);\n  } else if (mag >= 4.0 && mag <= 5.0) {\n    moderateCount++;\n    moderateMaxMag = Math.max(moderateMaxMag, mag);\n    moderateMaxDepth = Math.max(moderateMaxDepth, depth);\n  } else {\n    majorCount++;\n    majorMaxMag = Math.max(majorMaxMag, mag);\n    majorMaxDepth = Math.max(majorMaxDepth, depth);\n  }\n});\n\n// Create records for bands with events\nif (minorCount > 0) {\n  records.push({\n    magnitude_band: 'minor',\n    event_count: minorCount,\n    max_magnitude: minorMaxMag,\n    max_depth_km: minorMaxDepth\n  });\n}\nif (moderateCount > 0) {\n  records.push({\n    magnitude_band: 'moderate',\n    event_count: moderateCount,\n    max_magnitude: moderateMaxMag,\n    max_depth_km: moderateMaxDepth\n  });\n}\nif (majorCount > 0) {\n  records.push({\n    magnitude_band: 'major',\n    event_count: majorCount,\n    max_magnitude: majorMaxMag,\n    max_depth_km: majorMaxDepth\n  });\n}\n\nreturn [{ json: { records } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/a076f9a0_1?attempt=0",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

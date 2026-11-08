@@ -1,0 +1,48 @@
+id: bench_5f4c7edb_1
+namespace: bench
+execution:
+  run: {}
+tasks:
+- id: t3_open_meteo_join
+  type: io.kestra.plugin.scripts.python.Script
+  runner: PROCESS
+  script: |
+    import urllib.request
+    import json
+
+    particulate_url = "http://recorder:8090/source/open-meteo/particulate?run_id=5f4c7edb_1&attempt=0"
+    gases_url = "http://recorder:8090/source/open-meteo/gases?run_id=5f4c7edb_1&attempt=0"
+    sink_url = "http://recorder:8090/sink/5f4c7edb_1?attempt=0"
+
+    # Fetch particulate data
+    req_p = urllib.request.Request(particulate_url)
+    resp_p = urllib.request.urlopen(req_p)
+    data_p = json.loads(resp_p.read().decode('utf-8'))
+
+    # Fetch gases data
+    req_g = urllib.request.Request(gases_url)
+    resp_g = urllib.request.urlopen(req_g)
+    data_g = json.loads(resp_g.read().decode('utf-8'))
+
+    # Build time -> record mappings for inner join
+    particulate_times = set(data_p['hourly']['time'])
+    gases_times = set(data_g['hourly']['time'])
+    common_times = particulate_times.intersection(gases_times)
+
+    records = []
+    for t in common_times:
+        idx_p = data_p['hourly']['time'].index(t)
+        idx_g = data_g['hourly']['time'].index(t)
+        record = {
+            "time": data_p['hourly']['time'][idx_p],
+            "pm10": data_p['hourly']['pm10'][idx_p],
+            "pm2_5": data_p['hourly']['pm2_5'][idx_p],
+            "nitrogen_dioxide": data_g['hourly']['nitrogen_dioxide'][idx_g],
+            "ozone": data_g['hourly']['ozone'][idx_g]
+        }
+        records.append(record)
+
+    # POST to sink
+    payload = json.dumps(records).encode('utf-8')
+    req_sink = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+    urllib.request.urlopen(req_sink)

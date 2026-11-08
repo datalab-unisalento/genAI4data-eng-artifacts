@@ -1,0 +1,259 @@
+{
+  "run_id": "f8f31b6f_1",
+  "task": "t6_earthquake_band_summary",
+  "platform": "n8n",
+  "model": "qwen3-coder:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/f8f31b6f_1_attempt-2.json",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:06395f865e8b241ffad87d5b6820392f2229559a06d4316ed7406d491ada875d"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+    "source": {
+      "git_revision": "1f55271104dc9e0706d576f3e83500b6e8f2d427",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "398769fcaf416c1381a577024dcfab10e168e332ce238b5f621aa6e55e52d591"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 26.068896767974366,
+    "execution_duration_seconds": 37.07967176899547,
+    "total_duration_seconds": 98.1032821550034,
+    "prompt_tokens": 7349,
+    "output_tokens": 3147,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 76.32333333333334,
+    "peak_cpu_percent": 253.54999999999998,
+    "peak_memory_bytes": 428804669,
+    "resource_sample_count": 12,
+    "mean_gpu_utilization_percent": 40.43181818181818,
+    "peak_gpu_memory_bytes": 19752026112,
+    "estimated_gpu_energy_wh": 2.554094724936785,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.0,
+    "source_request_count": 0,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_f8f31b6f_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"workflowInputs\": {\n          \"values\": []\n        }\n      },\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.executeWorkflowTrigger\",\n      \"typeVersion\": 1.1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=0\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=0\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 8.397749831026886,
+        "ollama_total_duration_seconds": 8.390984446,
+        "model_load_duration_seconds": 0.001194279,
+        "prompt_tokens": 1335,
+        "output_tokens": 1049,
+        "output_tokens_per_second": 132.1001800415895,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/f8f31b6f_1_attempt-0.json",
+      "execution_error": "docker compose exec -T n8n n8n execute --id bench_f8f31b6f_1 failed: User settings loaded from: /tmp/n8n-user/.n8n/config\nError tracking disabled because this release is older than 6 weeks.\n\nThere is a deprecation related to your environment variables. Please take the recommended actions to update your configuration:\n - N8N_RUNNERS_ENABLED -> Running n8n without task runners is deprecated. Task runners will be turned on by default in a future version. Please set `N8N_RUNNERS_ENABLED=true` to enable task runners now and avoid potential issues in the future. Learn more: https://docs.n8n.io/hosting/configuration/task-runners/\n\nProblem with execution 1: The workflow has issues and cannot be executed for that reason. Please fix them first.. Aborting.\nThe workflow has issues and cannot be executed for that reason. Please fix them first. (execution 1)\nError executing workflow. See log messages for details.\n\nExecution error:\n====================================\nThe workflow has issues and cannot be executed for that reason. Please fix them first.\nundefined\nWorkflowHasIssuesError: The workflow has issues and cannot be executed for that reason. Please fix them first.\n    at WorkflowExecute.processRunExecutionData (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:771:19)\n    at WorkflowExecute.run (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:117:21)\n    at ManualExecutionService.runManually (/usr/local/lib/node_modules/n8n/dist/manual-execution.service.js:98:36)\n    at WorkflowRunner.runMainProcess (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:214:65)\n    at WorkflowRunner.run (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:140:13)\n    at Execute.run (/usr/local/lib/node_modules/n8n/dist/commands/execute.js:57:29)\n    at Execute._run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/command.js:302:22)\n    at Config.runCommand (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/config/config.js:424:25)\n    at run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/main.js:94:16)\n    at /usr/local/lib/node_modules/n8n/bin/n8n:71:2",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 11.868762593017891,
+      "request_metrics": {
+        "run_id": "f8f31b6f_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 76.55,
+        "peak_cpu_percent": 230.67,
+        "peak_memory_bytes": 428804669,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 40.42857142857143,
+        "gpu_sample_count": 14,
+        "peak_gpu_memory_bytes": 19752026112,
+        "gpu_power_sample_count": 14,
+        "estimated_gpu_energy_wh": 0.835163126587253,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_f8f31b6f_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"workflowInputs\": {\n          \"values\": []\n        }\n      },\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.executeWorkflowTrigger\",\n      \"typeVersion\": 1.1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=1\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=1\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\ndocker compose exec -T n8n n8n execute --id bench_f8f31b6f_1 failed: User settings loaded from: /tmp/n8n-user/.n8n/config\nError tracking disabled because this release is older than 6 weeks.\n\nThere is a deprecation related to your environment variables. Please take the recommended actions to update your configuration:\n - N8N_RUNNERS_ENABLED -> Running n8n without task runners is deprecated. Task runners will be turned on by default in a future version. Please set `N8N_RUNNERS_ENABLED=true` to enable task runners now and avoid potential issues in the future. Learn more: https://docs.n8n.io/hosting/configuration/task-runners/\n\nProblem with execution 1: The workflow has issues and cannot be executed for that reason. Please fix them first.. Aborting.\nThe workflow has issues and cannot be executed for that reason. Please fix them first. (execution 1)\nError executing workflow. See log messages for details.\n\nExecution error:\n====================================\nThe workflow has issues and cannot be executed for that reason. Please fix them first.\nundefined\nWorkflowHasIssuesError: The workflow has issues and cannot be executed for that reason. Please fix them first.\n    at WorkflowExecute.processRunExecutionData (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:771:19)\n    at WorkflowExecute.run (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:117:21)\n    at ManualExecutionService.runManually (/usr/local/lib/node_modules/n8n/dist/manual-execution.service.js:98:36)\n    at WorkflowRunner.runMainProcess (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:214:65)\n    at WorkflowRunner.run (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:140:13)\n    at Execute.run (/usr/local/lib/node_modules/n8n/dist/commands/execute.js:57:29)\n    at Execute._run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/command.js:302:22)\n    at Config.runCommand (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/config/config.js:424:25)\n    at run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/main.js:94:16)\n    at /usr/local/lib/node_modules/n8n/bin/n8n:71:2\nPrevious artifact:\n{\n  \"id\": \"bench_f8f31b6f_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"workflowInputs\": {\n          \"values\": []\n        }\n      },\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.executeWorkflowTrigger\",\n      \"typeVersion\": 1.1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=0\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const features = $('Source 1').first().json.features;\\n\\n// Initialize band summary objects\\nconst bands = {\\n  minor: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\\n  moderate: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\\n  major: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity }\\n};\\n\\n// Process each feature\\nfeatures.forEach(feature => {\\n  const mag = feature.properties.mag;\\n  const depth = feature.geometry.coordinates[2];\\n  \\n  let band;\\n  if (mag < 4.0) {\\n    band = 'minor';\\n  } else if (mag >= 4.0 && mag < 5.0) {\\n    band = 'moderate';\\n  } else {\\n    band = 'major';\\n  }\\n\\n  // Update band stats\\n  const bandStats = bands[band];\\n  bandStats.event_count++;\\n  if (mag > bandStats.max_magnitude) {\\n    bandStats.max_magnitude = mag;\\n  }\\n  if (depth > bandStats.max_depth_km) {\\n    bandStats.max_depth_km = depth;\\n  }\\n});\\n\\n// Build final records, only including bands with events\\nconst records = [];\\nfor (const [bandName, stats] of Object.entries(bands)) {\\n  if (stats.event_count > 0) {\\n    records.push({\\n      magnitude_band: bandName,\\n      event_count: stats.event_count,\\n      max_magnitude: stats.max_magnitude,\\n      max_depth_km: stats.max_depth_km\\n    });\\n  }\\n}\\n\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=0\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 8.777024193957914,
+        "ollama_total_duration_seconds": 8.767371481,
+        "model_load_duration_seconds": 0.001244166,
+        "prompt_tokens": 3007,
+        "output_tokens": 1049,
+        "output_tokens_per_second": 129.6167311105238,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/f8f31b6f_1_attempt-1.json",
+      "execution_error": "docker compose exec -T n8n n8n execute --id bench_f8f31b6f_1 failed: User settings loaded from: /tmp/n8n-user/.n8n/config\nError tracking disabled because this release is older than 6 weeks.\n\nThere is a deprecation related to your environment variables. Please take the recommended actions to update your configuration:\n - N8N_RUNNERS_ENABLED -> Running n8n without task runners is deprecated. Task runners will be turned on by default in a future version. Please set `N8N_RUNNERS_ENABLED=true` to enable task runners now and avoid potential issues in the future. Learn more: https://docs.n8n.io/hosting/configuration/task-runners/\n\nProblem with execution 1: The workflow has issues and cannot be executed for that reason. Please fix them first.. Aborting.\nThe workflow has issues and cannot be executed for that reason. Please fix them first. (execution 1)\nError executing workflow. See log messages for details.\n\nExecution error:\n====================================\nThe workflow has issues and cannot be executed for that reason. Please fix them first.\nundefined\nWorkflowHasIssuesError: The workflow has issues and cannot be executed for that reason. Please fix them first.\n    at WorkflowExecute.processRunExecutionData (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:771:19)\n    at WorkflowExecute.run (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:117:21)\n    at ManualExecutionService.runManually (/usr/local/lib/node_modules/n8n/dist/manual-execution.service.js:98:36)\n    at WorkflowRunner.runMainProcess (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:214:65)\n    at WorkflowRunner.run (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:140:13)\n    at Execute.run (/usr/local/lib/node_modules/n8n/dist/commands/execute.js:57:29)\n    at Execute._run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/command.js:302:22)\n    at Config.runCommand (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/config/config.js:424:25)\n    at run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/main.js:94:16)\n    at /usr/local/lib/node_modules/n8n/bin/n8n:71:2",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 12.134803672961425,
+      "request_metrics": {
+        "run_id": "f8f31b6f_1",
+        "attempt": 1,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 63.37500000000001,
+        "peak_cpu_percent": 129.59,
+        "peak_memory_bytes": 387532717,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 40.333333333333336,
+        "gpu_sample_count": 15,
+        "peak_gpu_memory_bytes": 19752026112,
+        "gpu_power_sample_count": 15,
+        "estimated_gpu_energy_wh": 0.8720839377637781,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable aggregation workflow for n8n. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired n8n artifact: Return a complete n8n workflow JSON object. Start from the canonical workflow skeleton below and preserve its node names, IDs, types, settings, parameters, and connections exactly. Replace only the Transform node's `parameters.jsCode` with working JavaScript for the task. The skeleton already contains the current attempt's source and sink URLs; do not edit or reconstruct them. For two-source tasks, read each response by node name (for example, `$('Source 1').first().json`) and join or combine them as required. The Code node must return one n8n item shaped as `[{ json: { records: [...] } }]`. Do not add, remove, rename, or reconnect nodes. Return only the JSON object, without markdown fences.\n\nCanonical n8n workflow skeleton:\n{\n  \"id\": \"bench_f8f31b6f_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"workflowInputs\": {\n          \"values\": []\n        }\n      },\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.executeWorkflowTrigger\",\n      \"typeVersion\": 1.1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=2\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const records = [];\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=2\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\ndocker compose exec -T n8n n8n execute --id bench_f8f31b6f_1 failed: User settings loaded from: /tmp/n8n-user/.n8n/config\nError tracking disabled because this release is older than 6 weeks.\n\nThere is a deprecation related to your environment variables. Please take the recommended actions to update your configuration:\n - N8N_RUNNERS_ENABLED -> Running n8n without task runners is deprecated. Task runners will be turned on by default in a future version. Please set `N8N_RUNNERS_ENABLED=true` to enable task runners now and avoid potential issues in the future. Learn more: https://docs.n8n.io/hosting/configuration/task-runners/\n\nProblem with execution 1: The workflow has issues and cannot be executed for that reason. Please fix them first.. Aborting.\nThe workflow has issues and cannot be executed for that reason. Please fix them first. (execution 1)\nError executing workflow. See log messages for details.\n\nExecution error:\n====================================\nThe workflow has issues and cannot be executed for that reason. Please fix them first.\nundefined\nWorkflowHasIssuesError: The workflow has issues and cannot be executed for that reason. Please fix them first.\n    at WorkflowExecute.processRunExecutionData (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:771:19)\n    at WorkflowExecute.run (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:117:21)\n    at ManualExecutionService.runManually (/usr/local/lib/node_modules/n8n/dist/manual-execution.service.js:98:36)\n    at WorkflowRunner.runMainProcess (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:214:65)\n    at WorkflowRunner.run (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:140:13)\n    at Execute.run (/usr/local/lib/node_modules/n8n/dist/commands/execute.js:57:29)\n    at Execute._run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/command.js:302:22)\n    at Config.runCommand (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/config/config.js:424:25)\n    at run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/main.js:94:16)\n    at /usr/local/lib/node_modules/n8n/bin/n8n:71:2\nPrevious artifact:\n{\n  \"id\": \"bench_f8f31b6f_1\",\n  \"name\": \"Benchmark workflow\",\n  \"active\": false,\n  \"nodes\": [\n    {\n      \"parameters\": {\n        \"workflowInputs\": {\n          \"values\": []\n        }\n      },\n      \"id\": \"benchmark_trigger\",\n      \"name\": \"Benchmark Trigger\",\n      \"type\": \"n8n-nodes-base.executeWorkflowTrigger\",\n      \"typeVersion\": 1.1,\n      \"position\": [\n        0,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"GET\",\n        \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=1\",\n        \"options\": {}\n      },\n      \"id\": \"source_1\",\n      \"name\": \"Source 1\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        300,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"mode\": \"runOnceForAllItems\",\n        \"jsCode\": \"const features = $('Source 1').first().json.features;\\n\\n// Initialize band summary objects\\nconst bands = {\\n  minor: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\\n  moderate: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\\n  major: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity }\\n};\\n\\n// Process each feature\\nfeatures.forEach(feature => {\\n  const mag = feature.properties.mag;\\n  const depth = feature.geometry.coordinates[2];\\n  \\n  let band;\\n  if (mag < 4.0) {\\n    band = 'minor';\\n  } else if (mag >= 4.0 && mag < 5.0) {\\n    band = 'moderate';\\n  } else {\\n    band = 'major';\\n  }\\n\\n  // Update band stats\\n  const bandStats = bands[band];\\n  bandStats.event_count++;\\n  if (mag > bandStats.max_magnitude) {\\n    bandStats.max_magnitude = mag;\\n  }\\n  if (depth > bandStats.max_depth_km) {\\n    bandStats.max_depth_km = depth;\\n  }\\n});\\n\\n// Build final records, only including bands with events\\nconst records = [];\\nfor (const [bandName, stats] of Object.entries(bands)) {\\n  if (stats.event_count > 0) {\\n    records.push({\\n      magnitude_band: bandName,\\n      event_count: stats.event_count,\\n      max_magnitude: stats.max_magnitude,\\n      max_depth_km: stats.max_depth_km\\n    });\\n  }\\n}\\n\\nreturn [{ json: { records } }];\"\n      },\n      \"id\": \"transform\",\n      \"name\": \"Transform\",\n      \"type\": \"n8n-nodes-base.code\",\n      \"typeVersion\": 2,\n      \"position\": [\n        600,\n        0\n      ]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"http://recorder:8090/sink/f8f31b6f_1?attempt=1\",\n        \"sendBody\": true,\n        \"specifyBody\": \"json\",\n        \"jsonBody\": \"={{ $json }}\",\n        \"options\": {}\n      },\n      \"id\": \"sink\",\n      \"name\": \"Sink\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.2,\n      \"position\": [\n        900,\n        0\n      ]\n    }\n  ],\n  \"connections\": {\n    \"Benchmark Trigger\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Source 1\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Source 1\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Transform\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    },\n    \"Transform\": {\n      \"main\": [\n        [\n          {\n            \"node\": \"Sink\",\n            \"type\": \"main\",\n            \"index\": 0\n          }\n        ]\n      ]\n    }\n  },\n  \"settings\": {\n    \"executionOrder\": \"v1\",\n    \"saveDataErrorExecution\": \"all\",\n    \"saveDataSuccessExecution\": \"all\",\n    \"saveManualExecutions\": true\n  }\n}\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 8.894122742989566,
+        "ollama_total_duration_seconds": 8.883829171,
+        "model_load_duration_seconds": 0.001620396,
+        "prompt_tokens": 3007,
+        "output_tokens": 1049,
+        "output_tokens_per_second": 128.9259741223816,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/f8f31b6f_1_attempt-2.json",
+      "execution_error": "docker compose exec -T n8n n8n execute --id bench_f8f31b6f_1 failed: User settings loaded from: /tmp/n8n-user/.n8n/config\nError tracking disabled because this release is older than 6 weeks.\n\nThere is a deprecation related to your environment variables. Please take the recommended actions to update your configuration:\n - N8N_RUNNERS_ENABLED -> Running n8n without task runners is deprecated. Task runners will be turned on by default in a future version. Please set `N8N_RUNNERS_ENABLED=true` to enable task runners now and avoid potential issues in the future. Learn more: https://docs.n8n.io/hosting/configuration/task-runners/\n\nProblem with execution 1: The workflow has issues and cannot be executed for that reason. Please fix them first.. Aborting.\nThe workflow has issues and cannot be executed for that reason. Please fix them first. (execution 1)\nError executing workflow. See log messages for details.\n\nExecution error:\n====================================\nThe workflow has issues and cannot be executed for that reason. Please fix them first.\nundefined\nWorkflowHasIssuesError: The workflow has issues and cannot be executed for that reason. Please fix them first.\n    at WorkflowExecute.processRunExecutionData (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:771:19)\n    at WorkflowExecute.run (/usr/local/lib/node_modules/n8n/node_modules/n8n-core/dist/execution-engine/workflow-execute.js:117:21)\n    at ManualExecutionService.runManually (/usr/local/lib/node_modules/n8n/dist/manual-execution.service.js:98:36)\n    at WorkflowRunner.runMainProcess (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:214:65)\n    at WorkflowRunner.run (/usr/local/lib/node_modules/n8n/dist/workflow-runner.js:140:13)\n    at Execute.run (/usr/local/lib/node_modules/n8n/dist/commands/execute.js:57:29)\n    at Execute._run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/command.js:302:22)\n    at Config.runCommand (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/config/config.js:424:25)\n    at run (/usr/local/lib/node_modules/n8n/node_modules/@oclif/core/lib/main.js:94:16)\n    at /usr/local/lib/node_modules/n8n/bin/n8n:71:2",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 13.076105503016151,
+      "request_metrics": {
+        "run_id": "f8f31b6f_1",
+        "attempt": 2,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "usgs_earthquakes"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 89.045,
+        "peak_cpu_percent": 253.54999999999998,
+        "peak_memory_bytes": 399780085,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 40.53333333333333,
+        "gpu_sample_count": 15,
+        "peak_gpu_memory_bytes": 19752026112,
+        "gpu_power_sample_count": 15,
+        "estimated_gpu_energy_wh": 0.8468476605857537,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T14:24:47Z"
+}

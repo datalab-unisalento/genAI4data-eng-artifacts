@@ -1,0 +1,50 @@
+id: bench_c3cf48ce_1
+namespace: bench
+
+tasks:
+  - id: daily_summary
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      from urllib.request import urlopen, Request
+      
+      # Fetch source data
+      with urlopen("http://recorder:8090/source/open-meteo/particulate?run_id=c3cf48ce_1&attempt=0") as response:
+          data = json.load(response)
+      
+      # Extract hourly records
+      times = data["hourly"]["time"]
+      pm25_values = data["hourly"]["pm2_5"]
+      pm10_values = data["hourly"]["pm10"]
+      
+      # Group by date and calculate summaries
+      daily_summaries = {}
+      for time, pm25, pm10 in zip(times, pm25_values, pm10_values):
+          date = time[:10]
+          if date not in daily_summaries:
+              daily_summaries[date] = {
+                  "date": date,
+                  "hours": 0,
+                  "pm2_5_max": float('-inf'),
+                  "pm10_max": float('-inf')
+              }
+          
+          summary = daily_summaries[date]
+          summary["hours"] += 1
+          summary["pm2_5_max"] = max(summary["pm2_5_max"], pm25)
+          summary["pm10_max"] = max(summary["pm10_max"], pm10)
+      
+      # Convert to list of records
+      records = list(daily_summaries.values())
+      
+      # Post to sink
+      request = Request(
+          "http://recorder:8090/sink/c3cf48ce_1?attempt=0",
+          data=json.dumps({"records": records}).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urlopen(request) as response:
+          pass

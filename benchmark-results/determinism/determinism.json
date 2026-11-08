@@ -1,0 +1,46 @@
+[
+  {
+    "model": "qwen3-coder:30b",
+    "task": "t1_open_meteo_ingestion",
+    "setting": "temperature_0_fixed_seed",
+    "hashes": [
+      "7a6d1edb1009d329",
+      "7a6d1edb1009d329",
+      "7a6d1edb1009d329"
+    ],
+    "identical": true
+  },
+  {
+    "model": "qwen3-coder:30b",
+    "task": "t1_open_meteo_ingestion",
+    "setting": "temperature_0.7_varied_seed",
+    "hashes": [
+      "810c62e872c80126",
+      "e4369405e9dff76d",
+      "3cdfc09e20c52157"
+    ],
+    "identical": false
+  },
+  {
+    "model": "qwen3-coder:30b",
+    "task": "t3_open_meteo_join",
+    "setting": "temperature_0_fixed_seed",
+    "hashes": [
+      "019b1d0f43655721",
+      "019b1d0f43655721",
+      "019b1d0f43655721"
+    ],
+    "identical": true
+  },
+  {
+    "model": "qwen3-coder:30b",
+    "task": "t3_open_meteo_join",
+    "setting": "temperature_0.7_varied_seed",
+    "hashes": [
+      "5537cd49db25cbe1",
+      "f2be3d4570cd7966",
+      "33734f84143f1050"
+    ],
+    "identical": false
+  }
+]

@@ -1,0 +1,56 @@
+id: bench_aa3bbe72_1
+namespace: bench
+
+tasks:
+  - id: daily_particulate_summary
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+      
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=aa3bbe72_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/aa3bbe72_1?attempt=0"
+      
+      with urllib.request.urlopen(source_url) as response:
+          data = json.load(response)
+          
+      hourly_data = data["hourly"]
+      times = hourly_data["time"]
+      pm10_values = hourly_data["pm10"]
+      pm25_values = hourly_data["pm2_5"]
+      
+      date_groups = {}
+      for time, pm10, pm25 in zip(times, pm10_values, pm25_values):
+          date_key = time[:10]
+          if date_key not in date_groups:
+              date_groups[date_key] = {
+                  "hours": 0,
+                  "pm10_max": float('-inf'),
+                  "pm2_5_max": float('-inf')
+              }
+          
+          group = date_groups[date_key]
+          group["hours"] += 1
+          group["pm10_max"] = max(group["pm10_max"], pm10)
+          group["pm2_5_max"] = max(group["pm2_5_max"], pm25)
+      
+      summary_records = []
+      for date, stats in date_groups.items():
+          record = {
+              "date": date,
+              "hours": stats["hours"],
+              "pm2_5_max": stats["pm2_5_max"],
+              "pm10_max": stats["pm10_max"]
+          }
+          summary_records.append(record)
+      
+      request = urllib.request.Request(
+          sink_url,
+          data=json.dumps(summary_records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urllib.request.urlopen(request) as response:
+          pass

@@ -1,0 +1,75 @@
+id: bench_03651ad3_1
+namespace: bench
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      particulate_url = "http://recorder:8090/source/open-meteo/particulate?run_id=03651ad3_1&attempt=0"
+      gases_url = "http://recorder:8090/source/open-meteo/gases?run_id=03651ad3_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/03651ad3_1?attempt=0"
+
+      # Fetch data
+      particulate_data = json.loads(urllib.request.urlopen(particulate_url).read())
+      gases_data = json.loads(urllib.request.urlopen(gases_url).read())
+
+      # Extract hourly data
+      particulate_hourly = particulate_data['hourly']
+      gases_hourly = gases_data['hourly']
+
+      # Convert to list of records
+      particulate_records = [
+          {
+              'time': time,
+              'pm10': pm10,
+              'pm2_5': pm2_5
+          }
+          for time, pm10, pm2_5 in zip(
+              particulate_hourly['time'],
+              particulate_hourly['pm10'],
+              particulate_hourly['pm2_5']
+          )
+      ]
+
+      gases_records = [
+          {
+              'time': time,
+              'nitrogen_dioxide': no2,
+              'ozone': o3
+          }
+          for time, no2, o3 in zip(
+              gases_hourly['time'],
+              gases_hourly['nitrogen_dioxide'],
+              gases_hourly['ozone']
+          )
+      ]
+
+      # Create lookup dict from gases records by time
+      gases_lookup = {record['time']: record for record in gases_records}
+
+      # Inner join on time
+      joined_records = []
+      for p_record in particulate_records:
+          time = p_record['time']
+          if time in gases_lookup:
+              g_record = gases_lookup[time]
+              merged = {
+                  'time': time,
+                  'pm10': p_record['pm10'],
+                  'pm2_5': p_record['pm2_5'],
+                  'nitrogen_dioxide': g_record['nitrogen_dioxide'],
+                  'ozone': g_record['ozone']
+              }
+              joined_records.append(merged)
+
+      # POST to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(joined_records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      urllib.request.urlopen(req)

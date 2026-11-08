@@ -1,0 +1,72 @@
+{
+  "n_runs": 108,
+  "passed": 94,
+  "prompt_versions": [
+    "v2"
+  ],
+  "scorer_versions": [
+    "2"
+  ],
+  "cochran_q": {
+    "Q": 36.25,
+    "df": 5,
+    "p_value": 8.464793531670622e-07,
+    "blocks": 18
+  },
+  "by_platform": [
+    {
+      "platform": "airflow",
+      "passed": 18,
+      "cells": 18,
+      "pass_rate": 1.0,
+      "ci95_low": 0.8241207763533424,
+      "ci95_high": 1.0,
+      "first_attempt_pass_rate": 0.9444444444444444
+    },
+    {
+      "platform": "n8n",
+      "passed": 15,
+      "cells": 18,
+      "pass_rate": 0.8333333333333334,
+      "ci95_low": 0.6077796189608428,
+      "ci95_high": 0.9416342319413856,
+      "first_attempt_pass_rate": 0.6666666666666666
+    },
+    {
+      "platform": "dagster",
+      "passed": 17,
+      "cells": 18,
+      "pass_rate": 0.9444444444444444,
+      "ci95_low": 0.7424269921812741,
+      "ci95_high": 0.990124809021697,
+      "first_attempt_pass_rate": 0.9444444444444444
+    },
+    {
+      "platform": "prefect",
+      "passed": 18,
+      "cells": 18,
+      "pass_rate": 1.0,
+      "ci95_low": 0.8241207763533424,
+      "ci95_high": 1.0,
+      "first_attempt_pass_rate": 1.0
+    },
+    {
+      "platform": "nifi",
+      "passed": 8,
+      "cells": 18,
+      "pass_rate": 0.4444444444444444,
+      "ci95_low": 0.2455951812700563,
+      "ci95_high": 0.6628358435795723,
+      "first_attempt_pass_rate": 0.3333333333333333
+    },
+    {
+      "platform": "kestra",
+      "passed": 18,
+      "cells": 18,
+      "pass_rate": 1.0,
+      "ci95_low": 0.8241207763533424,
+      "ci95_high": 1.0,
+      "first_attempt_pass_rate": 1.0
+    }
+  ]
+}

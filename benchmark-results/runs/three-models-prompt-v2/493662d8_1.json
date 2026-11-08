@@ -1,0 +1,153 @@
+{
+  "run_id": "493662d8_1",
+  "task": "t1_open_meteo_ingestion",
+  "platform": "dagster",
+  "model": "qwen3-coder:30b",
+  "status": "passed",
+  "attempts": 1,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/493662d8_1_attempt-0.py",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:dd5b546827c9160758ea73baacf921be027641c3fe206b57fc8508cb44a0ad3a"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {},
+  "metrics": {
+    "first_attempt_passed": true,
+    "first_attempt_f1": 1.0,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 2.4118525449994195,
+    "execution_duration_seconds": 10.714833891997841,
+    "total_duration_seconds": 36.08428135799841,
+    "prompt_tokens": 727,
+    "output_tokens": 311,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 1.4300000000000002,
+    "peak_cpu_percent": 5.48,
+    "peak_memory_bytes": 30985420,
+    "resource_sample_count": 4,
+    "mean_gpu_utilization_percent": 10.5,
+    "peak_gpu_memory_bytes": 42082500608,
+    "estimated_gpu_energy_wh": 0.9685476926649792,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 48
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for dagster. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired dagster artifact: Return one complete Python file. Import only `op` and `job` from Dagster, plus standard-library modules needed for JSON and HTTP. The file MUST start with the exact line `from dagster import op, job`. Define one zero-argument op using exactly `@op` (not `@op()`), with no decorator arguments; inside it, use the literal current source and sink URLs from the contract, fetch the source with urllib.request, transform the records exactly as specified, and POST them to the sink using urllib.request.Request with a JSON body and Content-Type application/json. Do not use Dagster context, resources, op inputs, output schemas, or output mappings. Then include exactly this job declaration, with no decorator arguments:\n`@job\\ndef bench_493662d8_1():\\n    ingest_pipeline()`\nThe op function must be named `ingest_pipeline`. Do not suppress exceptions or access any other network destination. The job must be loadable by `dagster job execute -f FILE -j bench_493662d8_1`.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=493662d8_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/493662d8_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.4118525449994195,
+        "ollama_total_duration_seconds": 2.40718901,
+        "model_load_duration_seconds": 0.001029175,
+        "prompt_tokens": 727,
+        "output_tokens": 311,
+        "output_tokens_per_second": 142.28187182553592,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/493662d8_1_attempt-0.py",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 48,
+        "actual_count": 48,
+        "matched_count": 48,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 10.714833891997841,
+      "request_metrics": {
+        "run_id": "493662d8_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 48,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 4,
+        "mean_cpu_percent": 1.4300000000000002,
+        "peak_cpu_percent": 5.48,
+        "peak_memory_bytes": 30985420,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 10.5,
+        "gpu_sample_count": 30,
+        "peak_gpu_memory_bytes": 42082500608,
+        "gpu_power_sample_count": 30,
+        "estimated_gpu_energy_wh": 0.9685476926649792,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T13:13:43Z"
+}

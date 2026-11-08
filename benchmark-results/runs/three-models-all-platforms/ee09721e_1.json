@@ -1,0 +1,957 @@
+{
+  "run_id": "ee09721e_1",
+  "task": "t3_open_meteo_join",
+  "platform": "nifi",
+  "model": "cogito:32b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/ee09721e_1_attempt-2.groovy",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:5703fbb790dfae791a97333bea1e66d7bfe7afb88527c7bc6602370a462e861f"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 1,
+    "incorrect_output": 2
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": 0.0,
+    "generation_duration_seconds": 74.96216415200615,
+    "execution_duration_seconds": 164.04504007293144,
+    "total_duration_seconds": 307.08259000000544,
+    "prompt_tokens": 8043,
+    "output_tokens": 1977,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 99.35188679245282,
+    "peak_cpu_percent": 403.62,
+    "peak_memory_bytes": 1466982989,
+    "resource_sample_count": 53,
+    "mean_gpu_utilization_percent": 47.57364341085271,
+    "peak_gpu_memory_bytes": 22354591744,
+    "estimated_gpu_energy_wh": 8.089854384127026,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 6,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=ee09721e_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=ee09721e_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/ee09721e_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 23.832011836988386,
+        "ollama_total_duration_seconds": 23.825295915,
+        "model_load_duration_seconds": 0.001311425,
+        "prompt_tokens": 904,
+        "output_tokens": 659,
+        "output_tokens_per_second": 29.77076241883514,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/ee09721e_1_attempt-0.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c459e78-01a1-1000-1252-9ee32fa2322a] groovy.lang.MissingMethodException: No signature of method: transfer for class: org.apache.nifi.processors.groovyx.flow.GroovySessionFile is applicable for argument types: (o.a.n.p.g.f.GroovyProcessSessionWrap, o.a.n.p.Relationship) values: [org.apache.nifi.processors.groovyx.flow.GroovyProcessSessionWrap@20a928e2, success]\nPossible solutions: transfer(org.apache.nifi.processor.Relationship): groovy.lang.MissingMethodException: No signature of method: transfer for class: org.apache.nifi.processors.groovyx.flow.GroovySessionFile is applicable for argument types: (o.a.n.p.g.f.GroovyProcessSessionWrap, o.a.n.p.Relationship) values: [org.apache.nifi.processors.groovyx.flow.GroovyProcessSessionWrap@20a928e2, success]\nPossible solutions: transfer(org.apache.nifi.processor.Relationship)",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 62.000915251963306,
+      "request_metrics": {
+        "run_id": "ee09721e_1",
+        "attempt": 0,
+        "source_request_count": 2,
+        "requested_source_ids": [
+          "open_meteo_gases",
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 20,
+        "mean_cpu_percent": 89.41749999999999,
+        "peak_cpu_percent": 344.45,
+        "peak_memory_bytes": 1401233079,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 42.5,
+        "gpu_sample_count": 44,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 44,
+        "estimated_gpu_energy_wh": 2.64326407104937,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=ee09721e_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=ee09721e_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/ee09721e_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=9c459e78-01a1-1000-1252-9ee32fa2322a] groovy.lang.MissingMethodException: No signature of method: transfer for class: org.apache.nifi.processors.groovyx.flow.GroovySessionFile is applicable for argument types: (o.a.n.p.g.f.GroovyProcessSessionWrap, o.a.n.p.Relationship) values: [org.apache.nifi.processors.groovyx.flow.GroovyProcessSessionWrap@20a928e2, success]\nPossible solutions: transfer(org.apache.nifi.processor.Relationship): groovy.lang.MissingMethodException: No signature of method: transfer for class: org.apache.nifi.processors.groovyx.flow.GroovySessionFile is applicable for argument types: (o.a.n.p.g.f.GroovyProcessSessionWrap, o.a.n.p.Relationship) values: [org.apache.nifi.processors.groovyx.flow.GroovyProcessSessionWrap@20a928e2, success]\nPossible solutions: transfer(org.apache.nifi.processor.Relationship)\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef slurper = new JsonSlurper()\n\n// Fetch and parse particulate data\ndef particulateUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=ee09721e_1&attempt=0'\ndef particulateConn = new URL(particulateUrl).openConnection()\nparticulateConn.connectTimeout = 5000\nparticulateConn.readTimeout = 5000\ndef particulateData = slurper.parse(particulateConn.inputStream)\n\n// Fetch and parse gases data\ndef gasesUrl = 'http://recorder:8090/source/open-meteo/gases?run_id=ee09721e_1&attempt=0'\ndef gasesConn = new URL(gasesUrl).openConnection()\ngasesConn.connectTimeout = 5000\ngasesConn.readTimeout = 5000\ndef gasesData = slurper.parse(gasesConn.inputStream)\n\n// Convert hourly data to records for particulate\ndef particulateRecords = []\nparticulateData.hourly.time.eachWithIndex { time, index ->\n    def record = [\n        time: time,\n        pm10: particulateData.hourly.pm10[index],\n        pm2_5: particulateData.hourly.pm2_5[index]\n    ]\n    particulateRecords << record\n}\n\n// Convert hourly data to records for gases\ndef gasesRecords = []\ngasesData.hourly.time.eachWithIndex { time, index ->\n    def record = [\n        time: time,\n        nitrogen_dioxide: gasesData.hourly.nitrogen_dioxide[index],\n        ozone: gasesData.hourly.ozone[index]\n    ]\n    gasesRecords << record\n}\n\n// Create maps for efficient joining\ndef particulateMap = particulateRecords.collectEntries { [it.time, it] }\ndef gasesMap = gasesRecords.collectEntries { [it.time, it] }\n\n// Inner join on time\ndef joinedRecords = []\nparticulateMap.keySet().each { time ->\n    if (gasesMap.containsKey(time)) {\n        def record = [\n            time: time,\n            pm10: particulateMap[time].pm10,\n            pm2_5: particulateMap[time].pm2_5,\n            nitrogen_dioxide: gasesMap[time].nitrogen_dioxide,\n            ozone: gasesMap[time].ozone\n        ]\n        joinedRecords << record\n    }\n}\n\n// Prepare and send POST request to sink\ndef sinkUrl = 'http://recorder:8090/sink/ee09721e_1?attempt=0'\ndef jsonBody = JsonOutput.toJson([records: joinedRecords])\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.setRequestMethod('POST')\nsinkConn.setDoOutput(true)\nsinkConn.setRequestProperty('Content-Type', 'application/json')\nsinkConn.outputStream.write(jsonBody.bytes)\n\n// Create and transfer FlowFile\ndef flowFile = session.create()\nflowFile.transfer(session, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 23.737621094973292,
+        "ollama_total_duration_seconds": 23.729872714,
+        "model_load_duration_seconds": 0.001475719,
+        "prompt_tokens": 1883,
+        "output_tokens": 659,
+        "output_tokens_per_second": 29.49861618365704,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/ee09721e_1_attempt-1.groovy",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 48,
+        "actual_count": 0,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "nitrogen_dioxide": 21.4,
+            "ozone": 54.0,
+            "pm10": 10.9,
+            "pm2_5": 6.5,
+            "time": "2024-01-01T00:00"
+          },
+          {
+            "nitrogen_dioxide": 27.2,
+            "ozone": 46.0,
+            "pm10": 13.6,
+            "pm2_5": 8.4,
+            "time": "2024-01-01T01:00"
+          },
+          {
+            "nitrogen_dioxide": 35.3,
+            "ozone": 34.0,
+            "pm10": 14.1,
+            "pm2_5": 8.9,
+            "time": "2024-01-01T02:00"
+          },
+          {
+            "nitrogen_dioxide": 42.8,
+            "ozone": 24.0,
+            "pm10": 14.4,
+            "pm2_5": 9.2,
+            "time": "2024-01-01T03:00"
+          },
+          {
+            "nitrogen_dioxide": 49.3,
+            "ozone": 16.0,
+            "pm10": 15.7,
+            "pm2_5": 10.3,
+            "time": "2024-01-01T04:00"
+          },
+          {
+            "nitrogen_dioxide": 55.2,
+            "ozone": 8.0,
+            "pm10": 16.8,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T05:00"
+          },
+          {
+            "nitrogen_dioxide": 58.7,
+            "ozone": 3.0,
+            "pm10": 16.5,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T06:00"
+          },
+          {
+            "nitrogen_dioxide": 58.2,
+            "ozone": 2.0,
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T07:00"
+          },
+          {
+            "nitrogen_dioxide": 55.3,
+            "ozone": 2.0,
+            "pm10": 15.9,
+            "pm2_5": 10.9,
+            "time": "2024-01-01T08:00"
+          },
+          {
+            "nitrogen_dioxide": 52.5,
+            "ozone": 3.0,
+            "pm10": 15.4,
+            "pm2_5": 10.5,
+            "time": "2024-01-01T09:00"
+          },
+          {
+            "nitrogen_dioxide": 50.8,
+            "ozone": 2.0,
+            "pm10": 14.6,
+            "pm2_5": 10.0,
+            "time": "2024-01-01T10:00"
+          },
+          {
+            "nitrogen_dioxide": 49.4,
+            "ozone": 1.0,
+            "pm10": 14.3,
+            "pm2_5": 9.8,
+            "time": "2024-01-01T11:00"
+          },
+          {
+            "nitrogen_dioxide": 49.4,
+            "ozone": 0.0,
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T12:00"
+          },
+          {
+            "nitrogen_dioxide": 48.2,
+            "ozone": 0.0,
+            "pm10": 16.7,
+            "pm2_5": 11.4,
+            "time": "2024-01-01T13:00"
+          },
+          {
+            "nitrogen_dioxide": 46.3,
+            "ozone": 0.0,
+            "pm10": 17.6,
+            "pm2_5": 11.8,
+            "time": "2024-01-01T14:00"
+          },
+          {
+            "nitrogen_dioxide": 43.5,
+            "ozone": 0.0,
+            "pm10": 19.5,
+            "pm2_5": 13.0,
+            "time": "2024-01-01T15:00"
+          },
+          {
+            "nitrogen_dioxide": 38.8,
+            "ozone": 4.0,
+            "pm10": 21.8,
+            "pm2_5": 14.6,
+            "time": "2024-01-01T16:00"
+          },
+          {
+            "nitrogen_dioxide": 33.1,
+            "ozone": 9.0,
+            "pm10": 23.6,
+            "pm2_5": 15.8,
+            "time": "2024-01-01T17:00"
+          },
+          {
+            "nitrogen_dioxide": 28.8,
+            "ozone": 14.0,
+            "pm10": 24.7,
+            "pm2_5": 16.5,
+            "time": "2024-01-01T18:00"
+          },
+          {
+            "nitrogen_dioxide": 26.8,
+            "ozone": 20.0,
+            "pm10": 25.1,
+            "pm2_5": 16.6,
+            "time": "2024-01-01T19:00"
+          },
+          {
+            "nitrogen_dioxide": 26.3,
+            "ozone": 27.0,
+            "pm10": 24.6,
+            "pm2_5": 16.1,
+            "time": "2024-01-01T20:00"
+          },
+          {
+            "nitrogen_dioxide": 27.1,
+            "ozone": 31.0,
+            "pm10": 24.3,
+            "pm2_5": 15.7,
+            "time": "2024-01-01T21:00"
+          },
+          {
+            "nitrogen_dioxide": 29.6,
+            "ozone": 33.0,
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T22:00"
+          },
+          {
+            "nitrogen_dioxide": 33.4,
+            "ozone": 32.0,
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T23:00"
+          },
+          {
+            "nitrogen_dioxide": 35.7,
+            "ozone": 27.0,
+            "pm10": 14.8,
+            "pm2_5": 10.0,
+            "time": "2024-01-02T00:00"
+          },
+          {
+            "nitrogen_dioxide": 40.8,
+            "ozone": 22.0,
+            "pm10": 15.7,
+            "pm2_5": 10.6,
+            "time": "2024-01-02T01:00"
+          },
+          {
+            "nitrogen_dioxide": 47.9,
+            "ozone": 14.0,
+            "pm10": 16.9,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T02:00"
+          },
+          {
+            "nitrogen_dioxide": 53.6,
+            "ozone": 8.0,
+            "pm10": 18.0,
+            "pm2_5": 12.2,
+            "time": "2024-01-02T03:00"
+          },
+          {
+            "nitrogen_dioxide": 56.8,
+            "ozone": 5.0,
+            "pm10": 17.5,
+            "pm2_5": 11.9,
+            "time": "2024-01-02T04:00"
+          },
+          {
+            "nitrogen_dioxide": 58.7,
+            "ozone": 2.0,
+            "pm10": 18.3,
+            "pm2_5": 12.5,
+            "time": "2024-01-02T05:00"
+          },
+          {
+            "nitrogen_dioxide": 59.6,
+            "ozone": 1.0,
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T06:00"
+          },
+          {
+            "nitrogen_dioxide": 59.8,
+            "ozone": 0.0,
+            "pm10": 23.6,
+            "pm2_5": 16.4,
+            "time": "2024-01-02T07:00"
+          },
+          {
+            "nitrogen_dioxide": 59.1,
+            "ozone": 0.0,
+            "pm10": 22.9,
+            "pm2_5": 15.9,
+            "time": "2024-01-02T08:00"
+          },
+          {
+            "nitrogen_dioxide": 57.3,
+            "ozone": 0.0,
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T09:00"
+          },
+          {
+            "nitrogen_dioxide": 54.1,
+            "ozone": 2.0,
+            "pm10": 19.3,
+            "pm2_5": 13.1,
+            "time": "2024-01-02T10:00"
+          },
+          {
+            "nitrogen_dioxide": 49.8,
+            "ozone": 6.0,
+            "pm10": 17.2,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T11:00"
+          },
+          {
+            "nitrogen_dioxide": 36.6,
+            "ozone": 14.0,
+            "pm10": 12.9,
+            "pm2_5": 8.9,
+            "time": "2024-01-02T12:00"
+          },
+          {
+            "nitrogen_dioxide": 33.9,
+            "ozone": 18.0,
+            "pm10": 11.5,
+            "pm2_5": 7.7,
+            "time": "2024-01-02T13:00"
+          },
+          {
+            "nitrogen_dioxide": 30.0,
+            "ozone": 24.0,
+            "pm10": 10.0,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T14:00"
+          },
+          {
+            "nitrogen_dioxide": 26.0,
+            "ozone": 30.0,
+            "pm10": 9.4,
+            "pm2_5": 5.8,
+            "time": "2024-01-02T15:00"
+          },
+          {
+            "nitrogen_dioxide": 22.1,
+            "ozone": 35.0,
+            "pm10": 10.0,
+            "pm2_5": 6.0,
+            "time": "2024-01-02T16:00"
+          },
+          {
+            "nitrogen_dioxide": 18.1,
+            "ozone": 41.0,
+            "pm10": 10.9,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T17:00"
+          },
+          {
+            "nitrogen_dioxide": 14.4,
+            "ozone": 47.0,
+            "pm10": 11.4,
+            "pm2_5": 6.6,
+            "time": "2024-01-02T18:00"
+          },
+          {
+            "nitrogen_dioxide": 10.9,
+            "ozone": 56.0,
+            "pm10": 10.9,
+            "pm2_5": 6.1,
+            "time": "2024-01-02T19:00"
+          },
+          {
+            "nitrogen_dioxide": 7.8,
+            "ozone": 65.0,
+            "pm10": 9.9,
+            "pm2_5": 5.2,
+            "time": "2024-01-02T20:00"
+          },
+          {
+            "nitrogen_dioxide": 5.6,
+            "ozone": 72.0,
+            "pm10": 9.2,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T21:00"
+          },
+          {
+            "nitrogen_dioxide": 5.0,
+            "ozone": 74.0,
+            "pm10": 9.1,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T22:00"
+          },
+          {
+            "nitrogen_dioxide": 5.3,
+            "ozone": 73.0,
+            "pm10": 8.1,
+            "pm2_5": 4.5,
+            "time": "2024-01-02T23:00"
+          }
+        ],
+        "unexpected_rows": []
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 62.1043235459947,
+      "request_metrics": {
+        "run_id": "ee09721e_1",
+        "attempt": 1,
+        "source_request_count": 2,
+        "requested_source_ids": [
+          "open_meteo_gases",
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 20,
+        "mean_cpu_percent": 83.728,
+        "peak_cpu_percent": 403.62,
+        "peak_memory_bytes": 1466982989,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 44.422222222222224,
+        "gpu_sample_count": 45,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 45,
+        "estimated_gpu_energy_wh": 2.6472432640820287,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable relational-combine workflow for nifi. Retrieve the supplied Open-Meteo particulate and gas responses, convert their hourly columns into records, inner-join on exact time, and post only matching records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t3_open_meteo_join\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=ee09721e_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    },\n    \"open_meteo_gases\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/gases?run_id=ee09721e_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly nitrogen dioxide and ozone observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"nitrogen_dioxide\": \"number (\\u03bcg/m\\u00b3)\",\n          \"ozone\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"nitrogen_dioxide\": \"array<number>\",\n          \"ozone\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/ee09721e_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\",\n    \"nitrogen_dioxide\",\n    \"ozone\"\n  ],\n  \"task_details\": \"Inner join on exact time values. Do not emit particulate-only or gas-only times.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\n{\n  \"passed\": false,\n  \"expected_count\": 48,\n  \"actual_count\": 0,\n  \"matched_count\": 0,\n  \"precision\": 0.0,\n  \"recall\": 0.0,\n  \"f1\": 0.0,\n  \"missing_rows\": [\n    {\n      \"nitrogen_dioxide\": 21.4,\n      \"ozone\": 54.0,\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.5,\n      \"time\": \"2024-01-01T00:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 27.2,\n      \"ozone\": 46.0,\n      \"pm10\": 13.6,\n      \"pm2_5\": 8.4,\n      \"time\": \"2024-01-01T01:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 35.3,\n      \"ozone\": 34.0,\n      \"pm10\": 14.1,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-01T02:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 42.8,\n      \"ozone\": 24.0,\n      \"pm10\": 14.4,\n      \"pm2_5\": 9.2,\n      \"time\": \"2024-01-01T03:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 49.3,\n      \"ozone\": 16.0,\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.3,\n      \"time\": \"2024-01-01T04:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 55.2,\n      \"ozone\": 8.0,\n      \"pm10\": 16.8,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T05:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 58.7,\n      \"ozone\": 3.0,\n      \"pm10\": 16.5,\n      \"pm2_5\": 11.1,\n      \"time\": \"2024-01-01T06:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 58.2,\n      \"ozone\": 2.0,\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T07:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 55.3,\n      \"ozone\": 2.0,\n      \"pm10\": 15.9,\n      \"pm2_5\": 10.9,\n      \"time\": \"2024-01-01T08:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 52.5,\n      \"ozone\": 3.0,\n      \"pm10\": 15.4,\n      \"pm2_5\": 10.5,\n      \"time\": \"2024-01-01T09:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 50.8,\n      \"ozone\": 2.0,\n      \"pm10\": 14.6,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-01T10:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 49.4,\n      \"ozone\": 1.0,\n      \"pm10\": 14.3,\n      \"pm2_5\": 9.8,\n      \"time\": \"2024-01-01T11:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 49.4,\n      \"ozone\": 0.0,\n      \"pm10\": 16.4,\n      \"pm2_5\": 11.2,\n      \"time\": \"2024-01-01T12:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 48.2,\n      \"ozone\": 0.0,\n      \"pm10\": 16.7,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-01T13:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 46.3,\n      \"ozone\": 0.0,\n      \"pm10\": 17.6,\n      \"pm2_5\": 11.8,\n      \"time\": \"2024-01-01T14:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 43.5,\n      \"ozone\": 0.0,\n      \"pm10\": 19.5,\n      \"pm2_5\": 13.0,\n      \"time\": \"2024-01-01T15:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 38.8,\n      \"ozone\": 4.0,\n      \"pm10\": 21.8,\n      \"pm2_5\": 14.6,\n      \"time\": \"2024-01-01T16:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 33.1,\n      \"ozone\": 9.0,\n      \"pm10\": 23.6,\n      \"pm2_5\": 15.8,\n      \"time\": \"2024-01-01T17:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 28.8,\n      \"ozone\": 14.0,\n      \"pm10\": 24.7,\n      \"pm2_5\": 16.5,\n      \"time\": \"2024-01-01T18:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 26.8,\n      \"ozone\": 20.0,\n      \"pm10\": 25.1,\n      \"pm2_5\": 16.6,\n      \"time\": \"2024-01-01T19:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 26.3,\n      \"ozone\": 27.0,\n      \"pm10\": 24.6,\n      \"pm2_5\": 16.1,\n      \"time\": \"2024-01-01T20:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 27.1,\n      \"ozone\": 31.0,\n      \"pm10\": 24.3,\n      \"pm2_5\": 15.7,\n      \"time\": \"2024-01-01T21:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 29.6,\n      \"ozone\": 33.0,\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T22:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 33.4,\n      \"ozone\": 32.0,\n      \"pm10\": 23.2,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-01T23:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 35.7,\n      \"ozone\": 27.0,\n      \"pm10\": 14.8,\n      \"pm2_5\": 10.0,\n      \"time\": \"2024-01-02T00:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 40.8,\n      \"ozone\": 22.0,\n      \"pm10\": 15.7,\n      \"pm2_5\": 10.6,\n      \"time\": \"2024-01-02T01:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 47.9,\n      \"ozone\": 14.0,\n      \"pm10\": 16.9,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T02:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 53.6,\n      \"ozone\": 8.0,\n      \"pm10\": 18.0,\n      \"pm2_5\": 12.2,\n      \"time\": \"2024-01-02T03:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 56.8,\n      \"ozone\": 5.0,\n      \"pm10\": 17.5,\n      \"pm2_5\": 11.9,\n      \"time\": \"2024-01-02T04:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 58.7,\n      \"ozone\": 2.0,\n      \"pm10\": 18.3,\n      \"pm2_5\": 12.5,\n      \"time\": \"2024-01-02T05:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 59.6,\n      \"ozone\": 1.0,\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T06:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 59.8,\n      \"ozone\": 0.0,\n      \"pm10\": 23.6,\n      \"pm2_5\": 16.4,\n      \"time\": \"2024-01-02T07:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 59.1,\n      \"ozone\": 0.0,\n      \"pm10\": 22.9,\n      \"pm2_5\": 15.9,\n      \"time\": \"2024-01-02T08:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 57.3,\n      \"ozone\": 0.0,\n      \"pm10\": 21.4,\n      \"pm2_5\": 14.7,\n      \"time\": \"2024-01-02T09:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 54.1,\n      \"ozone\": 2.0,\n      \"pm10\": 19.3,\n      \"pm2_5\": 13.1,\n      \"time\": \"2024-01-02T10:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 49.8,\n      \"ozone\": 6.0,\n      \"pm10\": 17.2,\n      \"pm2_5\": 11.4,\n      \"time\": \"2024-01-02T11:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 36.6,\n      \"ozone\": 14.0,\n      \"pm10\": 12.9,\n      \"pm2_5\": 8.9,\n      \"time\": \"2024-01-02T12:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 33.9,\n      \"ozone\": 18.0,\n      \"pm10\": 11.5,\n      \"pm2_5\": 7.7,\n      \"time\": \"2024-01-02T13:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 30.0,\n      \"ozone\": 24.0,\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T14:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 26.0,\n      \"ozone\": 30.0,\n      \"pm10\": 9.4,\n      \"pm2_5\": 5.8,\n      \"time\": \"2024-01-02T15:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 22.1,\n      \"ozone\": 35.0,\n      \"pm10\": 10.0,\n      \"pm2_5\": 6.0,\n      \"time\": \"2024-01-02T16:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 18.1,\n      \"ozone\": 41.0,\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.4,\n      \"time\": \"2024-01-02T17:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 14.4,\n      \"ozone\": 47.0,\n      \"pm10\": 11.4,\n      \"pm2_5\": 6.6,\n      \"time\": \"2024-01-02T18:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 10.9,\n      \"ozone\": 56.0,\n      \"pm10\": 10.9,\n      \"pm2_5\": 6.1,\n      \"time\": \"2024-01-02T19:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 7.8,\n      \"ozone\": 65.0,\n      \"pm10\": 9.9,\n      \"pm2_5\": 5.2,\n      \"time\": \"2024-01-02T20:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 5.6,\n      \"ozone\": 72.0,\n      \"pm10\": 9.2,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T21:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 5.0,\n      \"ozone\": 74.0,\n      \"pm10\": 9.1,\n      \"pm2_5\": 4.8,\n      \"time\": \"2024-01-02T22:00\"\n    },\n    {\n      \"nitrogen_dioxide\": 5.3,\n      \"ozone\": 73.0,\n      \"pm10\": 8.1,\n      \"pm2_5\": 4.5,\n      \"time\": \"2024-01-02T23:00\"\n    }\n  ],\n  \"unexpected_rows\": []\n}\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef slurper = new JsonSlurper()\n\n// Fetch and parse particulate data\ndef particulateUrl = 'http://recorder:8090/source/open-meteo/particulate?run_id=ee09721e_1&attempt=1'\ndef particulateConn = new URL(particulateUrl).openConnection()\nparticulateConn.connectTimeout = 5000\nparticulateConn.readTimeout = 5000\ndef particulateData = slurper.parse(particulateConn.inputStream)\n\n// Fetch and parse gases data\ndef gasesUrl = 'http://recorder:8090/source/open-meteo/gases?run_id=ee09721e_1&attempt=1'\ndef gasesConn = new URL(gasesUrl).openConnection()\ngasesConn.connectTimeout = 5000\ngasesConn.readTimeout = 5000\ndef gasesData = slurper.parse(gasesConn.inputStream)\n\n// Convert hourly data to records for particulate\ndef particulateRecords = []\nparticulateData.hourly.time.eachWithIndex { time, index ->\n    def record = [\n        time: time,\n        pm10: particulateData.hourly.pm10[index],\n        pm2_5: particulateData.hourly.pm2_5[index]\n    ]\n    particulateRecords << record\n}\n\n// Convert hourly data to records for gases\ndef gasesRecords = []\ngasesData.hourly.time.eachWithIndex { time, index ->\n    def record = [\n        time: time,\n        nitrogen_dioxide: gasesData.hourly.nitrogen_dioxide[index],\n        ozone: gasesData.hourly.ozone[index]\n    ]\n    gasesRecords << record\n}\n\n// Create maps for efficient joining\ndef particulateMap = particulateRecords.collectEntries { [it.time, it] }\ndef gasesMap = gasesRecords.collectEntries { [it.time, it] }\n\n// Inner join on time\ndef joinedRecords = []\nparticulateMap.keySet().each { time ->\n    if (gasesMap.containsKey(time)) {\n        def record = [\n            time: time,\n            pm10: particulateMap[time].pm10,\n            pm2_5: particulateMap[time].pm2_5,\n            nitrogen_dioxide: gasesMap[time].nitrogen_dioxide,\n            ozone: gasesMap[time].ozone\n        ]\n        joinedRecords << record\n    }\n}\n\n// Prepare and send POST request to sink\ndef sinkUrl = 'http://recorder:8090/sink/ee09721e_1?attempt=1'\ndef jsonBody = JsonOutput.toJson([records: joinedRecords])\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.setRequestMethod('POST')\nsinkConn.setDoOutput(true)\nsinkConn.setRequestProperty('Content-Type', 'application/json')\nsinkConn.outputStream.write(jsonBody.bytes)\n\n// Create and transfer FlowFile\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 27.392531220044475,
+        "ollama_total_duration_seconds": 27.381571254,
+        "model_load_duration_seconds": 0.001561706,
+        "prompt_tokens": 5256,
+        "output_tokens": 659,
+        "output_tokens_per_second": 28.480473804446756,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/ee09721e_1_attempt-2.groovy",
+      "evaluation": {
+        "passed": false,
+        "expected_count": 48,
+        "actual_count": 0,
+        "matched_count": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "missing_rows": [
+          {
+            "nitrogen_dioxide": 21.4,
+            "ozone": 54.0,
+            "pm10": 10.9,
+            "pm2_5": 6.5,
+            "time": "2024-01-01T00:00"
+          },
+          {
+            "nitrogen_dioxide": 27.2,
+            "ozone": 46.0,
+            "pm10": 13.6,
+            "pm2_5": 8.4,
+            "time": "2024-01-01T01:00"
+          },
+          {
+            "nitrogen_dioxide": 35.3,
+            "ozone": 34.0,
+            "pm10": 14.1,
+            "pm2_5": 8.9,
+            "time": "2024-01-01T02:00"
+          },
+          {
+            "nitrogen_dioxide": 42.8,
+            "ozone": 24.0,
+            "pm10": 14.4,
+            "pm2_5": 9.2,
+            "time": "2024-01-01T03:00"
+          },
+          {
+            "nitrogen_dioxide": 49.3,
+            "ozone": 16.0,
+            "pm10": 15.7,
+            "pm2_5": 10.3,
+            "time": "2024-01-01T04:00"
+          },
+          {
+            "nitrogen_dioxide": 55.2,
+            "ozone": 8.0,
+            "pm10": 16.8,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T05:00"
+          },
+          {
+            "nitrogen_dioxide": 58.7,
+            "ozone": 3.0,
+            "pm10": 16.5,
+            "pm2_5": 11.1,
+            "time": "2024-01-01T06:00"
+          },
+          {
+            "nitrogen_dioxide": 58.2,
+            "ozone": 2.0,
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T07:00"
+          },
+          {
+            "nitrogen_dioxide": 55.3,
+            "ozone": 2.0,
+            "pm10": 15.9,
+            "pm2_5": 10.9,
+            "time": "2024-01-01T08:00"
+          },
+          {
+            "nitrogen_dioxide": 52.5,
+            "ozone": 3.0,
+            "pm10": 15.4,
+            "pm2_5": 10.5,
+            "time": "2024-01-01T09:00"
+          },
+          {
+            "nitrogen_dioxide": 50.8,
+            "ozone": 2.0,
+            "pm10": 14.6,
+            "pm2_5": 10.0,
+            "time": "2024-01-01T10:00"
+          },
+          {
+            "nitrogen_dioxide": 49.4,
+            "ozone": 1.0,
+            "pm10": 14.3,
+            "pm2_5": 9.8,
+            "time": "2024-01-01T11:00"
+          },
+          {
+            "nitrogen_dioxide": 49.4,
+            "ozone": 0.0,
+            "pm10": 16.4,
+            "pm2_5": 11.2,
+            "time": "2024-01-01T12:00"
+          },
+          {
+            "nitrogen_dioxide": 48.2,
+            "ozone": 0.0,
+            "pm10": 16.7,
+            "pm2_5": 11.4,
+            "time": "2024-01-01T13:00"
+          },
+          {
+            "nitrogen_dioxide": 46.3,
+            "ozone": 0.0,
+            "pm10": 17.6,
+            "pm2_5": 11.8,
+            "time": "2024-01-01T14:00"
+          },
+          {
+            "nitrogen_dioxide": 43.5,
+            "ozone": 0.0,
+            "pm10": 19.5,
+            "pm2_5": 13.0,
+            "time": "2024-01-01T15:00"
+          },
+          {
+            "nitrogen_dioxide": 38.8,
+            "ozone": 4.0,
+            "pm10": 21.8,
+            "pm2_5": 14.6,
+            "time": "2024-01-01T16:00"
+          },
+          {
+            "nitrogen_dioxide": 33.1,
+            "ozone": 9.0,
+            "pm10": 23.6,
+            "pm2_5": 15.8,
+            "time": "2024-01-01T17:00"
+          },
+          {
+            "nitrogen_dioxide": 28.8,
+            "ozone": 14.0,
+            "pm10": 24.7,
+            "pm2_5": 16.5,
+            "time": "2024-01-01T18:00"
+          },
+          {
+            "nitrogen_dioxide": 26.8,
+            "ozone": 20.0,
+            "pm10": 25.1,
+            "pm2_5": 16.6,
+            "time": "2024-01-01T19:00"
+          },
+          {
+            "nitrogen_dioxide": 26.3,
+            "ozone": 27.0,
+            "pm10": 24.6,
+            "pm2_5": 16.1,
+            "time": "2024-01-01T20:00"
+          },
+          {
+            "nitrogen_dioxide": 27.1,
+            "ozone": 31.0,
+            "pm10": 24.3,
+            "pm2_5": 15.7,
+            "time": "2024-01-01T21:00"
+          },
+          {
+            "nitrogen_dioxide": 29.6,
+            "ozone": 33.0,
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T22:00"
+          },
+          {
+            "nitrogen_dioxide": 33.4,
+            "ozone": 32.0,
+            "pm10": 23.2,
+            "pm2_5": 14.7,
+            "time": "2024-01-01T23:00"
+          },
+          {
+            "nitrogen_dioxide": 35.7,
+            "ozone": 27.0,
+            "pm10": 14.8,
+            "pm2_5": 10.0,
+            "time": "2024-01-02T00:00"
+          },
+          {
+            "nitrogen_dioxide": 40.8,
+            "ozone": 22.0,
+            "pm10": 15.7,
+            "pm2_5": 10.6,
+            "time": "2024-01-02T01:00"
+          },
+          {
+            "nitrogen_dioxide": 47.9,
+            "ozone": 14.0,
+            "pm10": 16.9,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T02:00"
+          },
+          {
+            "nitrogen_dioxide": 53.6,
+            "ozone": 8.0,
+            "pm10": 18.0,
+            "pm2_5": 12.2,
+            "time": "2024-01-02T03:00"
+          },
+          {
+            "nitrogen_dioxide": 56.8,
+            "ozone": 5.0,
+            "pm10": 17.5,
+            "pm2_5": 11.9,
+            "time": "2024-01-02T04:00"
+          },
+          {
+            "nitrogen_dioxide": 58.7,
+            "ozone": 2.0,
+            "pm10": 18.3,
+            "pm2_5": 12.5,
+            "time": "2024-01-02T05:00"
+          },
+          {
+            "nitrogen_dioxide": 59.6,
+            "ozone": 1.0,
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T06:00"
+          },
+          {
+            "nitrogen_dioxide": 59.8,
+            "ozone": 0.0,
+            "pm10": 23.6,
+            "pm2_5": 16.4,
+            "time": "2024-01-02T07:00"
+          },
+          {
+            "nitrogen_dioxide": 59.1,
+            "ozone": 0.0,
+            "pm10": 22.9,
+            "pm2_5": 15.9,
+            "time": "2024-01-02T08:00"
+          },
+          {
+            "nitrogen_dioxide": 57.3,
+            "ozone": 0.0,
+            "pm10": 21.4,
+            "pm2_5": 14.7,
+            "time": "2024-01-02T09:00"
+          },
+          {
+            "nitrogen_dioxide": 54.1,
+            "ozone": 2.0,
+            "pm10": 19.3,
+            "pm2_5": 13.1,
+            "time": "2024-01-02T10:00"
+          },
+          {
+            "nitrogen_dioxide": 49.8,
+            "ozone": 6.0,
+            "pm10": 17.2,
+            "pm2_5": 11.4,
+            "time": "2024-01-02T11:00"
+          },
+          {
+            "nitrogen_dioxide": 36.6,
+            "ozone": 14.0,
+            "pm10": 12.9,
+            "pm2_5": 8.9,
+            "time": "2024-01-02T12:00"
+          },
+          {
+            "nitrogen_dioxide": 33.9,
+            "ozone": 18.0,
+            "pm10": 11.5,
+            "pm2_5": 7.7,
+            "time": "2024-01-02T13:00"
+          },
+          {
+            "nitrogen_dioxide": 30.0,
+            "ozone": 24.0,
+            "pm10": 10.0,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T14:00"
+          },
+          {
+            "nitrogen_dioxide": 26.0,
+            "ozone": 30.0,
+            "pm10": 9.4,
+            "pm2_5": 5.8,
+            "time": "2024-01-02T15:00"
+          },
+          {
+            "nitrogen_dioxide": 22.1,
+            "ozone": 35.0,
+            "pm10": 10.0,
+            "pm2_5": 6.0,
+            "time": "2024-01-02T16:00"
+          },
+          {
+            "nitrogen_dioxide": 18.1,
+            "ozone": 41.0,
+            "pm10": 10.9,
+            "pm2_5": 6.4,
+            "time": "2024-01-02T17:00"
+          },
+          {
+            "nitrogen_dioxide": 14.4,
+            "ozone": 47.0,
+            "pm10": 11.4,
+            "pm2_5": 6.6,
+            "time": "2024-01-02T18:00"
+          },
+          {
+            "nitrogen_dioxide": 10.9,
+            "ozone": 56.0,
+            "pm10": 10.9,
+            "pm2_5": 6.1,
+            "time": "2024-01-02T19:00"
+          },
+          {
+            "nitrogen_dioxide": 7.8,
+            "ozone": 65.0,
+            "pm10": 9.9,
+            "pm2_5": 5.2,
+            "time": "2024-01-02T20:00"
+          },
+          {
+            "nitrogen_dioxide": 5.6,
+            "ozone": 72.0,
+            "pm10": 9.2,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T21:00"
+          },
+          {
+            "nitrogen_dioxide": 5.0,
+            "ozone": 74.0,
+            "pm10": 9.1,
+            "pm2_5": 4.8,
+            "time": "2024-01-02T22:00"
+          },
+          {
+            "nitrogen_dioxide": 5.3,
+            "ozone": 73.0,
+            "pm10": 8.1,
+            "pm2_5": 4.5,
+            "time": "2024-01-02T23:00"
+          }
+        ],
+        "unexpected_rows": []
+      },
+      "failure_stage": "data_correctness",
+      "failure_category": "incorrect_output",
+      "execution_duration_seconds": 39.93980127497343,
+      "request_metrics": {
+        "run_id": "ee09721e_1",
+        "attempt": 2,
+        "source_request_count": 2,
+        "requested_source_ids": [
+          "open_meteo_gases",
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 13,
+        "mean_cpu_percent": 138.6723076923077,
+        "peak_cpu_percent": 317.0,
+        "peak_memory_bytes": 1369020825,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 56.7,
+        "gpu_sample_count": 40,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 40,
+        "estimated_gpu_energy_wh": 2.7993470489956285,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T12:43:15Z"
+}

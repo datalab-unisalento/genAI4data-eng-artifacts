@@ -1,0 +1,106 @@
+{
+  "id": "bench_b5ed7466_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/particulate?run_id=b5ed7466_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data = $json;\nif (!data || !Array.isArray(data.hourly.time)) {\n  return [{ json: { records: [] } }];\n}\n\nconst times = data.hourly.time;\nconst pm25 = data.hourly.pm2_5;\nconst pm10 = data.hourly.pm10;\n\n// Group by date (first 10 chars of time string)\nconst groups = {};\nfor (let i = 0; i < times.length; i++) {\n  const date = times[i].substring(0, 10);\n  if (!groups[date]) {\n    groups[date] = [];\n  }\n  groups[date].push({\n    pm2_5: pm25[i],\n    pm10: pm10[i]\n  });\n}\n\n// Build summary records\nconst results = [];\nfor (const date in groups) {\n  const entries = groups[date];\n  const pm25Vals = entries.map(e => e.pm2_5);\n  const pm10Vals = entries.map(e => e.pm10);\n  results.push({\n    date,\n    hours: entries.length,\n    pm2_5_max: Math.max(...pm25Vals),\n    pm10_max: Math.max(...pm10Vals)\n  });\n}\n\nreturn [{ json: { records: results } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/b5ed7466_1?attempt=2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

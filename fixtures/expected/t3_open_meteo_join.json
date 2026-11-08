@@ -1,0 +1,338 @@
+[
+  {
+    "time": "2024-01-01T00:00",
+    "pm10": 10.9,
+    "pm2_5": 6.5,
+    "nitrogen_dioxide": 21.4,
+    "ozone": 54.0
+  },
+  {
+    "time": "2024-01-01T01:00",
+    "pm10": 13.6,
+    "pm2_5": 8.4,
+    "nitrogen_dioxide": 27.2,
+    "ozone": 46.0
+  },
+  {
+    "time": "2024-01-01T02:00",
+    "pm10": 14.1,
+    "pm2_5": 8.9,
+    "nitrogen_dioxide": 35.3,
+    "ozone": 34.0
+  },
+  {
+    "time": "2024-01-01T03:00",
+    "pm10": 14.4,
+    "pm2_5": 9.2,
+    "nitrogen_dioxide": 42.8,
+    "ozone": 24.0
+  },
+  {
+    "time": "2024-01-01T04:00",
+    "pm10": 15.7,
+    "pm2_5": 10.3,
+    "nitrogen_dioxide": 49.3,
+    "ozone": 16.0
+  },
+  {
+    "time": "2024-01-01T05:00",
+    "pm10": 16.8,
+    "pm2_5": 11.1,
+    "nitrogen_dioxide": 55.2,
+    "ozone": 8.0
+  },
+  {
+    "time": "2024-01-01T06:00",
+    "pm10": 16.5,
+    "pm2_5": 11.1,
+    "nitrogen_dioxide": 58.7,
+    "ozone": 3.0
+  },
+  {
+    "time": "2024-01-01T07:00",
+    "pm10": 16.4,
+    "pm2_5": 11.2,
+    "nitrogen_dioxide": 58.2,
+    "ozone": 2.0
+  },
+  {
+    "time": "2024-01-01T08:00",
+    "pm10": 15.9,
+    "pm2_5": 10.9,
+    "nitrogen_dioxide": 55.3,
+    "ozone": 2.0
+  },
+  {
+    "time": "2024-01-01T09:00",
+    "pm10": 15.4,
+    "pm2_5": 10.5,
+    "nitrogen_dioxide": 52.5,
+    "ozone": 3.0
+  },
+  {
+    "time": "2024-01-01T10:00",
+    "pm10": 14.6,
+    "pm2_5": 10.0,
+    "nitrogen_dioxide": 50.8,
+    "ozone": 2.0
+  },
+  {
+    "time": "2024-01-01T11:00",
+    "pm10": 14.3,
+    "pm2_5": 9.8,
+    "nitrogen_dioxide": 49.4,
+    "ozone": 1.0
+  },
+  {
+    "time": "2024-01-01T12:00",
+    "pm10": 16.4,
+    "pm2_5": 11.2,
+    "nitrogen_dioxide": 49.4,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-01T13:00",
+    "pm10": 16.7,
+    "pm2_5": 11.4,
+    "nitrogen_dioxide": 48.2,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-01T14:00",
+    "pm10": 17.6,
+    "pm2_5": 11.8,
+    "nitrogen_dioxide": 46.3,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-01T15:00",
+    "pm10": 19.5,
+    "pm2_5": 13.0,
+    "nitrogen_dioxide": 43.5,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-01T16:00",
+    "pm10": 21.8,
+    "pm2_5": 14.6,
+    "nitrogen_dioxide": 38.8,
+    "ozone": 4.0
+  },
+  {
+    "time": "2024-01-01T17:00",
+    "pm10": 23.6,
+    "pm2_5": 15.8,
+    "nitrogen_dioxide": 33.1,
+    "ozone": 9.0
+  },
+  {
+    "time": "2024-01-01T18:00",
+    "pm10": 24.7,
+    "pm2_5": 16.5,
+    "nitrogen_dioxide": 28.8,
+    "ozone": 14.0
+  },
+  {
+    "time": "2024-01-01T19:00",
+    "pm10": 25.1,
+    "pm2_5": 16.6,
+    "nitrogen_dioxide": 26.8,
+    "ozone": 20.0
+  },
+  {
+    "time": "2024-01-01T20:00",
+    "pm10": 24.6,
+    "pm2_5": 16.1,
+    "nitrogen_dioxide": 26.3,
+    "ozone": 27.0
+  },
+  {
+    "time": "2024-01-01T21:00",
+    "pm10": 24.3,
+    "pm2_5": 15.7,
+    "nitrogen_dioxide": 27.1,
+    "ozone": 31.0
+  },
+  {
+    "time": "2024-01-01T22:00",
+    "pm10": 23.2,
+    "pm2_5": 14.7,
+    "nitrogen_dioxide": 29.6,
+    "ozone": 33.0
+  },
+  {
+    "time": "2024-01-01T23:00",
+    "pm10": 23.2,
+    "pm2_5": 14.7,
+    "nitrogen_dioxide": 33.4,
+    "ozone": 32.0
+  },
+  {
+    "time": "2024-01-02T00:00",
+    "pm10": 14.8,
+    "pm2_5": 10.0,
+    "nitrogen_dioxide": 35.7,
+    "ozone": 27.0
+  },
+  {
+    "time": "2024-01-02T01:00",
+    "pm10": 15.7,
+    "pm2_5": 10.6,
+    "nitrogen_dioxide": 40.8,
+    "ozone": 22.0
+  },
+  {
+    "time": "2024-01-02T02:00",
+    "pm10": 16.9,
+    "pm2_5": 11.4,
+    "nitrogen_dioxide": 47.9,
+    "ozone": 14.0
+  },
+  {
+    "time": "2024-01-02T03:00",
+    "pm10": 18.0,
+    "pm2_5": 12.2,
+    "nitrogen_dioxide": 53.6,
+    "ozone": 8.0
+  },
+  {
+    "time": "2024-01-02T04:00",
+    "pm10": 17.5,
+    "pm2_5": 11.9,
+    "nitrogen_dioxide": 56.8,
+    "ozone": 5.0
+  },
+  {
+    "time": "2024-01-02T05:00",
+    "pm10": 18.3,
+    "pm2_5": 12.5,
+    "nitrogen_dioxide": 58.7,
+    "ozone": 2.0
+  },
+  {
+    "time": "2024-01-02T06:00",
+    "pm10": 21.4,
+    "pm2_5": 14.7,
+    "nitrogen_dioxide": 59.6,
+    "ozone": 1.0
+  },
+  {
+    "time": "2024-01-02T07:00",
+    "pm10": 23.6,
+    "pm2_5": 16.4,
+    "nitrogen_dioxide": 59.8,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-02T08:00",
+    "pm10": 22.9,
+    "pm2_5": 15.9,
+    "nitrogen_dioxide": 59.1,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-02T09:00",
+    "pm10": 21.4,
+    "pm2_5": 14.7,
+    "nitrogen_dioxide": 57.3,
+    "ozone": 0.0
+  },
+  {
+    "time": "2024-01-02T10:00",
+    "pm10": 19.3,
+    "pm2_5": 13.1,
+    "nitrogen_dioxide": 54.1,
+    "ozone": 2.0
+  },
+  {
+    "time": "2024-01-02T11:00",
+    "pm10": 17.2,
+    "pm2_5": 11.4,
+    "nitrogen_dioxide": 49.8,
+    "ozone": 6.0
+  },
+  {
+    "time": "2024-01-02T12:00",
+    "pm10": 12.9,
+    "pm2_5": 8.9,
+    "nitrogen_dioxide": 36.6,
+    "ozone": 14.0
+  },
+  {
+    "time": "2024-01-02T13:00",
+    "pm10": 11.5,
+    "pm2_5": 7.7,
+    "nitrogen_dioxide": 33.9,
+    "ozone": 18.0
+  },
+  {
+    "time": "2024-01-02T14:00",
+    "pm10": 10.0,
+    "pm2_5": 6.4,
+    "nitrogen_dioxide": 30.0,
+    "ozone": 24.0
+  },
+  {
+    "time": "2024-01-02T15:00",
+    "pm10": 9.4,
+    "pm2_5": 5.8,
+    "nitrogen_dioxide": 26.0,
+    "ozone": 30.0
+  },
+  {
+    "time": "2024-01-02T16:00",
+    "pm10": 10.0,
+    "pm2_5": 6.0,
+    "nitrogen_dioxide": 22.1,
+    "ozone": 35.0
+  },
+  {
+    "time": "2024-01-02T17:00",
+    "pm10": 10.9,
+    "pm2_5": 6.4,
+    "nitrogen_dioxide": 18.1,
+    "ozone": 41.0
+  },
+  {
+    "time": "2024-01-02T18:00",
+    "pm10": 11.4,
+    "pm2_5": 6.6,
+    "nitrogen_dioxide": 14.4,
+    "ozone": 47.0
+  },
+  {
+    "time": "2024-01-02T19:00",
+    "pm10": 10.9,
+    "pm2_5": 6.1,
+    "nitrogen_dioxide": 10.9,
+    "ozone": 56.0
+  },
+  {
+    "time": "2024-01-02T20:00",
+    "pm10": 9.9,
+    "pm2_5": 5.2,
+    "nitrogen_dioxide": 7.8,
+    "ozone": 65.0
+  },
+  {
+    "time": "2024-01-02T21:00",
+    "pm10": 9.2,
+    "pm2_5": 4.8,
+    "nitrogen_dioxide": 5.6,
+    "ozone": 72.0
+  },
+  {
+    "time": "2024-01-02T22:00",
+    "pm10": 9.1,
+    "pm2_5": 4.8,
+    "nitrogen_dioxide": 5.0,
+    "ozone": 74.0
+  },
+  {
+    "time": "2024-01-02T23:00",
+    "pm10": 8.1,
+    "pm2_5": 4.5,
+    "nitrogen_dioxide": 5.3,
+    "ozone": 73.0
+  }
+]

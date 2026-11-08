@@ -1,0 +1,259 @@
+{
+  "run_id": "91bde65e_1",
+  "task": "t1_open_meteo_ingestion",
+  "platform": "nifi",
+  "model": "nemotron-3.5-lightning:30b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-all-platforms/91bde65e_1_attempt-2.groovy",
+  "configuration": {
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "5m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645809664,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:6bde7ef2cb100f83fb4d75117e845f44990d72447abf17c62f77ab9751c0829e"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "e6905fffe2e2d9bbe325a9a2d2e074e3bd32683721bc6dfba409dede2f17f4dc",
+    "source": {
+      "git_revision": "cf28f45755f5588122c351ffa9785872fed137af",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "9862ced46071c2c6df74ff24e7e0c540bfec30f7841306b6454f820c62aba639"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "platform_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 40.52203551697312,
+    "execution_duration_seconds": 429.49729061708786,
+    "total_duration_seconds": 543.797827894974,
+    "prompt_tokens": 5418,
+    "output_tokens": 1102,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 42.778102189781016,
+    "peak_cpu_percent": 394.13,
+    "peak_memory_bytes": 1442070920,
+    "resource_sample_count": 137,
+    "mean_gpu_utilization_percent": 4.581521739130435,
+    "peak_gpu_memory_bytes": 26089619456,
+    "estimated_gpu_energy_wh": 5.003715972773907,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.6666666666666666,
+    "source_request_count": 2,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=91bde65e_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/91bde65e_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.6393663499620743,
+        "ollama_total_duration_seconds": 2.636246817,
+        "model_load_duration_seconds": 0.001201335,
+        "prompt_tokens": 723,
+        "output_tokens": 361,
+        "output_tokens_per_second": 155.4782614687829,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/91bde65e_1_attempt-0.groovy",
+      "execution_error": "NiFi processor did not validate: [\"'GroovyScript' is invalid because org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:\\nScriptffffffffd15be8fb.groovy: 8: unable to resolve class JsonSlurper\\n @ line 8, column 15.\\n   def slurper = new JsonSlurper()\\n                 ^\\norg.codehaus.groovy.syntax.SyntaxException: unable to resolve class JsonSlurper\\n @ line 8, column 15.\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.addError(ClassCodeVisitorSupport.java:273)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:362)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:348)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:344)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformConstructorCallExpression(ResolveVisitor.java:1152)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:821)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformDeclarationExpression(ResolveVisitor.java:1192)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:813)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitExpressionStatement(ClassCodeExpressionTransformer.java:135)\\n\\tat org.codehaus.groovy.ast.stmt.ExpressionStatement.visit(ExpressionStatement.java:41)\\n\\tat org.codehaus.groovy.ast.CodeVisitorSupport.visitBlockStatement(CodeVisitorSupport.java:86)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitBlockStatement(ClassCodeVisitorSupport.java:175)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitBlockStatement(ResolveVisitor.java:1415)\\n\\tat org.codehaus.groovy.ast.stmt.BlockStatement.visit(BlockStatement.java:72)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitClassCodeContainer(ClassCodeVisitorSupport.java:139)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitConstructorOrMethod(ClassCodeVisitorSupport.java:118)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitConstructorOrMethod(ClassCodeExpressionTransformer.java:85)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitConstructorOrMethod(ResolveVisitor.java:335)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitMethod(ClassCodeVisitorSupport.java:110)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitMethods(ClassNode.java:1338)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitContents(ClassNode.java:1331)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitClass(ResolveVisitor.java:1354)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.startResolving(ResolveVisitor.java:260)\\n\\tat org.codehaus.groovy.control.CompilationUnit.lambda$addPhaseOperations$5(CompilationUnit.java:218)\\n\\tat org.codehaus.groovy.control.CompilationUnit$ISourceUnitOperation.doPhaseOperation(CompilationUnit.java:881)\\n\\tat org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:668)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:642)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\n\\nScriptffffffffd15be8fb.groovy: 9: unable to resolve class JsonOutput\\n @ line 9, column 14.\\n   def output = new JsonOutput()\\n                ^\\norg.codehaus.groovy.syntax.SyntaxException: unable to resolve class JsonOutput\\n @ line 9, column 14.\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.addError(ClassCodeVisitorSupport.java:273)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:362)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:348)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:344)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformConstructorCallExpression(ResolveVisitor.java:1152)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:821)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformDeclarationExpression(ResolveVisitor.java:1192)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:813)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitExpressionStatement(ClassCodeExpressionTransformer.java:135)\\n\\tat org.codehaus.groovy.ast.stmt.ExpressionStatement.visit(ExpressionStatement.java:41)\\n\\tat org.codehaus.groovy.ast.CodeVisitorSupport.visitBlockStatement(CodeVisitorSupport.java:86)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitBlockStatement(ClassCodeVisitorSupport.java:175)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitBlockStatement(ResolveVisitor.java:1415)\\n\\tat org.codehaus.groovy.ast.stmt.BlockStatement.visit(BlockStatement.java:72)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitClassCodeContainer(ClassCodeVisitorSupport.java:139)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitConstructorOrMethod(ClassCodeVisitorSupport.java:118)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitConstructorOrMethod(ClassCodeExpressionTransformer.java:85)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitConstructorOrMethod(ResolveVisitor.java:335)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitMethod(ClassCodeVisitorSupport.java:110)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitMethods(ClassNode.java:1338)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitContents(ClassNode.java:1331)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitClass(ResolveVisitor.java:1354)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.startResolving(ResolveVisitor.java:260)\\n\\tat org.codehaus.groovy.control.CompilationUnit.lambda$addPhaseOperations$5(CompilationUnit.java:218)\\n\\tat org.codehaus.groovy.control.CompilationUnit$ISourceUnitOperation.doPhaseOperation(CompilationUnit.java:881)\\n\\tat org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:668)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:642)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\n\\n2 errors\\n\"]",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 344.5828798690345,
+      "request_metrics": {
+        "run_id": "91bde65e_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 110,
+        "mean_cpu_percent": 21.229454545454544,
+        "peak_cpu_percent": 384.75,
+        "peak_memory_bytes": 1442070920,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 2.5775862068965516,
+        "gpu_sample_count": 116,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 116,
+        "estimated_gpu_energy_wh": 2.8033167043745486,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=91bde65e_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/91bde65e_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor did not validate: [\"'GroovyScript' is invalid because org.codehaus.groovy.control.MultipleCompilationErrorsException: startup failed:\\nScriptffffffffd15be8fb.groovy: 8: unable to resolve class JsonSlurper\\n @ line 8, column 15.\\n   def slurper = new JsonSlurper()\\n                 ^\\norg.codehaus.groovy.syntax.SyntaxException: unable to resolve class JsonSlurper\\n @ line 8, column 15.\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.addError(ClassCodeVisitorSupport.java:273)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:362)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:348)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:344)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformConstructorCallExpression(ResolveVisitor.java:1152)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:821)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformDeclarationExpression(ResolveVisitor.java:1192)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:813)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitExpressionStatement(ClassCodeExpressionTransformer.java:135)\\n\\tat org.codehaus.groovy.ast.stmt.ExpressionStatement.visit(ExpressionStatement.java:41)\\n\\tat org.codehaus.groovy.ast.CodeVisitorSupport.visitBlockStatement(CodeVisitorSupport.java:86)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitBlockStatement(ClassCodeVisitorSupport.java:175)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitBlockStatement(ResolveVisitor.java:1415)\\n\\tat org.codehaus.groovy.ast.stmt.BlockStatement.visit(BlockStatement.java:72)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitClassCodeContainer(ClassCodeVisitorSupport.java:139)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitConstructorOrMethod(ClassCodeVisitorSupport.java:118)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitConstructorOrMethod(ClassCodeExpressionTransformer.java:85)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitConstructorOrMethod(ResolveVisitor.java:335)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitMethod(ClassCodeVisitorSupport.java:110)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitMethods(ClassNode.java:1338)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitContents(ClassNode.java:1331)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitClass(ResolveVisitor.java:1354)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.startResolving(ResolveVisitor.java:260)\\n\\tat org.codehaus.groovy.control.CompilationUnit.lambda$addPhaseOperations$5(CompilationUnit.java:218)\\n\\tat org.codehaus.groovy.control.CompilationUnit$ISourceUnitOperation.doPhaseOperation(CompilationUnit.java:881)\\n\\tat org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:668)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:642)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\n\\nScriptffffffffd15be8fb.groovy: 9: unable to resolve class JsonOutput\\n @ line 9, column 14.\\n   def output = new JsonOutput()\\n                ^\\norg.codehaus.groovy.syntax.SyntaxException: unable to resolve class JsonOutput\\n @ line 9, column 14.\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.addError(ClassCodeVisitorSupport.java:273)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:362)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:348)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.resolveOrFail(ResolveVisitor.java:344)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformConstructorCallExpression(ResolveVisitor.java:1152)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:821)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transformDeclarationExpression(ResolveVisitor.java:1192)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.transform(ResolveVisitor.java:813)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitExpressionStatement(ClassCodeExpressionTransformer.java:135)\\n\\tat org.codehaus.groovy.ast.stmt.ExpressionStatement.visit(ExpressionStatement.java:41)\\n\\tat org.codehaus.groovy.ast.CodeVisitorSupport.visitBlockStatement(CodeVisitorSupport.java:86)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitBlockStatement(ClassCodeVisitorSupport.java:175)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitBlockStatement(ResolveVisitor.java:1415)\\n\\tat org.codehaus.groovy.ast.stmt.BlockStatement.visit(BlockStatement.java:72)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitClassCodeContainer(ClassCodeVisitorSupport.java:139)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitConstructorOrMethod(ClassCodeVisitorSupport.java:118)\\n\\tat org.codehaus.groovy.ast.ClassCodeExpressionTransformer.visitConstructorOrMethod(ClassCodeExpressionTransformer.java:85)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitConstructorOrMethod(ResolveVisitor.java:335)\\n\\tat org.codehaus.groovy.ast.ClassCodeVisitorSupport.visitMethod(ClassCodeVisitorSupport.java:110)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitMethods(ClassNode.java:1338)\\n\\tat org.codehaus.groovy.ast.ClassNode.visitContents(ClassNode.java:1331)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.visitClass(ResolveVisitor.java:1354)\\n\\tat org.codehaus.groovy.control.ResolveVisitor.startResolving(ResolveVisitor.java:260)\\n\\tat org.codehaus.groovy.control.CompilationUnit.lambda$addPhaseOperations$5(CompilationUnit.java:218)\\n\\tat org.codehaus.groovy.control.CompilationUnit$ISourceUnitOperation.doPhaseOperation(CompilationUnit.java:881)\\n\\tat org.codehaus.groovy.control.CompilationUnit.processPhaseOperations(CompilationUnit.java:668)\\n\\tat org.codehaus.groovy.control.CompilationUnit.compile(CompilationUnit.java:642)\\n\\tat groovy.lang.GroovyClassLoader.doParseClass(GroovyClassLoader.java:399)\\n\\tat groovy.lang.GroovyClassLoader.lambda$parseClass$5(GroovyClassLoader.java:345)\\n\\tat org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:138)\\n\\tat groovy.lang.GroovyClassLoader.parseClass(GroovyClassLoader.java:345)\\n\\tat groovy.lang.GroovyShell.parseClass(GroovyShell.java:601)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:614)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:668)\\n\\tat groovy.lang.GroovyShell.parse(GroovyShell.java:672)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.getGroovyScript(ExecuteGroovyScript.java:344)\\n\\tat org.apache.nifi.processors.groovyx.ExecuteGroovyScript.lambda$customValidate$0(ExecuteGroovyScript.java:216)\\n\\tat java.base/java.lang.VirtualThread.run(VirtualThread.java:329)\\n\\n2 errors\\n\"]\nPrevious artifact:\n// Apache NiFi ExecuteGroovyScript source for task t1_open_meteo_ingestion\n\ndef sources = [\n    \"http://recorder:8090/source/open-meteo/particulate?run_id=91bde65e_1&attempt=0\"\n]\ndef sinkUrl = \"http://recorder:8090/sink/91bde65e_1?attempt=0\"\n\ndef slurper = new JsonSlurper()\ndef output = new JsonOutput()\n\ndef url = new URL(sources[0])\ndef conn = url.openConnection()\nconn.setRequestMethod(\"GET\")\ndef responseText = conn.getInputStream().text ?: conn.getInputStream().readBytes() as String\ndef data = slurper.parse(responseText)\n\ndef records = []\ndef times = data.hourly.time as List\ndef pm10s = data.hourly.pm10 as List\ndef pm25s = data.hourly.pm2_5 as List\n\ntimes.eachWithIndex { time, idx ->\n    def record = [\n        \"time\": time,\n        \"pm10\": pm10s[idx],\n        \"pm2_5\": pm25s[idx]\n    ]\n    records.add(record)\n}\n\ndef body = output.toJson(records)\n\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.setRequestMethod(\"POST\")\nsinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\nsinkConn.getOutputStream().write(body.getBytes(\"UTF-8\"))\nsinkConn.getInputStream().close()\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 35.23421413399046,
+        "ollama_total_duration_seconds": 35.226045226,
+        "model_load_duration_seconds": 31.87973062,
+        "prompt_tokens": 3340,
+        "output_tokens": 370,
+        "output_tokens_per_second": 166.8742823278331,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/91bde65e_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c195d7b-01a1-1000-32e4-12a0a2a06b02] groovy.lang.MissingMethodException: No signature of method: readBytes for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: readNBytes(int), readNBytes([B, int, int), readAllBytes(), getBytes(), readLines(), readLines(java.lang.String): groovy.lang.MissingMethodException: No signature of method: readBytes for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: readNBytes(int), readNBytes([B, int, int), readAllBytes(), getBytes(), readLines(), readLines(java.lang.String)",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 46.61644893704215,
+      "request_metrics": {
+        "run_id": "91bde65e_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 15,
+        "mean_cpu_percent": 126.75866666666666,
+        "peak_cpu_percent": 394.13,
+        "peak_memory_bytes": 1423450307,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 8.22,
+        "gpu_sample_count": 50,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 50,
+        "estimated_gpu_energy_wh": 1.490155371675694,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable data-ingestion workflow for nifi. Retrieve the supplied Open-Meteo particulate response, convert its hourly columns into records, preserve time, pm10, and pm2_5 unchanged, and post all records to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t1_open_meteo_ingestion\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=91bde65e_1&attempt=2\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/91bde65e_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm10\",\n    \"pm2_5\"\n  ],\n  \"task_details\": \"Preserve time, pm10, and pm2_5 exactly. Do not add derived values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=9c195d7b-01a1-1000-32e4-12a0a2a06b02] groovy.lang.MissingMethodException: No signature of method: readBytes for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: readNBytes(int), readNBytes([B, int, int), readAllBytes(), getBytes(), readLines(), readLines(java.lang.String): groovy.lang.MissingMethodException: No signature of method: readBytes for class: sun.net.www.protocol.http.HttpURLConnection$HttpInputStream is applicable for argument types: () values: []\nPossible solutions: readNBytes(int), readNBytes([B, int, int), readAllBytes(), getBytes(), readLines(), readLines(java.lang.String)\nPrevious artifact:\n// Apache NiFi ExecuteGroovyScript source for task t1_open_meteo_ingestion\n\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef sources = [\n    \"http://recorder:8090/source/open-meteo/particulate?run_id=91bde65e_1&attempt=1\"\n]\ndef sinkUrl = \"http://recorder:8090/sink/91bde65e_1?attempt=1\"\n\ndef slurper = new JsonSlurper()\ndef output = new JsonOutput()\n\ndef url = new URL(sources[0])\ndef conn = url.openConnection()\nconn.setRequestMethod(\"GET\")\ndef responseText = conn.getInputStream().readBytes() as String\ndef data = slurper.parse(responseText)\n\ndef records = []\ndef times = data.hourly.time as List\ndef pm10s = data.hourly.pm10 as List\ndef pm25s = data.hourly.pm2_5 as List\n\ntimes.eachWithIndex { time, idx ->\n    def record = [\n        \"time\": time,\n        \"pm10\": pm10s[idx],\n        \"pm2_5\": pm25s[idx]\n    ]\n    records.add(record)\n}\n\ndef body = output.toJson(records)\n\ndef sinkConn = new URL(sinkUrl).openConnection()\nsinkConn.setRequestMethod(\"POST\")\nsinkConn.setRequestProperty(\"Content-Type\", \"application/json\")\nsinkConn.getOutputStream().write(body.getBytes(\"UTF-8\"))\nsinkConn.getInputStream().close()\n\ndef flowFile = session.create()\nsession.transfer(flowFile, REL_SUCCESS)\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.648455033020582,
+        "ollama_total_duration_seconds": 2.640832569,
+        "model_load_duration_seconds": 0.001531935,
+        "prompt_tokens": 1355,
+        "output_tokens": 371,
+        "output_tokens_per_second": 177.3357290386539,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-all-platforms/91bde65e_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=9c1a6153-01a1-1000-911b-066162956845] groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [[123, 34, 108, 97, 116, 105, 116, 117, 100, 101, 34, 58, 32, 51, 55, 46, 56, 48, 48, 48, 48, 51, 44, 32, 34, 108, 111, 110, 103, 105, 116, 117, 100, 101, 34, 58, 32, 45, 49, 50, 50, 46, 51, 57, 57, 57, 57, 52, 44, 32, 34, 103, 101, 110, 101, 114, 97, 116, 105, 111, 110, 116, 105, 109, 101, 95, 109, 115, 34, 58, 32, 48, 46, 50, 56, 51, 49, 50, 50, 48, 54, 50, 54, 56, 51, 49, 48, 53, 52, 55, 44, 32, 34, 117, 116, 99, 95, 111, 102, 102, 115, 101, 116, 95, 115, 101, 99, 111, 110, 100, 115, 34, 58, 32, 48, 44, 32, 34, 116, 105, 109, 101, 122, 111, 110, 101, 34, 58, 32, 34, 71, 77, 84, 34, 44, 32, 34, 116, 105, 109, 101, 122, 111, 110, 101, 95, 97, 98, 98, 114, 101, 118, 105, 97, 116, 105, 111, 110, 34, 58, 32, 34, 71, 77, 84, 34, 44, 32, 34, 101, 108, 101, 118, 97, 116, 105, 111, 110, 34, 58, 32, 49, 56, 46, 48, 44, 32, 34, 104, 111, 117, 114, 108, 121, 95, 117, 110, 105, 116, 115, 34, 58, 32, 123, 34, 116, 105, 109, 101, 34, 58, 32, 34, 105, 115, 111, 56, 54, 48, 49, 34, 44, 32, 34, 112, 109, 49, 48, 34, 58, 32, 34, 92, 117, 48, 51, 98, 99, 103, 47, 109, 92, 117, 48, 48, 98, 51, 34, 44, 32, 34, 112, 109, 50, 95, 53, 34, 58, 32, 34, 92, 117, 48, 51, 98, 99, 103, 47, 109, 92, 117, 48, 48, 98, 51, 34, 125, 44, 32, 34, 104, 111, 117, 114, 108, 121, 34, 58, 32, 123, 34, 116, 105, 109, 101, 34, 58, 32, 91, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 51, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 52, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 53, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 54, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 55, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 56, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 48, 57, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 51, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 52, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 53, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 54, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 55, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 56, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 49, 57, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 50, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 50, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 50, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 49, 84, 50, 51, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 51, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 52, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 53, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 54, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 55, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 56, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 48, 57, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 51, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 52, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 53, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 54, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 55, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 56, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 49, 57, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 50, 48, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 50, 49, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 50, 50, 58, 48, 48, 34, 44, 32, 34, 50, 48, 50, 52, 45, 48, 49, 45, 48, 50, 84, 50, 51, 58, 48, 48, 34, 93, 44, 32, 34, 112, 109, 49, 48, 34, 58, 32, 91, 49, 48, 46, 57, 44, 32, 49, 51, 46, 54, 44, 32, 49, 52, 46, 49, 44, 32, 49, 52, 46, 52, 44, 32, 49, 53, 46, 55, 44, 32, 49, 54, 46, 56, 44, 32, 49, 54, 46, 53, 44, 32, 49, 54, 46, 52, 44, 32, 49, 53, 46, 57, 44, 32, 49, 53, 46, 52, 44, 32, 49, 52, 46, 54, 44, 32, 49, 52, 46, 51, 44, 32, 49, 54, 46, 52, 44, 32, 49, 54, 46, 55, 44, 32, 49, 55, 46, 54, 44, 32, 49, 57, 46, 53, 44, 32, 50, 49, 46, 56, 44, 32, 50, 51, 46, 54, 44, 32, 50, 52, 46, 55, 44, 32, 50, 53, 46, 49, 44, 32, 50, 52, 46, 54, 44, 32, 50, 52, 46, 51, 44, 32, 50, 51, 46, 50, 44, 32, 50, 51, 46, 50, 44, 32, 49, 52, 46, 56, 44, 32, 49, 53, 46, 55, 44, 32, 49, 54, 46, 57, 44, 32, 49, 56, 46, 48, 44, 32, 49, 55, 46, 53, 44, 32, 49, 56, 46, 51, 44, 32, 50, 49, 46, 52, 44, 32, 50, 51, 46, 54, 44, 32, 50, 50, 46, 57, 44, 32, 50, 49, 46, 52, 44, 32, 49, 57, 46, 51, 44, 32, 49, 55, 46, 50, 44, 32, 49, 50, 46, 57, 44, 32, 49, 49, 46, 53, 44, 32, 49, 48, 46, 48, 44, 32, 57, 46, 52, 44, 32, 49, 48, 46, 48, 44, 32, 49, 48, 46, 57, 44, 32, 49, 49, 46, 52, 44, 32, 49, 48, 46, 57, 44, 32, 57, 46, 57, 44, 32, 57, 46, 50, 44, 32, 57, 46, 49, 44, 32, 56, 46, 49, 93, 44, 32, 34, 112, 109, 50, 95, 53, 34, 58, 32, 91, 54, 46, 53, 44, 32, 56, 46, 52, 44, 32, 56, 46, 57, 44, 32, 57, 46, 50, 44, 32, 49, 48, 46, 51, 44, 32, 49, 49, 46, 49, 44, 32, 49, 49, 46, 49, 44, 32, 49, 49, 46, 50, 44, 32, 49, 48, 46, 57, 44, 32, 49, 48, 46, 53, 44, 32, 49, 48, 46, 48, 44, 32, 57, 46, 56, 44, 32, 49, 49, 46, 50, 44, 32, 49, 49, 46, 52, 44, 32, 49, 49, 46, 56, 44, 32, 49, 51, 46, 48, 44, 32, 49, 52, 46, 54, 44, 32, 49, 53, 46, 56, 44, 32, 49, 54, 46, 53, 44, 32, 49, 54, 46, 54, 44, 32, 49, 54, 46, 49, 44, 32, 49, 53, 46, 55, 44, 32, 49, 52, 46, 55, 44, 32, 49, 52, 46, 55, 44, 32, 49, 48, 46, 48, 44, 32, 49, 48, 46, 54, 44, 32, 49, 49, 46, 52, 44, 32, 49, 50, 46, 50, 44, 32, 49, 49, 46, 57, 44, 32, 49, 50, 46, 53, 44, 32, 49, 52, 46, 55, 44, 32, 49, 54, 46, 52, 44, 32, 49, 53, 46, 57, 44, 32, 49, 52, 46, 55, 44, 32, 49, 51, 46, 49, 44, 32, 49, 49, 46, 52, 44, 32, 56, 46, 57, 44, 32, 55, 46, 55, 44, 32, 54, 46, 52, 44, 32, 53, 46, 56, 44, 32, 54, 46, 48, 44, 32, 54, 46, 52, 44, 32, 54, 46, 54, 44, 32, 54, 46, 49, 44, 32, 53, 46, 50, 44, 32, 52, 46, 56, 44, 32, 52, 46, 56, 44, 32, 52, 46, 53, 93, 125, 125]]\nPossible solutions: parse([B), parse([C), parse(java.io.File), parse(java.io.InputStream), parse(java.io.Reader), parse(java.net.URL): groovy.lang.MissingMethodException: No signature of method: parse for class: groovy.json.JsonSlurper is applicable for argument types: (String) values: [[123, ",
+      "failure_stage": "platform_execution",
+      "failure_category": "platform_error",
+      "execution_duration_seconds": 38.29796181101119,
+      "request_metrics": {
+        "run_id": "91bde65e_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 12,
+        "mean_cpu_percent": 135.33166666666668,
+        "peak_cpu_percent": 329.96,
+        "peak_memory_bytes": 1370916650,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 7.388888888888889,
+        "gpu_sample_count": 18,
+        "peak_gpu_memory_bytes": 26089619456,
+        "gpu_power_sample_count": 18,
+        "estimated_gpu_energy_wh": 0.7102438967236653,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-02T11:52:55Z"
+}

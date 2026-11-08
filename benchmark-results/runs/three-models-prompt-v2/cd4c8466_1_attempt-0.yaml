@@ -1,0 +1,56 @@
+id: bench_cd4c8466_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=cd4c8466_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/cd4c8466_1?attempt=0"
+
+      response = urllib.request.urlopen(source_url)
+      data = json.loads(response.read().decode('utf-8'))
+
+      records = []
+      for feature in data["features"]:
+          props = feature["properties"]
+          geom = feature["geometry"]
+          coords = geom["coordinates"]
+
+          magnitude = props["mag"]
+          place = props["place"]
+          time_ms = props["time"]
+          longitude = coords[0]
+          latitude = coords[1]
+          depth_km = coords[2]
+
+          if magnitude < 4.0:
+              magnitude_band = "minor"
+          elif magnitude < 5.0:
+              magnitude_band = "moderate"
+          else:
+              magnitude_band = "major"
+
+          record = {
+              "id": feature["id"],
+              "magnitude": magnitude,
+              "place": place,
+              "time_ms": time_ms,
+              "longitude": longitude,
+              "latitude": latitude,
+              "depth_km": depth_km,
+              "magnitude_band": magnitude_band
+          }
+          records.append(record)
+
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      urllib.request.urlopen(req)

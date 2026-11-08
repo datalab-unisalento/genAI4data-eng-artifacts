@@ -1,0 +1,40 @@
+id: bench_7de7aed4_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      from urllib.request import urlopen, Request
+      
+      # Fetch source data
+      with urlopen("http://recorder:8090/source/open-meteo/particulate?run_id=7de7aed4_1&attempt=0") as response:
+          data = json.load(response)
+      
+      # Extract hourly arrays
+      times = data["hourly"]["time"]
+      pm10s = data["hourly"]["pm10"]
+      pm25s = data["hourly"]["pm2_5"]
+      
+      # Create records array
+      records = []
+      for i in range(len(times)):
+          record = {
+              "time": times[i],
+              "pm10": pm10s[i],
+              "pm2_5": pm25s[i]
+          }
+          records.append(record)
+      
+      # Post to sink
+      request = Request(
+          url="http://recorder:8090/sink/7de7aed4_1?attempt=0",
+          data=json.dumps({"records": records}).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urlopen(request) as response:
+          pass

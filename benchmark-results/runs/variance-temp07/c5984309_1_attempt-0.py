@@ -1,0 +1,49 @@
+from prefect import flow
+import json
+import urllib.request
+
+@flow(name="bench_c5984309_1")
+def bench_c5984309_1():
+    source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=c5984309_1&attempt=0"
+    sink_url = "http://recorder:8090/sink/c5984309_1?attempt=0"
+
+    with urllib.request.urlopen(source_url) as response:
+        data = json.loads(response.read().decode('utf-8'))
+
+    records = []
+    for feature in data['features']:
+        properties = feature['properties']
+        geometry = feature['geometry']
+        coordinates = geometry['coordinates']
+
+        magnitude_band = None
+        if properties['mag'] < 4.0:
+            magnitude_band = 'minor'
+        elif properties['mag'] < 5.0:
+            magnitude_band = 'moderate'
+        else:
+            magnitude_band = 'major'
+
+        record = {
+            "id": feature['id'],
+            "magnitude": properties['mag'],
+            "place": properties['place'],
+            "time_ms": properties['time'],
+            "longitude": coordinates[0],
+            "latitude": coordinates[1],
+            "depth_km": coordinates[2],
+            "magnitude_band": magnitude_band
+        }
+        records.append(record)
+
+    request = urllib.request.Request(
+        sink_url,
+        data=json.dumps(records).encode('utf-8'),
+        headers={'Content-Type': 'application/json'},
+        method='POST'
+    )
+    with urllib.request.urlopen(request) as response:
+        pass
+
+if __name__ == '__main__':
+    bench_c5984309_1()

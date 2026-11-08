@@ -1,0 +1,213 @@
+{
+  "run_id": "055e0d68_1",
+  "task": "t5_trailing_three_hour_peak",
+  "platform": "kestra",
+  "model": "qwen3-coder:30b",
+  "status": "passed",
+  "attempts": 2,
+  "artifact_path": "benchmark-results/runs/variance-temp07/055e0d68_1_attempt-1.yaml",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.7,
+      "seed": 3,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:2159909b72593fb2dfcfbdc26948d3e7645a467e962f263a7c876cb26de698ea"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+    "source": {
+      "git_revision": "1efd8f464dcfad2da81990867eedd8839a871976",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "invalid_artifact": 1
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": 1.0,
+    "generation_duration_seconds": 5.830663034001191,
+    "execution_duration_seconds": 32.05608299599771,
+    "total_duration_seconds": 65.74228485700223,
+    "prompt_tokens": 2328,
+    "output_tokens": 720,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 117.02454545454545,
+    "peak_cpu_percent": 592.35,
+    "peak_memory_bytes": 1627111030,
+    "resource_sample_count": 11,
+    "mean_gpu_utilization_percent": 16.0,
+    "peak_gpu_memory_bytes": 19754123264,
+    "estimated_gpu_energy_wh": 1.0165114234723416,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 0.5,
+    "source_request_count": 1,
+    "sink_post_count": 1,
+    "sink_rows_accepted": 46
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for kestra. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_055e0d68_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. Give the task an `id` key (not `task_id`), for example:\ntasks:\n  - id: ingest\n    type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import json\n      ...\nThe Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=055e0d68_1&attempt=0\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/055e0d68_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.7,
+        "seed": 3,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.94726323100258,
+        "ollama_total_duration_seconds": 2.941527223,
+        "model_load_duration_seconds": 0.002022846,
+        "prompt_tokens": 783,
+        "output_tokens": 361,
+        "output_tokens_per_second": 130.2323836350203,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/variance-temp07/055e0d68_1_attempt-0.yaml",
+      "execution_error": "POST http://172.19.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Illegal genericflow source: YAML parsing error: while scanning for the next token\\nfound character '`' that cannot start any token. (Do not use ` for indentation)\\n in 'reader', line 45, column 1:\\n    ```\\n    ^\\n\\n at [Source: (StringReader); line: 45, column: 1] (through reference chain: io.kestra.core.models.flows.GenericFlow[\\\"tasks\\\"]->java.util.ArrayList[0]) (at line 45)\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"YAML parsing error: while scanning for the next token\\nfound character '`' that cannot start any token. (Do not use ` for indentation)\\n in 'reader', line 45, column 1:\\n    ```\\n    ^\\n\\n at [Source: (StringReader); line: 45, column: 1] (through reference chain: io.kestra.core.models.flows.GenericFlow[\\\"tasks\\\"]->java.util.ArrayList[0]) (at line 45)\",\"logref\":null,\"path\":\"yaml\",\"_links\":{},\"_embedded\":{}}]}}",
+      "failure_stage": "platform_execution",
+      "failure_category": "invalid_artifact",
+      "execution_duration_seconds": 16.010967341997457,
+      "request_metrics": {
+        "run_id": "055e0d68_1",
+        "attempt": 0,
+        "source_request_count": 0,
+        "requested_source_ids": [],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 0.0,
+        "missing_source_ids": [
+          "open_meteo_particulate"
+        ]
+      },
+      "container_resources": {
+        "sample_count": 6,
+        "mean_cpu_percent": 36.37833333333334,
+        "peak_cpu_percent": 68.68,
+        "peak_memory_bytes": 1627111030,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 10.0,
+        "gpu_sample_count": 7,
+        "peak_gpu_memory_bytes": 19754123264,
+        "gpu_power_sample_count": 7,
+        "estimated_gpu_energy_wh": 0.5200677373998364,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable windowed-aggregation workflow for kestra. Retrieve the supplied Open-Meteo particulate response, compute for each hour the maximum pm2_5 over that hour and the two preceding hours, and post the results to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired kestra artifact: Return one complete Kestra flow in YAML. The flow must declare the top-level keys `id: bench_055e0d68_1` and `namespace: bench`, and must not define triggers or inputs. It must contain exactly one task of type `io.kestra.plugin.scripts.python.Script` with `runner: PROCESS` and a `script:` block written as a YAML literal block. Give the task an `id` key (not `task_id`), for example:\ntasks:\n  - id: ingest\n    type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import json\n      ...\nThe Python script must fetch each source with `urllib.request.urlopen`, transform the records exactly as specified, and POST them to the sink with `urllib.request.Request(sink_url, data=json.dumps(records).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')`. Use the exact source and sink URLs from the current contract. Do not suppress exceptions, do not access any other network destination, and do not use the Kestra `{{` or `}}` template delimiters anywhere in the flow.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t5_trailing_three_hour_peak\",\n  \"sources\": {\n    \"open_meteo_particulate\": {\n      \"url\": \"http://recorder:8090/source/open-meteo/particulate?run_id=055e0d68_1&attempt=1\",\n      \"description\": \"Open-Meteo hourly PM10 and PM2.5 observations\",\n      \"response_schema\": {\n        \"latitude\": \"number\",\n        \"longitude\": \"number\",\n        \"timezone\": \"string\",\n        \"hourly_units\": {\n          \"time\": \"ISO-8601 datetime\",\n          \"pm10\": \"number (\\u03bcg/m\\u00b3)\",\n          \"pm2_5\": \"number (\\u03bcg/m\\u00b3)\"\n        },\n        \"hourly\": {\n          \"time\": \"array<string>\",\n          \"pm10\": \"array<number>\",\n          \"pm2_5\": \"array<number>\"\n        }\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/055e0d68_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"time\",\n    \"pm2_5\",\n    \"pm2_5_peak_3h\"\n  ],\n  \"task_details\": \"Emit one record per hour starting with the third record in the series. Set pm2_5_peak_3h to the maximum pm2_5 among that hour and the two previous hours. Do not emit the first two hours. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nPOST http://172.19.0.3:8080/api/v1/main/flows returned HTTP 422: {\"message\":\"Invalid entity: Illegal genericflow source: YAML parsing error: while scanning for the next token\\nfound character '`' that cannot start any token. (Do not use ` for indentation)\\n in 'reader', line 45, column 1:\\n    ```\\n    ^\\n\\n at [Source: (StringReader); line: 45, column: 1] (through reference chain: io.kestra.core.models.flows.GenericFlow[\\\"tasks\\\"]->java.util.ArrayList[0]) (at line 45)\",\"logref\":null,\"path\":null,\"_links\":{\"self\":{\"href\":\"/api/v1/main/flows\",\"templated\":false,\"profile\":null,\"deprecation\":null,\"title\":null,\"hreflang\":null,\"type\":null,\"name\":null}},\"_embedded\":{\"errors\":[{\"message\":\"YAML parsing error: while scanning for the next token\\nfound character '`' that cannot start any token. (Do not use ` for indentation)\\n in 'reader', line 45, column 1:\\n    ```\\n    ^\\n\\n at [Source: (StringReader); line: 45, column: 1] (through reference chain: io.kestra.core.models.flows.GenericFlow[\\\"tasks\\\"]->java.util.ArrayList[0]) (at line 45)\",\"logref\":null,\"path\":\"yaml\",\"_links\":{},\"_embedded\":{}}]}}\nPrevious artifact:\nid: bench_055e0d68_1\nnamespace: bench\ntasks:\n  - id: t5_trailing_three_hour_peak\n    type: io.kestra.plugin.scripts.python.Script\n    runner: PROCESS\n    script: |\n      import json\n      import urllib.request\n\n      source_url = \"http://recorder:8090/source/open-meteo/particulate?run_id=055e0d68_1&attempt=0\"\n      sink_url = \"http://recorder:8090/sink/055e0d68_1?attempt=0\"\n\n      # Fetch source data\n      with urllib.request.urlopen(source_url) as response:\n          data = json.load(response)\n\n      hourly = data['hourly']\n      times = hourly['time']\n      pm2_5_values = hourly['pm2_5']\n\n      results = []\n\n      for i in range(2, len(times)):\n          # Get the current and previous two hours' pm2.5 values\n          window = pm2_5_values[i-2:i+1]\n          peak = max(window)\n          \n          record = {\n              \"time\": times[i],\n              \"pm2_5\": pm2_5_values[i],\n              \"pm2_5_peak_3h\": peak\n          }\n          results.append(record)\n\n      # POST to sink\n      request = urllib.request.Request(\n          sink_url,\n          data=json.dumps(results).encode('utf-8'),\n          headers={'Content-Type': 'application/json'},\n          method='POST'\n      )\n      with urllib.request.urlopen(request) as response:\n          pass  # Response is not used, but we ensure the POST completes\n```\n\n",
+      "generation_options": {
+        "temperature": 0.7,
+        "seed": 3,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 2.8833998029986105,
+        "ollama_total_duration_seconds": 2.877656094,
+        "model_load_duration_seconds": 0.001512811,
+        "prompt_tokens": 1545,
+        "output_tokens": 359,
+        "output_tokens_per_second": 138.13201650042728,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/variance-temp07/055e0d68_1_attempt-1.yaml",
+      "evaluation": {
+        "passed": true,
+        "expected_count": 46,
+        "actual_count": 46,
+        "matched_count": 46,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "missing_rows": [],
+        "unexpected_rows": []
+      },
+      "failure_stage": null,
+      "failure_category": null,
+      "execution_duration_seconds": 16.045115654000256,
+      "request_metrics": {
+        "run_id": "055e0d68_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "open_meteo_particulate"
+        ],
+        "sink_post_count": 1,
+        "sink_rows_accepted": 46,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 5,
+        "mean_cpu_percent": 213.8,
+        "peak_cpu_percent": 592.35,
+        "peak_memory_bytes": 1378856468,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 19.818181818181817,
+        "gpu_sample_count": 11,
+        "peak_gpu_memory_bytes": 19754123264,
+        "gpu_power_sample_count": 11,
+        "estimated_gpu_energy_wh": 0.4964436860725051,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T16:42:47Z"
+}

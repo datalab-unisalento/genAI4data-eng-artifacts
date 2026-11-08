@@ -1,0 +1,55 @@
+id: bench_ada3d7b8_1
+namespace: bench
+tasks:
+  - id: t4_daily_particulate_summary
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import urllib.request
+      import json
+      from collections import defaultdict
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=ada3d7b8_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/ada3d7b8_1?attempt=0"
+
+      # Fetch source data
+      with urllib.request.urlopen(source_url) as response:
+          data = json.loads(response.read().decode('utf-8'))
+
+      # Extract hourly records
+      times = data['hourly']['time']
+      pm10_values = data['hourly']['pm10']
+      pm2_5_values = data['hourly']['pm2_5']
+
+      # Group by date and compute maxima
+      daily_data = defaultdict(lambda: {'hours': 0, 'pm2_5_max': float('-inf'), 'pm10_max': float('-inf')})
+
+      for i in range(len(times)):
+          date = times[i][:10]  # First 10 characters as date
+          pm10_val = pm10_values[i]
+          pm2_5_val = pm2_5_values[i]
+
+          daily_data[date]['hours'] += 1
+          daily_data[date]['pm2_5_max'] = max(daily_data[date]['pm2_5_max'], pm2_5_val)
+          daily_data[date]['pm10_max'] = max(daily_data[date]['pm10_max'], pm10_val)
+
+      # Format output records
+      records = []
+      for date, values in daily_data.items():
+          record = {
+              'date': date,
+              'hours': values['hours'],
+              'pm2_5_max': values['pm2_5_max'],
+              'pm10_max': values['pm10_max']
+          }
+          records.append(record)
+
+      # POST to sink
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response ignored per contract

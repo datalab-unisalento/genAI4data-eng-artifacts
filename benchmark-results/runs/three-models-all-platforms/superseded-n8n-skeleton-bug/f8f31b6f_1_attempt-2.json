@@ -1,0 +1,110 @@
+{
+  "id": "bench_f8f31b6f_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": []
+        }
+      },
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/usgs/earthquakes?run_id=f8f31b6f_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const features = $('Source 1').first().json.features;\n\n// Initialize band summary objects\nconst bands = {\n  minor: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\n  moderate: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity },\n  major: { event_count: 0, max_magnitude: -Infinity, max_depth_km: -Infinity }\n};\n\n// Process each feature\nfeatures.forEach(feature => {\n  const mag = feature.properties.mag;\n  const depth = feature.geometry.coordinates[2];\n  \n  let band;\n  if (mag < 4.0) {\n    band = 'minor';\n  } else if (mag >= 4.0 && mag < 5.0) {\n    band = 'moderate';\n  } else {\n    band = 'major';\n  }\n\n  // Update band stats\n  const bandStats = bands[band];\n  bandStats.event_count++;\n  if (mag > bandStats.max_magnitude) {\n    bandStats.max_magnitude = mag;\n  }\n  if (depth > bandStats.max_depth_km) {\n    bandStats.max_depth_km = depth;\n  }\n});\n\n// Build final records, only including bands with events\nconst records = [];\nfor (const [bandName, stats] of Object.entries(bands)) {\n  if (stats.event_count > 0) {\n    records.push({\n      magnitude_band: bandName,\n      event_count: stats.event_count,\n      max_magnitude: stats.max_magnitude,\n      max_depth_km: stats.max_depth_km\n    });\n  }\n}\n\nreturn [{ json: { records } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/f8f31b6f_1?attempt=2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

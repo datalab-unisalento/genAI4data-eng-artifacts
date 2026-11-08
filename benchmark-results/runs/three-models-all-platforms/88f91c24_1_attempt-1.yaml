@@ -1,0 +1,70 @@
+id: bench_88f91c24_1
+namespace: bench
+tasks:
+- task_id: t6_earthquake_band_summary
+  type: io.kestra.plugin.scripts.python.Script
+  runner: PROCESS
+  script: |
+    import urllib.request
+    import json
+
+    source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=88f91c24_1&attempt=1"
+    sink_url = "http://recorder:8090/sink/88f91c24_1?attempt=1"
+
+    response = urllib.request.urlopen(source_url)
+    data = json.loads(response.read().decode('utf-8'))
+
+    features = data.get("features", [])
+
+    bands = {
+        "minor": {"min": 0, "max": 4.0},
+        "moderate": {"min": 4.0, "max": 5.0},
+        "major": {"min": 5.0, "max": float('inf')}
+    }
+
+    band_events = {name: [] for name in bands}
+
+    for feature in features:
+        props = feature.get("properties", {})
+        mag = props.get("mag")
+        geom = feature.get("geometry", {})
+        coords = geom.get("coordinates", [])
+        depth = coords[2] if len(coords) >= 3 else 0.0
+
+        if mag is None:
+            continue
+
+        classified = False
+        for band_name, band_range in bands.items():
+            band_min = band_range["min"]
+            band_max = band_range["max"]
+            if band_min <= mag < band_max:
+                band_events[band_name].append({
+                    "magnitude": mag,
+                    "depth_km": depth
+                })
+                classified = True
+                break
+        if not classified and mag >= 5.0:
+            band_events["major"].append({
+                "magnitude": mag,
+                "depth_km": depth
+            })
+
+    records = []
+    for band_name, events in band_events.items():
+        if not events:
+            continue
+        magnitudes = [e["magnitude"] for e in events]
+        depths = [e["depth_km"] for e in events]
+        record = {
+            "magnitude_band": band_name,
+            "event_count": len(events),
+            "max_magnitude": max(magnitudes),
+            "max_depth_km": max(depths)
+        }
+        records.append(record)
+
+    payload = json.dumps(records).encode('utf-8')
+    req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+    urllib.request.urlopen(req)

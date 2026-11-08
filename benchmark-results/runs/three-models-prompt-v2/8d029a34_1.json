@@ -1,0 +1,261 @@
+{
+  "run_id": "8d029a34_1",
+  "task": "t6_earthquake_band_summary",
+  "platform": "nifi",
+  "model": "cogito:32b",
+  "status": "failed",
+  "attempts": 3,
+  "artifact_path": "benchmark-results/runs/three-models-prompt-v2/8d029a34_1_attempt-2.groovy",
+  "configuration": {
+    "prompt_version": "v2",
+    "scorer_version": "2",
+    "repairs": 2,
+    "model_timeout_seconds": 300,
+    "execution_timeout_seconds": 300,
+    "ollama_generation_options": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repeat_penalty": 1.1,
+      "num_thread": 0,
+      "num_ctx": 8192,
+      "num_predict": 4096
+    },
+    "ollama_keep_alive": "30m",
+    "ollama_think": false,
+    "input_cost_per_million_tokens": null,
+    "output_cost_per_million_tokens": null
+  },
+  "environment": {
+    "python_version": "3.12.3",
+    "operating_system": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+    "architecture": "x86_64",
+    "cpu_model": "x86_64",
+    "logical_cpu_count": 8,
+    "host_memory_bytes": 33645797376,
+    "gpu_devices": [
+      "NVIDIA RTX A6000, 580.178.04"
+    ],
+    "docker_server_version": "29.1.3",
+    "docker_compose_version": "2.40.3+ds1-0ubuntu1~24.04.1",
+    "container_images": [
+      "genai4data-eng-paper-recorder"
+    ],
+    "container_image_ids": {
+      "genai4data-eng-paper-recorder": "sha256:2b32ca563d3ea5dee77dccceb109ab9dcc7b537e4ac7d0faed7ab1e0572dcbe0"
+    },
+    "container_image_errors": {},
+    "ollama_version": "0.34.0",
+    "ollama_model_digest": "0b4aab772f57ddf3d9e46235ef6f142e42598fd121dc15588c7f06de786c510e",
+    "source": {
+      "git_revision": "2f50bbbb0530851064d560caff160076e58ff28c",
+      "git_worktree_dirty": true,
+      "source_tree_sha256": "54142c7332ed837b951f281c8ed749a02a0817421ef76b2392c52d0b29f863ac"
+    },
+    "environment_collection_errors": {}
+  },
+  "failure_categories": {
+    "runtime_error": 3
+  },
+  "metrics": {
+    "first_attempt_passed": null,
+    "first_attempt_f1": null,
+    "best_f1": null,
+    "generation_duration_seconds": 69.8726760469981,
+    "execution_duration_seconds": 170.37001450599928,
+    "total_duration_seconds": 281.7124676639978,
+    "prompt_tokens": 3898,
+    "output_tokens": 1989,
+    "cost_estimate_usd": null,
+    "mean_cpu_percent": 49.3855,
+    "peak_cpu_percent": 427.82,
+    "peak_memory_bytes": 1496420711,
+    "resource_sample_count": 60,
+    "mean_gpu_utilization_percent": 40.63716814159292,
+    "peak_gpu_memory_bytes": 22354591744,
+    "estimated_gpu_energy_wh": 7.780810188326441,
+    "gpu_energy_measurement_complete": true,
+    "source_coverage": 1.0,
+    "source_request_count": 3,
+    "sink_post_count": 0,
+    "sink_rows_accepted": 0
+  },
+  "history": [
+    {
+      "attempt": 0,
+      "prompt": "Task:\nCreate an executable aggregation workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=8d029a34_1&attempt=0\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/8d029a34_1?attempt=0\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 22.631592650999664,
+        "ollama_total_duration_seconds": 22.626276635,
+        "model_load_duration_seconds": 0.001024476,
+        "prompt_tokens": 764,
+        "output_tokens": 657,
+        "output_tokens_per_second": 29.833642704121377,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/8d029a34_1_attempt-0.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac2da1cf-01a1-1000-7aa9-eea81e30a94b] java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \": java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \"",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 17.20326945999841,
+      "request_metrics": {
+        "run_id": "8d029a34_1",
+        "attempt": 0,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 12,
+        "mean_cpu_percent": 2.7783333333333338,
+        "peak_cpu_percent": 22.05,
+        "peak_memory_bytes": 1496420711,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 50.53846153846154,
+        "gpu_sample_count": 13,
+        "peak_gpu_memory_bytes": 22352494592,
+        "gpu_power_sample_count": 13,
+        "estimated_gpu_energy_wh": 2.213621270977044,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 1,
+      "prompt": "Task:\nCreate an executable aggregation workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=8d029a34_1&attempt=1\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/8d029a34_1?attempt=1\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=ac2da1cf-01a1-1000-7aa9-eea81e30a94b] java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \": java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \"\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef process() {\n    def sourceUrl = \"http://recorder:8090/source/usgs/earthquakes?run_id=8d029a34_1&attempt=0\"\n    def sinkUrl = \"http://recorder:8090/sink/8d029a34_1?attempt=0\"\n\n    // Fetch and parse source data\n    def connection = new URL(sourceUrl).openConnection()\n    def jsonText = connection.inputStream.text\n    def earthquakes = new JsonSlurper().parseText(jsonText)\n\n    // Initialize band statistics\n    def bands = [\n        minor: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE],\n        moderate: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE],\n        major: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE]\n    ]\n\n    // Process each earthquake\n    earthquakes.features.each { feature ->\n        def mag = feature.properties.mag as float\n        def depth = feature.geometry.coordinates[2] as float\n\n        if (mag < 4.0) {\n            bands.minor.count++\n            bands.minor.maxMag = Math.max(bands.minor.maxMag, mag)\n            bands.minor.maxDepth = Math.max(bands.minor.maxDepth, depth)\n        } else if (mag >= 4.0 && mag < 5.0) {\n            bands.moderate.count++\n            bands.moderate.maxMag = Math.max(bands.moderate.maxMag, mag)\n            bands.moderate.maxDepth = Math.max(bands.moderate.maxDepth, depth)\n        } else {\n            bands.major.count++\n            bands.major.maxMag = Math.max(bands.major.maxMag, mag)\n            bands.major.maxDepth = Math.max(bands.major.maxDepth, depth)\n        }\n    }\n\n    // Build output records\n    def records = []\n    ['minor', 'moderate', 'major'].each { band ->\n        if (bands[band].count > 0) {\n            records << [\n                magnitude_band: band,\n                event_count: bands[band].count,\n                max_magnitude: bands[band].maxMag,\n                max_depth_km: bands[band].maxDepth\n            ]\n        }\n    }\n\n    // Send to sink\n    def jsonOutput = JsonOutput.toJson([records: records])\n    connection = new URL(sinkUrl).openConnection()\n    connection.setRequestMethod(\"POST\")\n    connection.setDoOutput(true)\n    connection.setRequestProperty(\"Content-Type\", \"application/json\")\n\n    connection.outputStream.withWriter { writer ->\n        writer.write(jsonOutput)\n    }\n\n    def responseCode = connection.responseCode\n    if (responseCode >= 300) {\n        throw new Exception(\"Sink request failed with status: ${responseCode}\")\n    }\n\n    // Create success flow file\n    def flowFile = session.create()\n    session.transfer(flowFile, REL_SUCCESS)\n}\n\nprocess()\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 23.465184145999956,
+        "ollama_total_duration_seconds": 23.458238879,
+        "model_load_duration_seconds": 0.002071363,
+        "prompt_tokens": 1561,
+        "output_tokens": 666,
+        "output_tokens_per_second": 29.58691206507628,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/8d029a34_1_attempt-1.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac2f56f5-01a1-1000-5f4c-535ed83c0ce7] java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \": java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \"",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 78.5948012230001,
+      "request_metrics": {
+        "run_id": "8d029a34_1",
+        "attempt": 1,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 25,
+        "mean_cpu_percent": 55.596000000000004,
+        "peak_cpu_percent": 427.82,
+        "peak_memory_bytes": 1315241459,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 36.84313725490196,
+        "gpu_sample_count": 51,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 51,
+        "estimated_gpu_energy_wh": 2.824634668124661,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    },
+    {
+      "attempt": 2,
+      "prompt": "Task:\nCreate an executable aggregation workflow for nifi. Retrieve the supplied USGS earthquake GeoJSON, classify each event into the magnitude bands used by the USGS ETL task, and post one summary record per band with the event count, largest magnitude, and deepest depth to the supplied HTTP sink.\n\nExecution contract:\nUse only the supplied local fixture source URLs and HTTP sink URL; do not call the external source API or any other network destination. The source schema below describes record structure and types, not the saved fixture records. Implement the task without hardcoding fixture values. The sink is scored as a multiset of complete records, including exact field values, keys, and duplicate counts.\n\nRequired nifi artifact: Return only the Groovy source for the Script Body of an Apache NiFi ExecuteGroovyScript processor. NiFi runs the script once when the processor is started and treats any uncaught exception as a processor error. The script must fetch each source with `new URL(source_url).openConnection()` (or an equivalent java.net call) and read the body as text, parse it with `groovy.json.JsonSlurper`, transform the records exactly as specified, and deliver them with an HTTP POST to the sink URL. The POST body must be JSON with `Content-Type: application/json`, built with `groovy.json.JsonOutput`. Use the exact source and sink URLs from the current contract. Java's HttpURLConnection sends a request body only when the response is read, so after writing the body call `connection.responseCode` and throw an exception if the status is 300 or higher. After successful delivery, create a FlowFile with `def flowFile = session.create()` and call `session.transfer(flowFile, REL_SUCCESS)`. Do not catch and suppress exceptions, and do not access any other network destination. Use only Groovy and the Java standard library; do not use NiFi controller services or other processors.\nReturn only the requested artifact, with no explanatory prose or markdown fences.\n\nRun-specific URLs and data contract:\n{\n  \"task_id\": \"t6_earthquake_band_summary\",\n  \"sources\": {\n    \"usgs_earthquakes\": {\n      \"url\": \"http://recorder:8090/source/usgs/earthquakes?run_id=8d029a34_1&attempt=2\",\n      \"description\": \"USGS earthquake events as GeoJSON\",\n      \"response_schema\": {\n        \"type\": \"FeatureCollection\",\n        \"features\": \"array<Feature>\",\n        \"features[].id\": \"string\",\n        \"features[].properties.mag\": \"number\",\n        \"features[].properties.place\": \"string\",\n        \"features[].properties.time\": \"integer (Unix milliseconds)\",\n        \"features[].geometry.type\": \"Point\",\n        \"features[].geometry.coordinates\": \"[longitude, latitude, depth_km] (numbers)\"\n      }\n    }\n  },\n  \"sink_url\": \"http://recorder:8090/sink/8d029a34_1?attempt=2\",\n  \"sink_body\": \"JSON array of record objects (or {\\\"records\\\": [...]})\",\n  \"required_fields\": [\n    \"magnitude_band\",\n    \"event_count\",\n    \"max_magnitude\",\n    \"max_depth_km\"\n  ],\n  \"task_details\": \"Classify each event with the magnitude_band thresholds from the USGS ETL task (minor below 4.0, moderate from 4.0 up to 5.0, major at 5.0 and above). Set max_depth_km from the third element of geometry coordinates. Emit one record per band that has at least one event. Do not round values.\"\n}\n\nYour previous artifact failed execution or evaluation. Correct it using this machine-derived report. Return a complete replacement artifact, not a patch. For n8n, rebuild from the canonical skeleton above; do not copy the previous artifact's structure or URLs. The current attempt's URLs are in the skeleton and contract.\nFailure report:\nNiFi processor failed: ExecuteGroovyScript[id=ac2f56f5-01a1-1000-5f4c-535ed83c0ce7] java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \": java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \"\nPrevious artifact:\nimport groovy.json.JsonSlurper\nimport groovy.json.JsonOutput\n\ndef process() {\n    def sourceUrl = \"http://recorder:8090/source/usgs/earthquakes?run_id=8d029a34_1&attempt=1\"\n    def sinkUrl = \"http://recorder:8090/sink/8d029a34_1?attempt=1\"\n\n    // Fetch and parse source data\n    def connection = new URL(sourceUrl).openConnection()\n    def jsonText = connection.inputStream.text\n    def earthquakes = new JsonSlurper().parseText(jsonText)\n\n    // Initialize band statistics\n    def bands = [\n        minor: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE],\n        moderate: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE],\n        major: [count: 0, maxMag: -Float.MAX_VALUE, maxDepth: -Float.MAX_VALUE]\n    ]\n\n    // Process each earthquake\n    earthquakes.features.each { feature ->\n        def mag = feature.properties.mag as float\n        def depth = feature.geometry.coordinates[2] as float\n\n        if (mag < 4.0) {\n            bands.minor.count++\n            bands.minor.maxMag = Math.max(bands.minor.maxMag, mag)\n            bands.minor.maxDepth = Math.max(bands.minor.maxDepth, depth)\n        } else if (mag >= 4.0 && mag < 5.0) {\n            bands.moderate.count++\n            bands.moderate.maxMag = Math.max(bands.moderate.maxMag, mag)\n            bands.moderate.maxDepth = Math.max(bands.moderate.maxDepth, depth)\n        } else if (mag >= 5.0) {\n            bands.major.count++\n            bands.major.maxMag = Math.max(bands.major.maxMag, mag)\n            bands.major.maxDepth = Math.max(bands.major.maxDepth, depth)\n        }\n    }\n\n    // Build output records\n    def records = []\n    ['minor', 'moderate', 'major'].each { band ->\n        if (bands[band].count > 0) {\n            records << [\n                magnitude_band: band,\n                event_count: bands[band].count,\n                max_magnitude: bands[band].maxMag,\n                max_depth_km: bands[band].maxDepth\n            ]\n        }\n    }\n\n    // Send to sink\n    def jsonOutput = JsonOutput.toJson([records: records])\n    connection = new URL(sinkUrl).openConnection()\n    connection.setRequestMethod(\"POST\")\n    connection.setDoOutput(true)\n    connection.setRequestProperty(\"Content-Type\", \"application/json\")\n\n    connection.outputStream.withWriter { writer ->\n        writer.write(jsonOutput)\n    }\n\n    def responseCode = connection.responseCode\n    if (responseCode >= 300) {\n        throw new Exception(\"Sink request failed with status: ${responseCode}\")\n    }\n\n    // Create success flow file\n    def flowFile = session.create()\n    session.transfer(flowFile, REL_SUCCESS)\n}\n\nprocess()\n\n",
+      "generation_options": {
+        "temperature": 0.0,
+        "seed": 42,
+        "top_p": 1.0,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+        "num_thread": 0,
+        "num_ctx": 8192,
+        "num_predict": 4096
+      },
+      "generation_metrics": {
+        "generation_duration_seconds": 23.775899249998474,
+        "ollama_total_duration_seconds": 23.768865948,
+        "model_load_duration_seconds": 0.001126426,
+        "prompt_tokens": 1573,
+        "output_tokens": 666,
+        "output_tokens_per_second": 29.57089435438346,
+        "cost_estimate_usd": null
+      },
+      "artifact": "benchmark-results/runs/three-models-prompt-v2/8d029a34_1_attempt-2.groovy",
+      "execution_error": "NiFi processor failed: ExecuteGroovyScript[id=ac311846-01a1-1000-d89e-85dd16613a1e] java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \": java.lang.NullPointerException: Cannot invoke \"java.lang.Float.floatValue()\" because \"",
+      "failure_stage": "platform_execution",
+      "failure_category": "runtime_error",
+      "execution_duration_seconds": 74.57194382300077,
+      "request_metrics": {
+        "run_id": "8d029a34_1",
+        "attempt": 2,
+        "source_request_count": 1,
+        "requested_source_ids": [
+          "usgs_earthquakes"
+        ],
+        "sink_post_count": 0,
+        "sink_rows_accepted": 0,
+        "source_coverage": 1.0,
+        "missing_source_ids": []
+      },
+      "container_resources": {
+        "sample_count": 23,
+        "mean_cpu_percent": 66.95173913043477,
+        "peak_cpu_percent": 300.06,
+        "peak_memory_bytes": 1330011700,
+        "gpu_supported": true,
+        "gpu_names": [
+          "NVIDIA RTX A6000"
+        ],
+        "gpu_driver_version": "580.178.04",
+        "mean_gpu_utilization_percent": 41.95918367346939,
+        "gpu_sample_count": 49,
+        "peak_gpu_memory_bytes": 22354591744,
+        "gpu_power_sample_count": 49,
+        "estimated_gpu_energy_wh": 2.742554249224736,
+        "measurement_error": null,
+        "gpu_measurement_error": null
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-11-05T14:51:15Z"
+}

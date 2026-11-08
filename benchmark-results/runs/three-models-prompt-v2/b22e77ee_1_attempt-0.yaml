@@ -1,0 +1,33 @@
+id: bench_b22e77ee_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=b22e77ee_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/b22e77ee_1?attempt=0"
+
+      response = urllib.request.urlopen(source_url)
+      data = json.loads(response.read())
+
+      times = data["hourly"]["time"]
+      pm10s = data["hourly"]["pm10"]
+      pm25s = data["hourly"]["pm2_5"]
+
+      records = []
+      for i in range(len(times)):
+          record = {
+              "time": times[i],
+              "pm10": pm10s[i],
+              "pm2_5": pm25s[i]
+          }
+          records.append(record)
+
+      body = json.dumps(records).encode('utf-8')
+      req = urllib.request.Request(sink_url, data=body, headers={'Content-Type': 'application/json'}, method='POST')
+      urllib.request.urlopen(req)

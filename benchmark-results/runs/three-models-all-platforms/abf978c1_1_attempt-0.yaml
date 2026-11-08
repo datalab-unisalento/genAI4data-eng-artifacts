@@ -1,0 +1,48 @@
+id: bench_abf978c1_1
+namespace: bench
+
+tasks:
+  - id: t2_usgs_etl
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+      
+      # Fetch USGS earthquake data
+      with urllib.request.urlopen("http://recorder:8090/source/usgs/earthquakes?run_id=abf978c1_1&attempt=0") as response:
+          data = json.load(response)
+      
+      records = []
+      for feature in data["features"]:
+          # Extract and transform fields
+          record = {
+              "id": feature["id"],
+              "magnitude": feature["properties"]["mag"],
+              "place": feature["properties"]["place"],
+              "time_ms": feature["properties"]["time"],
+              "longitude": feature["geometry"]["coordinates"][0],
+              "latitude": feature["geometry"]["coordinates"][1],
+              "depth_km": feature["geometry"]["coordinates"][2]
+          }
+          
+          # Derive magnitude_band
+          if record["magnitude"] < 4.0:
+              record["magnitude_band"] = "minor"
+          elif 4.0 <= record["magnitude"] < 5.0:
+              record["magnitude_band"] = "moderate"
+          else:
+              record["magnitude_band"] = "major"
+          
+          records.append(record)
+      
+      # Post to sink
+      request = urllib.request.Request(
+          "http://recorder:8090/sink/abf978c1_1?attempt=0",
+          data=json.dumps({"records": records}).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      
+      with urllib.request.urlopen(request) as response:
+          pass

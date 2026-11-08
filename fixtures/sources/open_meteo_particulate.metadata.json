@@ -1,0 +1,11 @@
+{
+  "source_id": "open_meteo_particulate",
+  "description": "Open-Meteo hourly PM10 and PM2.5 observations",
+  "request_url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=37.7749&longitude=-122.4194&start_date=2024-01-01&end_date=2024-01-02&timezone=GMT&hourly=pm10%2Cpm2_5",
+  "retrieved_at_utc": "2026-10-28T12:06:29.699254+00:00",
+  "http_status": 200,
+  "response_sha256": "736e3ac178dbf8f7ddbe8d6ef877c7e8c553663e104436cbefad0069416a4a8d",
+  "saved_json_sha256": "27a3136399786ec154a563f00df6dafae0438c383e1be3431102c2b489a17dfb",
+  "payload_file": "fixtures/sources/open_meteo_particulate.json",
+  "payload_bytes": 2754
+}

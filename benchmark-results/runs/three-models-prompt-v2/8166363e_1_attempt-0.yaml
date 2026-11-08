@@ -1,0 +1,52 @@
+id: bench_8166363e_1
+namespace: bench
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+      from collections import defaultdict
+
+      source_url = "http://recorder:8090/source/open-meteo/particulate?run_id=8166363e_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/8166363e_1?attempt=0"
+
+      # Fetch source data
+      with urllib.request.urlopen(source_url) as response:
+          data = json.loads(response.read().decode('utf-8'))
+
+      hourly_records = data['hourly']
+      time_list = hourly_records['time']
+      pm10_list = hourly_records['pm10']
+      pm2_5_list = hourly_records['pm2_5']
+
+      # Group by date and compute maxima
+      daily_summary = defaultdict(lambda: {
+          'date': '',
+          'hours': 0,
+          'pm2_5_max': float('-inf'),
+          'pm10_max': float('-inf')
+      })
+
+      for i, time in enumerate(time_list):
+          date = time[:10]  # First 10 characters as date
+          pm10_val = pm10_list[i]
+          pm2_5_val = pm2_5_list[i]
+
+          record = daily_summary[date]
+          record['date'] = date
+          record['hours'] += 1
+          record['pm10_max'] = max(record['pm10_max'], pm10_val)
+          record['pm2_5_max'] = max(record['pm2_5_max'], pm2_5_val)
+
+      # Convert to list and post to sink
+      records = list(daily_summary.values())
+      req = urllib.request.Request(
+          sink_url,
+          data=json.dumps(records).encode('utf-8'),
+          headers={'Content-Type': 'application/json'},
+          method='POST'
+      )
+      with urllib.request.urlopen(req) as response:
+          pass  # Response ignored

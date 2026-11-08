@@ -1,0 +1,48 @@
+id: bench_de0db498_1
+namespace: bench
+
+tasks:
+  - id: ingest
+    type: io.kestra.plugin.scripts.python.Script
+    runner: PROCESS
+    script: |
+      import json
+      import urllib.request
+
+      source_url = "http://recorder:8090/source/usgs/earthquakes?run_id=de0db498_1&attempt=0"
+      sink_url = "http://recorder:8090/sink/de0db498_1?attempt=0"
+
+      response = urllib.request.urlopen(source_url)
+      data = json.loads(response.read().decode('utf-8'))
+      features = data["features"]
+
+      bands = {}
+      for f in features:
+        mag = f["properties"]["mag"]
+        depth = f["geometry"]["coordinates"][2]
+        if mag < 4.0:
+          band = "minor"
+        elif mag < 5.0:
+          band = "moderate"
+        else:
+          band = "major"
+        if band not in bands:
+          bands[band] = {"count": 0, "max_mag": -1, "max_depth": -1}
+        bands[band]["count"] += 1
+        if mag > bands[band]["max_mag"]:
+          bands[band]["max_mag"] = mag
+        if depth > bands[band]["max_depth"]:
+          bands[band]["max_depth"] = depth
+
+      records = []
+      for band, info in bands.items():
+        records.append({
+          "magnitude_band": band,
+          "event_count": info["count"],
+          "max_magnitude": info["max_mag"],
+          "max_depth_km": info["max_depth"]
+        })
+
+      payload = json.dumps(records).encode('utf-8')
+      req = urllib.request.Request(sink_url, data=payload, headers={'Content-Type': 'application/json'}, method='POST')
+      urllib.request.urlopen(req)

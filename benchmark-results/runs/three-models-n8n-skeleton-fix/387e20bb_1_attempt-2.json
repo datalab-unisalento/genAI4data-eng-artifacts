@@ -1,0 +1,137 @@
+{
+  "id": "bench_387e20bb_1",
+  "name": "Benchmark workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "benchmark_trigger",
+      "name": "Benchmark Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/particulate?run_id=387e20bb_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_1",
+      "name": "Source 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://recorder:8090/source/open-meteo/gases?run_id=387e20bb_1&attempt=2",
+        "options": {}
+      },
+      "id": "source_2",
+      "name": "Source 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const particulate = $('Source 1').first().json;\nconst gases = $('Source 2').first().json;\n\n// Convert hourly arrays to records\nconst particulateRecords = particulate.hourly.time.map((time, index) => ({\n  time,\n  pm10: particulate.hourly.pm10[index],\n  pm2_5: particulate.hourly.pm2_5[index]\n}));\n\nconst gasesRecords = gases.hourly.time.map((time, index) => {\n  return {\n    time,\n    nitrogen_dioxide: gases.hourly.nitrogen_dioxide[index],\n    ozone: gases.hourly.ozone[index]\n  };\n});\n\n// Create a map for fast lookup by time\nconst gasesMap = new Map();\nfor (const record of gasesRecords) {\n  gasesMap.set(record.time, record);\n}\n\n// Inner join on time\nconst joinedRecords = particulateRecords\n  .filter(partRecord => gasesMap.has(partRecord.time))\n  .map(partRecord => ({\n    ...partRecord,\n    ...gasesMap.get(partRecord.time)\n  }));\n\nreturn [{ json: { records: joinedRecords } }];"
+      },
+      "id": "transform",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://recorder:8090/sink/387e20bb_1?attempt=2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "sink",
+      "name": "Sink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Benchmark Trigger": {
+      "main": [
+        [
+          {
+            "node": "Source 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Source 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 1": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source 2": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Sink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}
