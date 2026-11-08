@@ -14,6 +14,26 @@ This repository contains the code, fixtures, reference implementations, and expe
 
 Drafts, reference-paper PDFs, collaboration materials, recorder logs, smoke runs, and the pending human-annotation sheets are not included.
 
+## Datasets and tasks
+
+The benchmark uses fixed, versioned JSON fixtures rather than live API responses during pipeline execution. The archived payloads, capture metadata, expected outputs, and checksums are in `fixtures/`.
+
+| Dataset | Archived data | Used by |
+| --- | --- | --- |
+| Open-Meteo Air Quality | 48 hourly records for particulate measures (PM10 and PM2.5) and a separate 48-record response for gases (nitrogen dioxide and ozone). | T1, T3, T4, T5 |
+| USGS Earthquake Catalog | 49 earthquake events in GeoJSON, including event properties and coordinates. | T2, T6 |
+
+| Task | Description |
+| --- | --- |
+| **T1: Open-Meteo ingestion** | Convert hourly particulate columns to records and deliver the required values unchanged. |
+| **T2: USGS earthquake ETL** | Flatten earthquake GeoJSON features and classify each event as minor, moderate, or major by magnitude. |
+| **T3: Open-Meteo relational combine** | Convert the particulate and gas responses to records, then inner-join them on exact hourly `time`. |
+| **T4: Daily particulate summary** | Group particulate observations by date and report each day's record count and maximum PM10 and PM2.5. |
+| **T5: Trailing three-hour peak** | For each hour with two preceding records, report the maximum PM2.5 over that three-hour window. |
+| **T6: Earthquake magnitude-band summary** | Group events by magnitude band and report each band's event count, maximum magnitude, and maximum depth. |
+
+Each task has a reference output under `fixtures/expected/`; full task specifications and source schemas are in `fixtures/benchmark.json`.
+
 ## Reproduce
 
 The harness requires Python 3.11+, Docker Compose, Ollama, and a compatible NVIDIA GPU with enough memory for the selected model. Images are pinned by digest in the Docker configuration. Install the package and run the unit tests:
