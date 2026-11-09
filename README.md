@@ -12,7 +12,7 @@ This repository contains the code, fixtures, reference implementations, and expe
 - `benchmark-results/runs/`: raw per-cell records for the main prompt-v2 grid, the prompt-v1 ablation, its n8n reruns, and the temperature-variance study.
 - `benchmark-results/report/`: aggregate tables, statistics, and model/platform results derived from the run records.
 - `benchmark-results/probes/`: outputs of the NiFi map-access probe.
-- `benchmark-results/report/extras/`: repair gain, dev/held-out split, and failure counts derived from the run records (`scripts/paper_extras.py`).
+- `benchmark-results/report/extras/`: repair gain, dev/held-out split, paired platform-effect intervals, and failure counts derived from the run records (`scripts/paper_extras.py`).
 - `docs/experiment-protocol.md`: protocol, deviations, and analysis details.
 
 Drafts, reference-paper PDFs, collaboration materials, recorder logs, smoke runs, and the pending human-annotation sheets are not included.

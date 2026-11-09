@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import csv
+import random
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -95,6 +96,46 @@ def dev_heldout(runs: list[dict]) -> str:
         "",
         "NiFi and Kestra prompts were revised after T1-T3 results, so their held-out columns are only partly held out.",
     ]
+    return "\n".join(lines) + "\n"
+
+
+def paired_effects(runs: list[dict], replicates: int = 200_000, seed: int = 20261109) -> str:
+    platforms = ["airflow", "dagster", "prefect", "kestra"]
+    blocks: dict[tuple[str, str], dict[str, bool]] = defaultdict(dict)
+    for row in runs:
+        if row["platform"] in {*platforms, "nifi"}:
+            blocks[(row["model"], row["task"])][row["platform"]] = row["passed"] == "True"
+
+    ordered_blocks = [blocks[key] for key in sorted(blocks)]
+    if len(ordered_blocks) != 18 or any(
+        not {"nifi", *platforms}.issubset(block) for block in ordered_blocks
+    ):
+        raise ValueError("Expected 18 complete model-task blocks for the paired platform analysis")
+
+    rng = random.Random(seed)
+    lines = [
+        "# Paired pass-rate differences versus NiFi",
+        "",
+        "Percentile bootstrap intervals resample the 18 model-task blocks with replacement (200,000 resamples).",
+        "",
+        "| Platform minus NiFi | Paired difference | 95% bootstrap CI |",
+        "|---|---:|---:|",
+    ]
+    for platform in platforms:
+        differences = [
+            int(block[platform]) - int(block["nifi"])
+            for block in ordered_blocks
+        ]
+        bootstrap = sorted(
+            sum(rng.choice(differences) for _ in differences) / len(differences)
+            for _ in range(replicates)
+        )
+        low = bootstrap[int(0.025 * replicates)]
+        high = bootstrap[int(0.975 * replicates) - 1]
+        lines.append(
+            f"| {platform} | {sum(differences) / len(differences):.1%} | "
+            f"[{low:.1%}, {high:.1%}] |"
+        )
     return "\n".join(lines) + "\n"
 
 
@@ -213,6 +254,7 @@ def main() -> int:
     runs = _read(REPORT / "master_runs.csv")
     (OUT / "repair_gain.md").write_text(repair_gain(runs), encoding="utf-8")
     (OUT / "dev_heldout.md").write_text(dev_heldout(runs), encoding="utf-8")
+    (OUT / "paired_effects.md").write_text(paired_effects(runs), encoding="utf-8")
 
     counts = failures(runs)
     with (OUT / "failures_by_platform.csv").open("w", newline="", encoding="utf-8") as handle:
@@ -227,7 +269,7 @@ def main() -> int:
 
     # Kappa and the adjudication need the human-annotation sheet, which is not published.
     sheet_path = REPORT / "annotation_sheet.csv"
-    written = ["repair_gain.md", "dev_heldout.md", "failures_by_platform.csv"]
+    written = ["repair_gain.md", "dev_heldout.md", "paired_effects.md", "failures_by_platform.csv"]
     if sheet_path.exists():
         text, rows = kappa(_read(sheet_path))
         (OUT / "kappa.md").write_text(text, encoding="utf-8")
