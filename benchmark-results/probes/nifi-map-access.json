@@ -1,0 +1,850 @@
+[
+  {
+    "probe": "dot",
+    "artifact": "controls/probes/nifi/map_access_dot.groovy",
+    "error": null,
+    "duration_seconds": 58.0,
+    "rows": [
+      {
+        "id": "us6000m0w6",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0wc",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0wm",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x6",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x8",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x9",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xj",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xl",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xm",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34g",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33l",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34h",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xn",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33v",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33u",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xp",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xq",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33m",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xt",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33s",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xu",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xw",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33y",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xx",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xy",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y1",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m341",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y7",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y4",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y9",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m35b",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0ya",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0ye",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yf",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yg",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yh",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yr",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yw",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0z3",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0zf",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0zk",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34l",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34m",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m10e",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m110",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m113",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m11n",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m11s",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m120",
+        "magnitude": null
+      }
+    ],
+    "delivered": 49,
+    "non_null_magnitude": 0
+  },
+  {
+    "probe": "bracket",
+    "artifact": "controls/probes/nifi/map_access_bracket.groovy",
+    "error": null,
+    "duration_seconds": 20.7,
+    "rows": [
+      {
+        "id": "us6000m0w6",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0wc",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0wm",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x6",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x8",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0x9",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xj",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xl",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xm",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34g",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33l",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34h",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xn",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33v",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33u",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xp",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xq",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33m",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xt",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33s",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xu",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xw",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m33y",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xx",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0xy",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y1",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m341",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y7",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y4",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0y9",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m35b",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0ya",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0ye",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yf",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yg",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yh",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yr",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0yw",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0z3",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0zf",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m0zk",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34l",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m34m",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m10e",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m110",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m113",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m11n",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m11s",
+        "magnitude": null
+      },
+      {
+        "id": "us6000m120",
+        "magnitude": null
+      }
+    ],
+    "delivered": 49,
+    "non_null_magnitude": 0
+  },
+  {
+    "probe": "get_get",
+    "artifact": "controls/probes/nifi/map_access_get_get.groovy",
+    "error": null,
+    "duration_seconds": 20.3,
+    "rows": [
+      {
+        "id": "us6000m0w6",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0wc",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0wm",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x6",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x8",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x9",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xj",
+        "magnitude": 5.8
+      },
+      {
+        "id": "us6000m0xl",
+        "magnitude": 7.5
+      },
+      {
+        "id": "us6000m0xm",
+        "magnitude": 6.2
+      },
+      {
+        "id": "us6000m34g",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m33l",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m34h",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xn",
+        "magnitude": 5.2
+      },
+      {
+        "id": "us6000m33v",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m33u",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xp",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m0xq",
+        "magnitude": 5.3
+      },
+      {
+        "id": "us6000m33m",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xt",
+        "magnitude": 5.6
+      },
+      {
+        "id": "us6000m33s",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0xu",
+        "magnitude": 5
+      },
+      {
+        "id": "us6000m0xw",
+        "magnitude": 5.1
+      },
+      {
+        "id": "us6000m33y",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0xx",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m0xy",
+        "magnitude": 4.9
+      },
+      {
+        "id": "us6000m0y1",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m341",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0y7",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0y4",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0y9",
+        "magnitude": 5.5
+      },
+      {
+        "id": "us6000m35b",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0ya",
+        "magnitude": 5.6
+      },
+      {
+        "id": "us6000m0ye",
+        "magnitude": 5.2
+      },
+      {
+        "id": "us6000m0yf",
+        "magnitude": 5
+      },
+      {
+        "id": "us6000m0yg",
+        "magnitude": 5.1
+      },
+      {
+        "id": "us6000m0yh",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0yr",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0yw",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0z3",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0zf",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0zk",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m34l",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m34m",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m10e",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m110",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m113",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m11n",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m11s",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m120",
+        "magnitude": 4.7
+      }
+    ],
+    "delivered": 49,
+    "non_null_magnitude": 49
+  },
+  {
+    "probe": "get_dot",
+    "artifact": "controls/probes/nifi/map_access_get_dot.groovy",
+    "error": null,
+    "duration_seconds": 19.9,
+    "rows": [
+      {
+        "id": "us6000m0w6",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0wc",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0wm",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x6",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x8",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0x9",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xj",
+        "magnitude": 5.8
+      },
+      {
+        "id": "us6000m0xl",
+        "magnitude": 7.5
+      },
+      {
+        "id": "us6000m0xm",
+        "magnitude": 6.2
+      },
+      {
+        "id": "us6000m34g",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m33l",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m34h",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xn",
+        "magnitude": 5.2
+      },
+      {
+        "id": "us6000m33v",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m33u",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xp",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m0xq",
+        "magnitude": 5.3
+      },
+      {
+        "id": "us6000m33m",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0xt",
+        "magnitude": 5.6
+      },
+      {
+        "id": "us6000m33s",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0xu",
+        "magnitude": 5
+      },
+      {
+        "id": "us6000m0xw",
+        "magnitude": 5.1
+      },
+      {
+        "id": "us6000m33y",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0xx",
+        "magnitude": 4.8
+      },
+      {
+        "id": "us6000m0xy",
+        "magnitude": 4.9
+      },
+      {
+        "id": "us6000m0y1",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m341",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0y7",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0y4",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0y9",
+        "magnitude": 5.5
+      },
+      {
+        "id": "us6000m35b",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0ya",
+        "magnitude": 5.6
+      },
+      {
+        "id": "us6000m0ye",
+        "magnitude": 5.2
+      },
+      {
+        "id": "us6000m0yf",
+        "magnitude": 5
+      },
+      {
+        "id": "us6000m0yg",
+        "magnitude": 5.1
+      },
+      {
+        "id": "us6000m0yh",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0yr",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0yw",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m0z3",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m0zf",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m0zk",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m34l",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m34m",
+        "magnitude": 4.7
+      },
+      {
+        "id": "us6000m10e",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m110",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m113",
+        "magnitude": 4.6
+      },
+      {
+        "id": "us6000m11n",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m11s",
+        "magnitude": 4.5
+      },
+      {
+        "id": "us6000m120",
+        "magnitude": 4.7
+      }
+    ],
+    "delivered": 49,
+    "non_null_magnitude": 49
+  },
+  {
+    "probe": "semantics",
+    "artifact": "controls/probes/nifi/semantics.groovy",
+    "error": null,
+    "duration_seconds": 20.4,
+    "rows": [
+      {
+        "check": "plain_map_dot_properties_mag",
+        "value": "null"
+      },
+      {
+        "check": "parsed_map_dot_properties_mag",
+        "value": "null"
+      },
+      {
+        "check": "parsed_map_bracket_properties_mag",
+        "value": "null"
+      },
+      {
+        "check": "parsed_map_get_properties_mag",
+        "value": "5.0"
+      }
+    ]
+  }
+]

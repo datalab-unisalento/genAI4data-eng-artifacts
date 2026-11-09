@@ -7,9 +7,12 @@ This repository contains the code, fixtures, reference implementations, and expe
 - `src/pipeline_bench/`: generation, execution, and scoring harness.
 - `scripts/`: experiment, validation, and report-generation utilities.
 - `controls/reference/`: hand-written reference pipelines for the platform/task cells.
+- `controls/probes/`: small NiFi probes that isolate Groovy map-access behaviour (`scripts/nifi_map_access_probe.py`).
 - `fixtures/`: archived Open-Meteo and USGS input data, expected outputs, and checksums.
 - `benchmark-results/runs/`: raw per-cell records for the main prompt-v2 grid, the prompt-v1 ablation, its n8n reruns, and the temperature-variance study.
 - `benchmark-results/report/`: aggregate tables, statistics, and model/platform results derived from the run records.
+- `benchmark-results/probes/`: outputs of the NiFi map-access probe.
+- `benchmark-results/report/extras/`: repair gain, dev/held-out split, and failure counts derived from the run records (`scripts/paper_extras.py`).
 - `docs/experiment-protocol.md`: protocol, deviations, and analysis details.
 
 Drafts, reference-paper PDFs, collaboration materials, recorder logs, smoke runs, and the pending human-annotation sheets are not included.
