@@ -132,7 +132,7 @@ def kappa(sheet: list[dict]) -> tuple[str, list[dict]]:
         f"- Cohen's kappa, collapsed to api_misuse / platform_quirk / other: {k3:.3f}",
         f"- Proposed adjudication agrees with rater 1 on {agree_first}/{n} cells and with rater 2 on {agree_second}/{n}.",
         "",
-        "The proposed adjudication is not a joint label. Kappa is reported only on the independent labels.",
+        "The proposed adjudication was reviewed and agreed by the second rater. Kappa is reported only on the independent labels.",
         "",
     ])
     rows = []
